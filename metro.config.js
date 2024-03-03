@@ -9,5 +9,5 @@ module.exports = config;
 const { withTamagui } = require("@tamagui/metro-plugin");
 module.exports = withTamagui(config, {
   components: ["tamagui"],
-  config: "./src/tamagui.config.ts",
+  config: "tamagui.config.ts",
 });

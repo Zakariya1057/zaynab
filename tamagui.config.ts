@@ -17,6 +17,7 @@ const appConfig = createTamagui({
     color: {
       ...tokens.color,
       sms: "#f43f5e",
+      purple: '#5e2cf3'
     },
   },
   shorthands,

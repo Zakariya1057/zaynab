@@ -16,6 +16,8 @@ export const schema = appSchema({
                 { name: 'duration', type: 'number' },
                 { name: 'position', type: 'number' },
                 { name: 'complete', type: 'boolean' },
+                { name: 'updated_at', type: 'number' },
+                { name: 'created_at', type: 'number' },
             ]
         }),
     ]

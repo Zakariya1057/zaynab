@@ -1,6 +1,7 @@
-import { Q } from '@nozbe/watermelondb';
-import { EpisodeModel } from "@/utils/database/models/episode-model";
-import { database } from "@/utils/database/setup";
+import {Q} from '@nozbe/watermelondb';
+import {EpisodeModel} from "@/utils/database/models/episode-model";
+import {database} from "@/utils/database/setup";
+import {getCurrentUnixTime} from "@/utils/date/get-current-unix-time";
 
 export const upsertEpisode = async (episodeData: Partial<EpisodeModel>) => {
     await database.write(async () => {
@@ -8,6 +9,8 @@ export const upsertEpisode = async (episodeData: Partial<EpisodeModel>) => {
         const existingEpisodes = await episodesCollection.query(
             Q.where('episodeId', episodeData.episodeId)
         ).fetch();
+
+        const time = getCurrentUnixTime()
 
         if (existingEpisodes.length > 0) {
             // Episode exists, update it
@@ -21,6 +24,7 @@ export const upsertEpisode = async (episodeData: Partial<EpisodeModel>) => {
                 episode.complete = episodeData.complete;
                 episode.podcastId = episodeData.podcastId;
                 episode.episodeId = episodeData.episodeId;
+                episode.updated_at = time
             });
         } else {
             // Episode does not exist, create a new one
@@ -34,6 +38,8 @@ export const upsertEpisode = async (episodeData: Partial<EpisodeModel>) => {
                 newEpisode.complete = episodeData.complete;
                 newEpisode.podcastId = episodeData.podcastId;
                 newEpisode.episodeId = episodeData.episodeId;
+                newEpisode.created_at = time
+                newEpisode.updated_at = time
             });
         }
     });

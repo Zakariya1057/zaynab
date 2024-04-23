@@ -3,131 +3,186 @@ import {
     YStack,
     XStack,
     Image,
-    ScrollView,
     Stack,
     H5,
-    CardProps, Card,
+    Card,
     H6, useTheme
 } from 'tamagui';
-import {Bell, Home, PlayCircle} from "@tamagui/lucide-icons";
-import {Redirect, router, Stack as RouterStack} from "expo-router";
-import {TouchableOpacity} from "react-native";
+import {PlayCircle} from "@tamagui/lucide-icons";
+import {router} from "expo-router";
+import {FlatList, ImageSourcePropType, RefreshControl, TouchableOpacity, SectionList} from "react-native";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
-import React from "react";
+import React, {useCallback, useRef, useState} from "react";
 import {Podcasts} from "@/utils/data/podcasts";
 import {Podcast} from "@/interfaces/podcast";
-import CircularProgress from "react-native-circular-progress-indicator";
+import {useEpisodes} from "@/hooks/useEpisodes";
+import {EpisodeModel} from "@/utils/database/models/episode-model";
+import {getPercentage} from "@/utils/percentage/get-percentage";
+import {AnimatedCircularProgress} from "react-native-circular-progress";
 
 export default function App() {
+    const {episodes, retry} = useEpisodes()
+    const [refreshing, setRefreshing] = useState(false);
+
+    const theme = useTheme();
+    const purple = theme.purple.get()
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true)
+        await retry()
+        setRefreshing(false)
+    }, [])
+
+    const sections = [
+        ...episodes.length > 0 ? [{
+            title: "Continue Listening",
+            data: [1]
+        }] : [], // Only add this section if there are episodes
+        {
+            title: "Popular Podcasts",
+            data: Object.values(Podcasts) // Assuming Podcasts is an array
+        }
+    ];
+
+    const renderItem = ({ section, item }) => {
+        if (section.title === "Continue Listening") {
+            // Render a horizontal list for this section
+            return (
+                <FlatList
+                    horizontal={true}
+                    data={episodes}
+                    renderItem={({ item }) => (
+                        <DemoCard
+                            title={item.title}
+                            position={item.position}
+                            duration={item.duration}
+                            episodeId={item.episodeId}
+                            podcastId={item.podcastId}
+                        />
+                    )}
+                    keyExtractor={item => item.episodeId}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ gap: 20 }}
+                />
+            );
+        } else {
+            // Render a single item for other sections
+            return <PodcastElement {...item} />;
+        }
+    };
+
+
     return (
-        <Stack f={1}>
-            <ScrollView showsVerticalScrollIndicator={false} backgroundColor={'$backgroundStrong'}>
-                <YStack flex={1} padding={10} gap={'$5'}>
-                    <YStack width="100%" >
-                        <XStack justifyContent="space-between" alignItems="center">
-                            <Text fontSize={20} fontWeight="bold">
-                                Continue Listening
-                            </Text>
+        <Stack f={1} backgroundColor={'$background'}>
+            <SectionList
+                sections={sections}
+                keyExtractor={(item, index) => item.id || index.toString()}
+                renderItem={renderItem}
+                renderSectionHeader={({ section: { title } }) => (
+                    <YStack width="100%">
+                        <XStack justifyContent="space-between" alignItems="center" backgroundColor={'$background'} py={'$3'}>
+                            <Text fontSize={20} fontWeight="bold">{title}</Text>
                         </XStack>
-                        <YStack width="100%" marginTop={10}>
-                            <HorizontalTabs />
-                        </YStack>
                     </YStack>
-
-                    {/*<YStack>*/}
-                    {/*    <Text fontSize={20} fontWeight="bold">*/}
-                    {/*        Top Speakers*/}
-                    {/*    </Text>*/}
-
-                    {/*    <ScrollView horizontal={true} mt={'$3'} space={'$3'} showsHorizontalScrollIndicator={false}>*/}
-                    {/*        <Speaker image={'https://i.ytimg.com/vi/5MjMUEi2pn8/maxresdefault.jpg'} firstName={'Mufti'} lastName={'Menk'}/>*/}
-                    {/*        <Speaker image={'https://akm-img-a-in.tosshub.com/indiatoday/images/story/201908/Zakir-Naik-PTI.jpeg?VersionId=Vzj5OB46sWoaYW5mSfcpOgS6iWMGbYXI&size=690:388'} firstName={'Zaker'} lastName={'Naik'}/>*/}
-                    {/*        <Speaker image={'https://celebrays.com/wp-content/uploads/2023/11/Nouman-Ali-Khan-1-768x1024.webp'} firstName={'Nouman'} lastName={'Ali Khan'}/>*/}
-                    {/*        <Speaker image={'https://imamsonline.com/wp-content/uploads/2015/10/hamza-yusuf.jpg'} firstName={'Hamza'} lastName={'Yusuf'}/>*/}
-                    {/*        <Speaker image={'https://islamicseminary.us/wp-content/uploads/2023/11/mail-3.png'} firstName={'Yasir'} lastName={'Qadhi'}/>*/}
-                    {/*        <Speaker image={'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZQkm-nVwTkn1oY_B2opIwSUDO_MOlN92UCg&usqp=CAU'} firstName={'Omar'} lastName={'Suleiman'}/>*/}
-                    {/*        <Speaker image={'https://www.islamicity.org/wp-content/plugins/blueprint-timthumb/timthumb.php?src=http://media.islamicity.org/wp-content/uploads/2017/04/Yusuf_Estes.jpg&w=350&h=350'} firstName={'Yusuf'} lastName={'Estes'}/>*/}
-                    {/*        <Speaker image={'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Bilal_Philips.jpg/440px-Bilal_Philips.jpg'} firstName={'Bilal'} lastName={'Philips'}/>*/}
-                    {/*    </ScrollView>*/}
-                    {/*</YStack>*/}
-
-                    <YStack>
-                        <Text fontSize={20} fontWeight="600">
-                            Popular Podcasts
-                        </Text>
-
-                        <ScrollView mt={'$3'} space={'$5'} showsHorizontalScrollIndicator={false}>
-                            {
-                                Object.values(Podcasts).map( (podcast) => {
-                                    return <PodcastElement key={podcast.id} {...podcast} />
-                                })
-                            }
-                        </ScrollView>
-                    </YStack>
-                </YStack>
-            </ScrollView>
-            <CompactAudioPlayer edges={[]}/>
+                )}
+                contentContainerStyle={{ paddingHorizontal: 10, rowGap: 10 }}
+                showsVerticalScrollIndicator={false}
+                backgroundColor={'$backgroundStrong'}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={purple}/>
+                }
+            />
+            <CompactAudioPlayer edges={[]} />
         </Stack>
     )
 }
 
-const HorizontalTabs = () => {
+const HorizontalTabs = ({episodes}: { episodes: EpisodeModel[] }) => {
+    episodes.map((a) => console.log(a.title))
     return (
-        <ScrollView horizontal={true} space={'$4'} showsHorizontalScrollIndicator={false}>
-            <DemoCard width={230}/>
-            <DemoCard width={230}/>
-            <DemoCard width={230}/>
-            <DemoCard width={230}/>
-            <DemoCard width={230}/>
-        </ScrollView>
-    )
+        <FlatList
+            horizontal={true}
+            data={episodes}
+            renderItem={({item}) =>
+                <DemoCard
+                    title={item.title}
+                    position={item.position}
+                    duration={item.duration}
+                    episodeId={item.episodeId}
+                    podcastId={item.podcastId}
+                />
+            }
+
+            keyExtractor={item => item.episodeId}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{gap: 20}} // Adjust padding as necessary
+        />
+    );
 }
 
-export function DemoCard(props: CardProps) {
+export function DemoCard({title, position, duration, podcastId, episodeId}: {
+    title: string,
+    position: number,
+    duration: number,
+    podcastId: string,
+    episodeId: string
+}) {
     const theme = useTheme();
     const purple = theme.purple.get()
 
+    const percentage = getPercentage(position, duration) ?? 0
+
+    const openEpisode = () => router.push({pathname: "/episode/", params: {podcastId, episodeId}});
+
+    console.log(percentage, duration, percentage)
     return (
-        <TouchableOpacity onPress={() => router.push('/episode/')}>
-            <Card size="$3" bordered {...props} br={'$5'} overflow={'hidden'}>
+        <TouchableOpacity onPress={openEpisode}>
+            <Card size="$3" bordered width={230} br={'$5'} overflow={'hidden'}>
                 <XStack>
                     <Image
                         resizeMode="cover"
                         alignSelf="center"
                         w={'100%'}
                         height={150}
+                        // source={image}
                         source={require('@/assets/images/podcasts/a3bc8692-476f-4d2d-98df-3fc498321517/cover.webp')}
                     />
                 </XStack>
                 <Card.Header>
                     <XStack gap={'$2'}>
-                        <H6 f={1} lineHeight={'$4'} numberOfLines={2}>5. Yusuf (Cont.) – Ayub – Yunus A.S.</H6>
+                        <H6 f={1} lineHeight={'$4'} numberOfLines={2}>{title}</H6>
                         <XStack alignItems={'center'} justifyContent={'flex-end'}>
-                            <CircularProgress
-                                value={(90)}
-                                inActiveStrokeColor={'rgba(94,44,243,0.92)'}
-                                activeStrokeColor={purple}
-                                inActiveStrokeOpacity={0.1}
-                                activeStrokeWidth={4}
-                                progressValueColor={'#fff'}
-                                valueSuffix={'%'}
-                                radius={22}
-                            />
+                            <AnimatedCircularProgress
+                                size={43}
+                                width={4}
+                                fill={(percentage * 100)}
+                                tintColor={purple}
+                                backgroundColor={'rgba(111,67,241,0.47)'}
+                                rotation={0}
+                            >
+                                {
+                                    (fill) => (
+                                        <Text fontSize={'$2'}>
+                                            {Math.ceil(percentage * 100)}%
+                                        </Text>
+                                    )
+                                }
+                            </AnimatedCircularProgress>
                         </XStack>
                     </XStack>
                 </Card.Header>
             </Card>
         </TouchableOpacity>
-    )
+    );
 }
 
 export const PodcastElement = (podcast: Podcast) => {
-    const { name, subTitle, image} = podcast
+    const {name, subTitle, image} = podcast
 
     return (
         <TouchableOpacity onPress={
-            () =>  router.push({ pathname: "/series/", params: { id: podcast.id } })
-        }>
+            () => router.push({pathname: "/series/", params: {id: podcast.id}})
+        } >
             <XStack
                 gap="$3"
                 alignItems="center"
@@ -145,7 +200,8 @@ export const PodcastElement = (podcast: Podcast) => {
                     <H5 lineHeight="$4" numberOfLines={2}>{name}</H5>
                     <Text fontSize={'$4'} numberOfLines={2}>{subTitle}</Text>
                 </YStack>
-                <TouchableOpacity onPress={ () =>  router.push({ pathname: "/series/", params: { id: podcast.id, play: true } })}>
+                <TouchableOpacity
+                    onPress={() => router.push({pathname: "/series/", params: {id: podcast.id, play: true}})}>
                     <PlayCircle size="$4" strokeWidth={1.3} color={'$color.purple'}/>
                 </TouchableOpacity>
             </XStack>

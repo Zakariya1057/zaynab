@@ -18,7 +18,7 @@ export const Podcasts: Record<string, Podcast> = {
             "15c09fa2-3f12-4492-8b98-1f9b6890b511": {
                 id: "15c09fa2-3f12-4492-8b98-1f9b6890b511",
                 number: 2,
-                url: "https://archive.org/download/Lives/CD02.mp",
+                url: "https://archive.org/download/Lives/CD02.mp3",
                 description: "Adam (Cont.) – Idris – Sheeth – Hud"
             },
             "a16d54e6-d216-4ad5-82dc-ef522e07804c": {
@@ -30,7 +30,7 @@ export const Podcasts: Record<string, Podcast> = {
             "0cf44fa4-292c-43a9-9112-e82843af9cf7": {
                 id: "0cf44fa4-292c-43a9-9112-e82843af9cf7",
                 number: 4,
-                url: "https://drive.google.com/uc?id=1c-6KKjWAJASGFOIfpbozJmub4C7FMx2w&export=download",
+                url: "https://archive.org/download/Lives/CD04.mp3",
                 description: "The Dawah Of Ibrahim/Hijra Of Ibrahim"
             },
             "83e20bbb-c348-4804-8ee5-55ecb2b3a295": {

@@ -13,4 +13,6 @@ export class EpisodeModel extends Model {
     @field('complete') complete;
     @field('podcastId') podcastId;
     @field('episodeId') episodeId;
+    @field('updated_at') updated_at;
+    @field('created_at') created_at;
 }

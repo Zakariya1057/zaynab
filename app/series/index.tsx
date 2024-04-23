@@ -7,12 +7,14 @@ import Series from "../../components/Series/Series";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
 import {Theme} from "../../constants";
 import {getPodcastById} from "@/utils/data/getPodcastById";
-import TrackPlayer, {State, Track} from "react-native-track-player";
+import TrackPlayer, {State, Track, useActiveTrack} from "react-native-track-player";
 import {Episode} from "@/interfaces/episode";
 
 export default function () {
     const {id} = useLocalSearchParams<{ id: string }>()
     const podcast = getPodcastById(id)
+
+    const track = useActiveTrack()
 
     const play = async () => {
         try {
@@ -52,7 +54,7 @@ export default function () {
 
             <Navigation goBack={() => router.back()}/>
 
-            <Series podcast={podcast} play={play}/>
+            <Series podcast={podcast} play={play} playingEpisodeId={track?.id}/>
 
             <CompactAudioPlayer/>
         </SafeAreaView>

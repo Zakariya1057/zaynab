@@ -8,6 +8,8 @@ import React, {useEffect} from 'react'
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {ArrowLeft, Bookmark} from "@tamagui/lucide-icons";
 import Toast from 'react-native-toast-message';
+import '@/utils/database/setup'
+import { recordAudioPosition } from '@/utils/audio/record-audio-position'
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -27,6 +29,8 @@ export default function RootLayout() {
         Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
         InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
     })
+
+    recordAudioPosition()
 
     useEffect(() => {
         if (interLoaded || interError) {

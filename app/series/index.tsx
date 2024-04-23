@@ -1,5 +1,5 @@
-import React, {useEffect} from "react";
-import {StyleSheet, FlatList, TouchableOpacity} from "react-native";
+import React, {useEffect, useState} from "react";
+import {StyleSheet} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {router, Stack, useLocalSearchParams} from "expo-router";
 import Navigation from "../../components/Navigation/Navigation";
@@ -7,12 +7,18 @@ import Series from "../../components/Series/Series";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
 import {Theme} from "../../constants";
 import {getPodcastById} from "@/utils/data/getPodcastById";
-import TrackPlayer, {State, Track, useActiveTrack} from "react-native-track-player";
+import TrackPlayer, {State, Track, useActiveTrack, usePlaybackState, useProgress} from "react-native-track-player";
 import {Episode} from "@/interfaces/episode";
+import {getEpisodes} from "@/utils/database/episode/get-episodes";
+import {useCallback} from 'react';
+import {useFocusEffect} from 'expo-router';
+import {EpisodeModel} from "@/utils/database/models/episode-model";
 
 export default function () {
-    const {id} = useLocalSearchParams<{ id: string }>()
+    const {id, play: playAudio} = useLocalSearchParams<{ id: string, play?: string }>()
     const podcast = getPodcastById(id)
+
+    const [episodes, setEpisodes] = useState<EpisodeModel[]>([]);
 
     const track = useActiveTrack()
 
@@ -25,7 +31,7 @@ export default function () {
 
         const track = await TrackPlayer.getActiveTrack()
         if (track) {
-            const [ podcastId ] = (track?.description?.split('|') ?? [])
+            const [podcastId] = (track?.description?.split('|') ?? [])
             if (podcastId === podcast.id) {
                 TrackPlayer.play()
                 return
@@ -46,6 +52,31 @@ export default function () {
         await TrackPlayer.play()
     }
 
+    useEffect(() => {
+        if (playAudio) {
+            play()
+        }
+    }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            const setEpisodeProgress = async () => {
+                console.log('Getting History')
+                const episodes = await getEpisodes()
+
+                for (const episode of episodes) {
+                    console.log(episode.title, episode.id, episode.position, episode.duration)
+                    podcast.episodes[episode.episodeId].duration = episode.duration
+                    podcast.episodes[episode.episodeId].position = episode.position
+                }
+
+                setEpisodes(episodes)
+
+            }
+            setEpisodeProgress()
+        }, [])
+    )
+
     return (
         <SafeAreaView style={styles.container} edges={[]}>
             <Stack.Screen options={{
@@ -54,7 +85,7 @@ export default function () {
 
             <Navigation goBack={() => router.back()}/>
 
-            <Series podcast={podcast} play={play} playingEpisodeId={track?.id}/>
+            <Series podcast={podcast} play={play} playingEpisodeId={track?.id} episodes={episodes}/>
 
             <CompactAudioPlayer/>
         </SafeAreaView>
@@ -64,7 +95,6 @@ export default function () {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // backgroundColor: Theme.colors.white,
     },
     scrollView: {
         flex: 1,

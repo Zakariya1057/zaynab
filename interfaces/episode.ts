@@ -5,6 +5,8 @@ export interface Episode {
     number: number;
     url: string;
     description: string;
+    duration?: number;
+    position?: number;
     image?: ImageSourcePropType;
     background?: ImageSourcePropType;
     author?: string

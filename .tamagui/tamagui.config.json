@@ -48444,6 +48444,13 @@
           "name": "color-194",
           "val": "#5e2cf3",
           "variable": ""
+        },
+        "purple2": {
+          "isVar": true,
+          "key": "$purple2",
+          "name": "color-195",
+          "val": "#6f43f1",
+          "variable": ""
         }
       },
       "radius": {
@@ -50729,6 +50736,13 @@
         "key": "$purple",
         "name": "color-194",
         "val": "#5e2cf3",
+        "variable": ""
+      },
+      "$color.purple2": {
+        "isVar": true,
+        "key": "$purple2",
+        "name": "color-195",
+        "val": "#6f43f1",
         "variable": ""
       },
       "$radius.0": {

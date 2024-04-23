@@ -10,14 +10,11 @@ import TrackPlayer, {
 import MediaPlayerControls from '../../MediaPlayerControls/MediaPlayerControls';
 import MediaProgressSlider from '../../MediaPlayerControls/MediaProgressSlider';
 import MediaImage from '../../MediaPlayerControls/MediaImage';
-import PlaceholderImage from '../../../../assets/images/img_9.png';
-import AboutEpisodeSheet from "../../../Sheet/AboutEpisodeSheet";
 import {Theme} from "../../../../constants";
 import {Podcast} from "@/interfaces/podcast";
 import {Episode} from "@/interfaces/episode";
 import Toast from "react-native-toast-message";
 import {RefreshControl} from "react-native";
-// import { ScrollView } from 'react-native'
 
 export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, episode: Episode }) {
     const track = useActiveTrack()
@@ -125,6 +122,7 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
         const newTracks = tracks.filter( (track) => track.id !== activeTrack?.id )
         await TrackPlayer.setQueue(newTracks)
         await TrackPlayer.skip(newTrackPosition)
+        await TrackPlayer.play()
     }
 
     const playPrev = async () => {

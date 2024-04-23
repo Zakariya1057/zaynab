@@ -20,7 +20,7 @@ export default function SeriesHeader({ image, title, description, play }: Series
                         bottom={0}
                         justifyContent="center"
                         alignItems="center"
-                        backgroundColor="rgba(0,0,0,0.55)"
+                        backgroundColor="rgba(0,0,0,0.6)"
                     />
                 </YStack>
                 <YStack
@@ -28,7 +28,7 @@ export default function SeriesHeader({ image, title, description, play }: Series
                     alignSelf="center"
                     justifyContent="flex-end"
                     paddingHorizontal={'$4'} // Assuming $4 matches Theme.spacing.large in your theme
-                    paddingBottom={'$3'}
+                    paddingBottom={'$4'}
                     space="$4" // Assuming you want to maintain a 20px gap similar to 'rowGap: 20'
                     bottom={0}
                     top={0}
@@ -41,10 +41,15 @@ export default function SeriesHeader({ image, title, description, play }: Series
                     </H2>
 
                     <Button
-                        icon={<Play color={purple} fill={purple} size={'$2'} />} // Adjust the color according to your theme
+                        icon={<Play color={purple} fill={purple} size={'$1'} />} // Adjust the color according to your theme
                         onPress={play}
                         size="$4"
                         fontSize="$7" // Adjust based on your theme
+                        width={'$12'}
+                        alignSelf="center"
+                        backgroundColor="rgba(0,0,0,0.60)"
+                        borderColor={purple}
+                        borderWidth={'$0.3'}
                     >
                         Play
                     </Button>

@@ -1,7 +1,10 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {YStack, Text, Separator} from 'tamagui';
+import LottieView from 'lottie-react-native';
 
 export default function SeriesEpisode({title, description, openEpisode}: SeriesEpisodeProps) {
+    const animation = useRef(null);
+
     return (
         <>
             <YStack
@@ -12,6 +15,19 @@ export default function SeriesEpisode({title, description, openEpisode}: SeriesE
             >
                 <Text fontSize={17} fontWeight="bold" mb={'$1.5'}>{title}</Text>
                 <Text fontSize={15} color="$charcoal">{description}</Text>
+
+                <LottieView
+                    autoPlay
+                    ref={animation}
+                    style={{
+                        width: 200,
+                        height: 200,
+                        backgroundColor: '#eee',
+                    }}
+                    // Find more Lottie files at https://lottiefiles.com/featured
+                    source={require('@/assets/animation/sound.json')}
+                />
+
             </YStack>
 
             <Separator alignSelf="stretch" vertical={false}/>

@@ -1,27 +1,60 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {StyleSheet, FlatList, TouchableOpacity} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import {router, Stack} from "expo-router";
+import {SafeAreaView} from "react-native-safe-area-context";
+import {router, Stack, useLocalSearchParams} from "expo-router";
 import Navigation from "../../components/Navigation/Navigation";
 import Series from "../../components/Series/Series";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
 import {Theme} from "../../constants";
+import {getPodcastById} from "@/utils/data/getPodcastById";
+import TrackPlayer, {State, Track} from "react-native-track-player";
+import {Episode} from "@/interfaces/episode";
+
 export default function () {
-    const openEpisode = () => router.push('/episode/')
+    const {id} = useLocalSearchParams<{ id: string }>()
+    const podcast = getPodcastById(id)
+
+    const play = async () => {
+        try {
+            await TrackPlayer.setupPlayer();
+            await TrackPlayer.reset()
+        } catch {
+        }
+
+        const track = await TrackPlayer.getActiveTrack()
+        if (track) {
+            const [ podcastId ] = (track?.description?.split('|') ?? [])
+            if (podcastId === podcast.id) {
+                TrackPlayer.play()
+                return
+            }
+        }
+
+        const tracks = Object.values(podcast.episodes).map((episode: Episode): Track => {
+            return {
+                id: episode.id,
+                url: episode.url,
+                title: `${episode.number}. ${episode.description}`,
+                description: `${podcast.id}|${episode.id}`,
+                artist: podcast.name
+            }
+        })
+
+        await TrackPlayer.setQueue(tracks);
+        await TrackPlayer.play()
+    }
 
     return (
         <SafeAreaView style={styles.container} edges={[]}>
             <Stack.Screen options={{
                 headerShown: false
-            }} />
+            }}/>
 
-            <Navigation goBack={() => router.back() }/>
+            <Navigation goBack={() => router.back()}/>
 
-            <Series />
+            <Series podcast={podcast} play={play}/>
 
-            <TouchableOpacity onPress={openEpisode} activeOpacity={0.9}>
-                <CompactAudioPlayer />
-            </TouchableOpacity>
+            <CompactAudioPlayer/>
         </SafeAreaView>
     );
 };

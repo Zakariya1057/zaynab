@@ -20,7 +20,7 @@ export default function SeriesHeader({ image, title, description, play }: Series
                         bottom={0}
                         justifyContent="center"
                         alignItems="center"
-                        backgroundColor="rgba(0,0,0,0.45)"
+                        backgroundColor="rgba(0,0,0,0.55)"
                     />
                 </YStack>
                 <YStack
@@ -52,6 +52,7 @@ export default function SeriesHeader({ image, title, description, play }: Series
                     <Text
                         color="white"
                         fontSize={16} // Adjust based on your theme or use a direct value
+                        numberOfLines={5}
                     >
                         {description}
                     </Text>

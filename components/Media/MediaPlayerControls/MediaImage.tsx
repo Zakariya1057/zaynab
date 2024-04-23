@@ -1,12 +1,12 @@
-import PlaceholderImage from '../../../assets/images/img_10.png'
 import {Image} from "tamagui";
+import {ImageSourcePropType} from "react-native";
 
-export default function () {
+export default function ({ image }: { image: ImageSourcePropType }) {
     return (
-        <Image source={PlaceholderImage}
+        <Image source={image}
                resizeMode={'cover'}
-               height={'42%'}
-               aspectRatio={1}
+               height={'50%'}
+               width={'100%'}
                alignSelf={'center'}
                borderRadius={'$5'}
         />

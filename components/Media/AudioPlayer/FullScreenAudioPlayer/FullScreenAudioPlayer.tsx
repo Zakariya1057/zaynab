@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {H4, Image, Paragraph, YStack} from 'tamagui';
+import React, {useCallback, useEffect, useState} from 'react';
+import {H4, Image, Paragraph, YStack, View, Button,ScrollView } from 'tamagui';
 import TrackPlayer, {
     Event,
-    State,
+    State, useActiveTrack,
     usePlaybackState,
     useProgress,
     useTrackPlayerEvents
@@ -13,42 +13,71 @@ import MediaImage from '../../MediaPlayerControls/MediaImage';
 import PlaceholderImage from '../../../../assets/images/img_9.png';
 import AboutEpisodeSheet from "../../../Sheet/AboutEpisodeSheet";
 import {Theme} from "../../../../constants";
+import {Podcast} from "@/interfaces/podcast";
+import {Episode} from "@/interfaces/episode";
+import Toast from "react-native-toast-message";
+import {RefreshControl} from "react-native";
+// import { ScrollView } from 'react-native'
 
-export default function EpisodePlayer() {
+export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, episode: Episode }) {
+    const track = useActiveTrack()
+    const { state } = usePlaybackState()
+
     const {position, duration} = useProgress(1000); // Updates every 1000 ms
-    const [isPlaying, setIsPlaying] = useState(false);
     const [loading, setLoading] = useState(false)
     const [buffering, setBuffering] = useState<boolean>(false);
+    const [audioLoaded, setAudioLoaded] = useState(state === State.Playing);
+    const [refreshing, setRefreshing] = useState(false);
+    const [audioFailedToLoad, setAudioFailedToLoad] = useState(false);
 
-    useEffect(() => {
-        async function setupPlayer() {
-            try {
-                await TrackPlayer.setupPlayer();
-                await TrackPlayer.reset()
-            } catch {
-            }
+    const episodes = Object.values(podcast.episodes)
+    const firstEpisode = episodes.at(0)
+    const lastEpisode = episodes.at(-1)
 
-            const track = await TrackPlayer.getActiveTrack()
-            const { state } = await TrackPlayer.getPlaybackState()
+    const [open, setOpen] = React.useState(false)
+    const timerRef = React.useRef(0)
 
-            if (!track || track.url !== "https://drive.google.com/uc?id=1c-6KKjWAJASGFOIfpbozJmub4C7FMx2w&export=download") {
-                await TrackPlayer.setQueue([{
-                    id: 'trackId',
-                    url: 'https://drive.google.com/uc?id=1c-6KKjWAJASGFOIfpbozJmub4C7FMx2w&export=download',
-                    title: 'Tearful Moments Of The Prophet’s Life',
-                    artist: 'Yahya Ibrahim'
-                }]);
-            }
+    React.useEffect(() => {
+        return () => clearTimeout(timerRef.current)
+    }, [])
 
-            if (state === State.Playing) {
-                setIsPlaying(true)
-            }
-        }
 
-        setupPlayer();
-    }, []);
+    // useEffect(() => {
+    //     async function setupPlayer() {
+    //         try {
+    //             await TrackPlayer.setupPlayer();
+    //             await TrackPlayer.reset()
+    //         } catch {
+    //         }
+    //
+    //         const track = await TrackPlayer.getActiveTrack()
+    //         const {state} = await TrackPlayer.getPlaybackState()
+    //
+    //         if (!track || track.url !== episode.url) {
+    //             await TrackPlayer.setQueue([{
+    //                 id: 'trackId',
+    //                 url: episode.url,
+    //                 title: `${episode.number}. ${episode.description}`,
+    //                 description: `${podcast.id}|${episode.id}`,
+    //                 artist: podcast.name
+    //             }]);
+    //         }
+    //
+    //     }
+    //
+    //     setupPlayer();
+    // }, []);
 
     useTrackPlayerEvents([Event.PlaybackState], (event) => {
+        console.log(event)
+
+        if ('error' in event) {
+            setAudioFailedToLoad(true)
+            showToast()
+        } else {
+            setAudioFailedToLoad(false)
+        }
+
         // Handle the loading state directly
         setLoading(event.state === State.Loading);
 
@@ -57,71 +86,159 @@ export default function EpisodePlayer() {
             setBuffering(true);
         } else {
             setBuffering(false);
-
-            if (event.state === State.Paused) {
-                setIsPlaying(false)
-            } else if (event.state === State.Playing) {
-                setIsPlaying(true)
-            }
         }
 
         // Simplify ready state handling
         if (event.state === State.Ready) {
+            setAudioLoaded(true)
             setLoading(false);
         }
     });
-
 
     const togglePlayPause = async () => {
         if (Math.ceil(position) === Math.ceil(duration)) {
             await TrackPlayer.seekTo(0)
         }
 
-        if (!isPlaying) {
+        if (state !== State.Playing) {
             TrackPlayer.play();
         } else {
             TrackPlayer.pause();
         }
     };
 
+    const playNext = async () => {
+        setAudioLoaded(false)
+
+        if (audioFailedToLoad) {
+            const currentPosition = await TrackPlayer.getActiveTrackIndex()
+            await replaceFailedTrack(currentPosition ?? 0)
+        } else {
+            await TrackPlayer.skipToNext()
+        }
+    }
+
+    const replaceFailedTrack = async (newTrackPosition: number) => {
+        // Remove the current track from the queue and play next one
+        const tracks = await TrackPlayer.getQueue()
+        const activeTrack = await TrackPlayer.getActiveTrack()
+        const newTracks = tracks.filter( (track) => track.id !== activeTrack?.id )
+        await TrackPlayer.setQueue(newTracks)
+        await TrackPlayer.skip(newTrackPosition)
+    }
+
+    const playPrev = async () => {
+        setAudioLoaded(false)
+
+        if (audioFailedToLoad) {
+            const currentPosition = await TrackPlayer.getActiveTrackIndex()
+            let newPosition = currentPosition ? currentPosition - 1 : 0
+            await replaceFailedTrack(newPosition)
+        } else {
+            await TrackPlayer.skipToPrevious()
+        }
+    }
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        try {
+            await replaceTrack()
+            console.log('Player setup and refreshed');
+        } catch (error) {
+            console.error('Error during refresh:', error);
+        }
+        setRefreshing(false);
+    }, []);
+
+
+    const showToast = () => {
+        Toast.show({
+            type: 'error', // Indicates that this toast is for an error message
+            text1: 'Audio Load Failed', // A clear, concise title for the error
+            text2: 'Swipe down to refresh and try again.', // Specific instructions for the user
+            position: 'bottom', // Position at the bottom so it does not block other UI elements
+            visibilityTime: 4000, // Duration in milliseconds the toast should be visible
+            autoHide: true, // The toast will disappear after the visibilityTime
+            topOffset: 30, // Spacing from the top, when position is 'top'
+            bottomOffset: 40, // Spacing from the bottom, useful when position is 'bottom'
+        });
+    }
+
+    const replaceTrack = async () => {
+        const { duration: audioDuration } = await TrackPlayer.getProgress()
+
+        if (audioLoaded || audioDuration > 0){
+            return
+        }
+
+        setAudioLoaded(false)
+        await TrackPlayer.load({
+            id: episode.id,
+            url: episode.url,
+            title: `${episode.number}. ${episode.description}`,
+            description: `${podcast.id}|${episode.id}`,
+            artist: podcast.name
+        });
+
+        await TrackPlayer.seekTo(position)
+    }
+
     return (
-        <YStack f={1} p={Theme.spacing.large} pt={Theme.spacing.normal} space="$4">
-            <YStack position="absolute" t={0} b={0} r={0} l={0}>
-                <Image src={PlaceholderImage} width="100%" aspectRatio={1} position="absolute" top={0} bottom={0}
-                       right={0} left={0} resizeMode={'cover'}/>
-                <YStack position="absolute" t={0} b={0} r={0} l={0} opacity={0.85}
-                        backgroundColor="$background"></YStack>
+        <ScrollView
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                />
+            }
+            style={{ flex: 1 }}
+            contentContainerStyle={{ flexGrow: 1 }}
+            showsVerticalScrollIndicator={false}
+        >
+            <YStack f={1} p={Theme.spacing.large} pt={Theme.spacing.normal} space="$4">
+                <YStack position="absolute" t={0} b={0} r={0} l={0}>
+                    <Image src={episode.background ?? podcast.background} width="100%" aspectRatio={1} position="absolute" top={0} bottom={0}
+                           right={0} left={0} resizeMode={'cover'} />
+                    <YStack position="absolute" t={0} b={0} r={0} l={0} opacity={0.85}
+                            backgroundColor="$background" width={'100%'}></YStack>
+                </YStack>
+
+                <MediaImage image={episode.image ?? podcast.image}/>
+
+                <YStack mt="$2" space="$1">
+                    <H4 textAlign="center" color={'$color'} numberOfLines={1}>
+                        { track?.title }
+                    </H4>
+                    <Paragraph textAlign="center" color={'$color'} numberOfLines={1}>
+                        { track?.artist }
+                    </Paragraph>
+                </YStack>
+
+                <MediaProgressSlider
+                    currentTime={position}
+                    endTime={duration}
+                    minimumTrackColor={Theme.colors.vividPurple}
+                    maximumTrackColor={'white'}
+                    loading={duration === 0}
+                    onValueChange={(value) => TrackPlayer.seekTo(value)}
+                />
+
+                <MediaPlayerControls
+                    variant="large"
+                    togglePlayPause={togglePlayPause}
+                    playNext={playNext}
+                    playPrev={playPrev}
+                    buffering={audioLoaded && buffering}
+                    isPlaying={state === State.Playing}
+                    isFirst={track?.id === firstEpisode?.id}
+                    isLast={track?.id === lastEpisode?.id}
+                />
+
+                {/*<AboutEpisodeSheet*/}
+                {/*    about={'The life of the Muslim Ummah is solely dependent on the ink of its scholars and the blood of its Martyrs." - Shaykh Abdullah Azzam (May the Mercy of Allah be with him) Indeed history is written in the colours, black - the ink of its scholars, red - the blood of the martyrs. Maktabah Sound Studio is proud to introduce "Heroes of Islam" a series of lectures exploring the lives of some of the greatest men in the history of Islam'}*/}
+                {/*/>*/}
+
             </YStack>
-
-            <MediaImage/>
-
-            <YStack mt="$2" space="$1">
-                <H4 textAlign="center" color={'$color'}>
-                    Imam Abu Hanifah [702-772 CE]
-                </H4>
-                <Paragraph textAlign="center" color={'$color'}>
-                    Heroes Of Islam
-                </Paragraph>
-            </YStack>
-
-            <MediaProgressSlider
-                currentTime={position}
-                endTime={duration}
-                minimumTrackColor={Theme.colors.vividPurple}
-                maximumTrackColor={'white'}
-                loading={loading}
-                onValueChange={(value) => TrackPlayer.seekTo(value)}
-            />
-
-            <MediaPlayerControls
-                variant="large"
-                togglePlayPause={togglePlayPause}
-                isPlaying={isPlaying}
-            />
-
-            <AboutEpisodeSheet
-                about={'The life of the Muslim Ummah is solely dependent on the ink of its scholars and the blood of its Martyrs." - Shaykh Abdullah Azzam (May the Mercy of Allah be with him) Indeed history is written in the colours, black - the ink of its scholars, red - the blood of the martyrs. Maktabah Sound Studio is proud to introduce "Heroes of Islam" a series of lectures exploring the lives of some of the greatest men in the history of Islam'}
-            />
-        </YStack>
+         </ScrollView>
     );
 }

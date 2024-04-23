@@ -22,10 +22,9 @@ import {TouchableOpacity} from "react-native";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
 import React from "react";
 import {Podcasts} from "@/utils/data/podcasts";
+import {Podcast} from "@/interfaces/podcast";
 
 export default function App() {
-    const openEpisode = () => router.push('/episode/')
-
     return (
         <Stack f={1}>
             <ScrollView showsVerticalScrollIndicator={false} backgroundColor={'$backgroundStrong'}>
@@ -65,22 +64,15 @@ export default function App() {
 
                         <ScrollView mt={'$3'} space={'$5'} showsHorizontalScrollIndicator={false}>
                             {
-                                Podcasts.map( (podcast) => {
-                                    return <Podcast
-                                        key={podcast.id}
-                                        title={podcast.name}
-                                        image={podcast.image}
-                                        subTitle={podcast.subTitle}
-                                    />
+                                Object.values(Podcasts).map( (podcast) => {
+                                    return <PodcastElement key={podcast.id} {...podcast} />
                                 })
                             }
                         </ScrollView>
                     </YStack>
                 </YStack>
             </ScrollView>
-            <TouchableOpacity onPress={openEpisode} activeOpacity={0.9}>
-                <CompactAudioPlayer edges={[]}/>
-            </TouchableOpacity>
+            <CompactAudioPlayer edges={[]}/>
         </Stack>
     )
 }
@@ -94,27 +86,6 @@ const HorizontalTabs = () => {
             <DemoCard width={230}/>
             <DemoCard width={230}/>
         </ScrollView>
-    )
-}
-
-const TabsContent = (props: TabsContentProps) => {
-    return (
-        <Tabs.Content
-            // backgroundColor="$background"
-            key="tab3"
-            padding="$2"
-            alignItems="center"
-            justifyContent="center"
-            flex={1}
-            // borderColor="$background"
-            // borderRadius="$2"
-            // borderTopLeftRadius={0}
-            // borderTopRightRadius={0}
-            // borderWidth="$2"
-            {...props}
-        >
-            {props.children}
-        </Tabs.Content>
     )
 }
 
@@ -150,49 +121,34 @@ export function DemoCard(props: CardProps) {
     )
 }
 
-const Speaker = ({ image, firstName, lastName}) => {
-    return (
-        <TouchableOpacity onPress={() => router.push('/speaker/')}>
-            <YStack alignItems={'center'}>
-                <Avatar circular size="$7" mb={'$3'}>
-                    <Avatar.Image src={image} />
-                    <Avatar.Fallback bc="red" />
-                </Avatar>
-                <Text fontSize={16} fontWeight={'500'}>
-                    {firstName}
-                </Text>
-                <Text fontSize={16} fontWeight={'500'}>
-                    {lastName}
-                </Text>
-            </YStack>
-        </TouchableOpacity>
+export const PodcastElement = (podcast: Podcast) => {
+    const { name, subTitle, image} = podcast
 
+    return (
+        <TouchableOpacity onPress={
+            () =>  router.push({ pathname: "/series/", params: { id: podcast.id } })
+        }>
+            <XStack
+                gap="$3"
+                alignItems="center"
+                borderRadius="$3"
+            >
+                <Image
+                    src={image}
+                    width={80}
+                    aspectRatio={1}
+                    borderRadius={'$3'}
+                    overflow={'hidden'}
+                    resizeMode="cover"
+                />
+                <YStack f={1} justifyContent="center" space="$2">
+                    <H5 lineHeight="$4" numberOfLines={2}>{name}</H5>
+                    <Text fontSize={'$4'} numberOfLines={2}>{subTitle}</Text>
+                </YStack>
+                <YStack justifyContent="center">
+                    <PlayCircle size="$4" strokeWidth={1.3} color={'$color.purple'}/>
+                </YStack>
+            </XStack>
+        </TouchableOpacity>
     )
 }
-
-export const Podcast = ({ title, image, subTitle }) => (
-    <TouchableOpacity onPress={() => router.push('/series/') }>
-        <XStack
-            gap="$3"
-            alignItems="center"
-            borderRadius="$3"
-        >
-            <Image
-                src={image}
-                width={80}
-                aspectRatio={1}
-                borderRadius={'$3'}
-                overflow={'hidden'}
-                resizeMode="cover"
-            />
-            <YStack f={1} justifyContent="center" space="$2">
-                <H5 lineHeight="$4" numberOfLines={2}>{title}</H5>
-                <Text fontSize={'$4'} numberOfLines={2}>{subTitle}</Text>
-            </YStack>
-            <YStack justifyContent="center">
-                <PlayCircle size="$4" strokeWidth={1.3} color={'$color.purple'}/>
-            </YStack>
-        </XStack>
-    </TouchableOpacity>
-
-)

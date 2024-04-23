@@ -6,8 +6,8 @@ import config from '../tamagui.config'
 import {useFonts} from 'expo-font'
 import React, {useEffect} from 'react'
 import {GestureHandlerRootView} from "react-native-gesture-handler";
-import {AudioProvider} from "../contexts/AudioContext";
 import {ArrowLeft, Bookmark} from "@tamagui/lucide-icons";
+import Toast from 'react-native-toast-message';
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -49,28 +49,27 @@ function RootLayoutNav() {
         <TamaguiProvider config={config} defaultTheme={colorScheme as any}>
             <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
                 <GestureHandlerRootView style={{flex: 1}}>
-                    <AudioProvider>
-                        <Stack screenOptions={{
-                            title: '',
-                            headerLeft: () =>
+                    <Stack screenOptions={{
+                        title: '',
+                        headerLeft: () =>
+                            <TouchableOpacity onPress={() => router.back()}>
+                                <ArrowLeft size={30} color={'$color'}/>
+                            </TouchableOpacity>
+                    }}
+                    >
+                        <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+                        <Stack.Screen name="series" options={{headerShown: false}}/>
+                        <Stack.Screen name="speaker" options={{
+                            headerShown: true,
+                            headerRight: () =>
                                 <TouchableOpacity onPress={() => router.back()}>
-                                    <ArrowLeft size={30} color={'$color'}/>
+                                    <Bookmark size={'$2'} color={'$color'}/>
                                 </TouchableOpacity>
-                        }}
-                        >
-                            <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
-                            <Stack.Screen name="series" options={{headerShown: false}}/>
-                            <Stack.Screen name="speaker" options={{
-                                headerShown: true,
-                                headerRight: () =>
-                                    <TouchableOpacity onPress={() => router.back()}>
-                                        <Bookmark size={'$2'} color={'$color'}/>
-                                    </TouchableOpacity>
-                            }}/>
-                            <Stack.Screen name="episode"
-                                          options={{headerRight: () => <Bookmark size={'$2'} color={'$color'}/>}}/>
-                        </Stack>
-                    </AudioProvider>
+                        }}/>
+                        <Stack.Screen name="episode"
+                                      options={{headerRight: () => <Bookmark size={'$2'} color={'$color'}/>}}/>
+                    </Stack>
+                    <Toast />
                 </GestureHandlerRootView>
             </ThemeProvider>
         </TamaguiProvider>

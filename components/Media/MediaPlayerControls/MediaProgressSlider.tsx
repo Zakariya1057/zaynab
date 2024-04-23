@@ -60,7 +60,7 @@ const MediaProgressSlider: React.FC<MediaProgressSliderProps> = ({
                 <Text color={Theme.colors.primary} fontSize={Theme.fontSizes.small}
                       mt={Platform.OS === 'android' ? 5 : 0}>
                     {
-                        loading ? <Spinner size="small" color="$color.purple"/> : formatRemainingTime(currentTime, endTime)
+                        loading ? <Spinner size="small" color="$color.purple" height={10}/> : formatRemainingTime(currentTime, endTime)
                     }
                 </Text>
             </YStack>

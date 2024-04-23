@@ -38,33 +38,6 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
         return () => clearTimeout(timerRef.current)
     }, [])
 
-
-    // useEffect(() => {
-    //     async function setupPlayer() {
-    //         try {
-    //             await TrackPlayer.setupPlayer();
-    //             await TrackPlayer.reset()
-    //         } catch {
-    //         }
-    //
-    //         const track = await TrackPlayer.getActiveTrack()
-    //         const {state} = await TrackPlayer.getPlaybackState()
-    //
-    //         if (!track || track.url !== episode.url) {
-    //             await TrackPlayer.setQueue([{
-    //                 id: 'trackId',
-    //                 url: episode.url,
-    //                 title: `${episode.number}. ${episode.description}`,
-    //                 description: `${podcast.id}|${episode.id}`,
-    //                 artist: podcast.name
-    //             }]);
-    //         }
-    //
-    //     }
-    //
-    //     setupPlayer();
-    // }, []);
-
     useTrackPlayerEvents([Event.PlaybackState], (event) => {
         console.log(event)
 
@@ -141,7 +114,6 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
         setRefreshing(true);
         try {
             await replaceTrack()
-            console.log('Player setup and refreshed');
         } catch (error) {
             console.error('Error during refresh:', error);
         }

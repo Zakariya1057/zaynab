@@ -9,7 +9,6 @@ export const getEpisodes = async (): Promise<EpisodeModel[]> => {
         const sortedEpisodes = episodesCollection.query(
             Q.sortBy('updated_at', Q.desc)
         );
-        console.log( await sortedEpisodes.fetch())
         return await sortedEpisodes.fetch() as EpisodeModel[];
     } catch (error) {
         console.error('Error retrieving episodes:', error);

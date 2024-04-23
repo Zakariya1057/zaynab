@@ -19,6 +19,7 @@ import {useEpisodes} from "@/hooks/useEpisodes";
 import {EpisodeModel} from "@/utils/database/models/episode-model";
 import {getPercentage} from "@/utils/percentage/get-percentage";
 import {AnimatedCircularProgress} from "react-native-circular-progress";
+import {getPodcastById} from "@/utils/data/getPodcastById";
 
 export default function App() {
     const {episodes, retry} = useEpisodes()
@@ -97,29 +98,6 @@ export default function App() {
     )
 }
 
-const HorizontalTabs = ({episodes}: { episodes: EpisodeModel[] }) => {
-    episodes.map((a) => console.log(a.title))
-    return (
-        <FlatList
-            horizontal={true}
-            data={episodes}
-            renderItem={({item}) =>
-                <DemoCard
-                    title={item.title}
-                    position={item.position}
-                    duration={item.duration}
-                    episodeId={item.episodeId}
-                    podcastId={item.podcastId}
-                />
-            }
-
-            keyExtractor={item => item.episodeId}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{gap: 20}} // Adjust padding as necessary
-        />
-    );
-}
-
 export function DemoCard({title, position, duration, podcastId, episodeId}: {
     title: string,
     position: number,
@@ -134,7 +112,8 @@ export function DemoCard({title, position, duration, podcastId, episodeId}: {
 
     const openEpisode = () => router.push({pathname: "/episode/", params: {podcastId, episodeId}});
 
-    console.log(percentage, duration, percentage)
+    const { image } = getPodcastById(podcastId)
+
     return (
         <TouchableOpacity onPress={openEpisode}>
             <Card size="$3" bordered width={230} br={'$5'} overflow={'hidden'}>
@@ -144,8 +123,7 @@ export function DemoCard({title, position, duration, podcastId, episodeId}: {
                         alignSelf="center"
                         w={'100%'}
                         height={150}
-                        // source={image}
-                        source={require('@/assets/images/podcasts/a3bc8692-476f-4d2d-98df-3fc498321517/cover.webp')}
+                        source={image}
                     />
                 </XStack>
                 <Card.Header>

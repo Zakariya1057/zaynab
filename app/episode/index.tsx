@@ -35,12 +35,13 @@ export default function () {
             const recordedEpisode = await getRecordedEpisodeById(episodeId)
             console.log('Recorded Episopde', recordedEpisode, recordedEpisode?.position)
 
-            console.log('Existing Track Index', existingTrackIndex)
+            const completed = (Math.floor(recordedEpisode?.duration) - Math.floor(recordedEpisode?.position)) < 4
+
             if (existingTrackIndex && existingTrackIndex > -1) {
 
                 // if the tracks are skipping - then just overwrite the fricking thing
                 console.log('Setting From Existing Tracks')
-                await TrackPlayer.skip(existingTrackIndex, recordedEpisode?.position ?? 0);
+                await TrackPlayer.skip(existingTrackIndex, completed ? 0 : recordedEpisode?.position ?? 0);
                 await TrackPlayer.play();
 
                 console.log('Set From Existing Tracks')
@@ -71,53 +72,11 @@ export default function () {
 
             await TrackPlayer.play()
 
-            await TrackPlayer.seekTo(recordedEpisode?.position ?? 0)
-
-            // for (const track of tracks) {
-            //     const index = tracks.indexOf(track);
-            //     if (track.url !== episode.url) {
-            //         await TrackPlayer.add(track, index)
-            //     }
-            // }
-            //
-            // console.log(await TrackPlayer.getQueue())
-
-            // console.log('Setting Queue')
-            // await TrackPlayer.setQueue(tracks);
-            // console.log('Queue Set. Skipping')
-            // await TrackPlayer.skip(trackIndex);
-            // console.log('Skipped')
-
-            //
-            //
-            // if (!track || track.url !== episode.url) {
-            //     console.log('Replacing Tracks')
-            //     await TrackPlayer.setQueue(tracks);
-            // }
-            //
-            // await TrackPlayer.skip(trackIndex);
-
-            // if the selected episode exists in the existing track then skip to that otherwise replace the stack
-
-
-
-            //
-            // const track = await TrackPlayer.getActiveTrack()
-            // const {state} = await TrackPlayer.getPlaybackState()
-            //
-            // if (!track || track.url !== episode.url) {
-            //     await TrackPlayer.setQueue([{
-            //         id: 'trackId',
-            //         url: episode.url,
-            //         title: episode.description,
-            //         description: `${podcast.id}|${episode.id}`,
-            //         artist: podcast.name
-            //     }]);
-            // }
-            //
-            // if (state === State.Playing) {
-            //     setIsPlaying(true)
-            // }
+            if (completed) {
+                await TrackPlayer.seekTo(0)
+            } else {
+                await TrackPlayer.seekTo(recordedEpisode?.position ?? 0)
+            }
         }
 
         setupPlayer();

@@ -12,7 +12,7 @@ export const Podcasts: Record<string, Podcast> = {
             "6605c3ca-cdc4-4904-a82a-178ffb8466f5": {
                 id: "6605c3ca-cdc4-4904-a82a-178ffb8466f5",
                 number: 1,
-                url: "https://archive.org/download/Lives/CD01.mp3",
+                url: "https://archive.org/download/Lives/CD01.mp31",
                 description: "Introduction – Story Of Creation"
             },
             "15c09fa2-3f12-4492-8b98-1f9b6890b511": {

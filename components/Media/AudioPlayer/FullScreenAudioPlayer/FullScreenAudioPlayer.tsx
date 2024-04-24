@@ -15,6 +15,8 @@ import {Podcast} from "@/interfaces/podcast";
 import {Episode} from "@/interfaces/episode";
 import Toast from "react-native-toast-message";
 import {RefreshControl} from "react-native";
+import useDownloadManager from "@/hooks/useDownloadManager";
+import useDownloadManager2 from "@/hooks/useDownloadManager2";
 
 export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, episode: Episode }) {
     const track = useActiveTrack()
@@ -153,6 +155,42 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
         await TrackPlayer.seekTo(position)
     }
 
+    // const { startOrResumeDownload, downloads } = useDownloadManager();
+    //
+    // const [percentageDownloaded, setPercentageDownlaoded] = useState()
+    //
+    // const download = async () => {
+    //     const track = await TrackPlayer.getActiveTrack()
+    //
+    //     if (track && track.url) {
+    //         const [ _, episodeId ] = (track.description?.split('|') ?? [])
+    //         await startOrResumeDownload(episodeId, track.url)
+    //     }
+    // }
+    //
+    // useEffect(() => {
+    //     const [ _, episodeId ] = (track.description?.split('|') ?? [])
+    //     const percentage = downloads.find((downloadItem) => downloadItem.id === episodeId)?.progress
+    //     if (percentage) {
+    //         setPercentageDownlaoded(download)
+    //     }
+    // }, [downloads]);
+
+    const { downloadAudio } = useDownloadManager2()
+
+    const download = async () => {
+        const track = await TrackPlayer.getActiveTrack()
+
+        if (track && track.url) {
+            const [ podcastId, episodeId ] = (track.description?.split('|') ?? [])
+            await downloadAudio({
+                ...track,
+                podcastId,
+                episodeId,
+            })
+        }
+    }
+
     return (
         <ScrollView
             refreshControl={
@@ -202,6 +240,7 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
                     isPlaying={state === State.Playing}
                     isFirst={track?.id === firstEpisode?.id}
                     isLast={track?.id === lastEpisode?.id}
+                    download={download}
                 />
 
                 {/*<AboutEpisodeSheet*/}

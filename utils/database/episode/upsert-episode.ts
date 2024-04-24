@@ -1,7 +1,7 @@
-import {Q} from '@nozbe/watermelondb';
-import {EpisodeModel} from "@/utils/database/models/episode-model";
-import {database} from "@/utils/database/setup";
-import {getCurrentUnixTime} from "@/utils/date/get-current-unix-time";
+import { Q } from '@nozbe/watermelondb';
+import { EpisodeModel } from "@/utils/database/models/episode-model";
+import { database } from "@/utils/database/setup";
+import { getCurrentUnixTime } from "@/utils/date/get-current-unix-time";
 
 export const upsertEpisode = async (episodeData: Partial<EpisodeModel>) => {
     await database.write(async () => {
@@ -10,36 +10,30 @@ export const upsertEpisode = async (episodeData: Partial<EpisodeModel>) => {
             Q.where('episodeId', episodeData.episodeId)
         ).fetch();
 
-        const time = getCurrentUnixTime()
+        const time = getCurrentUnixTime();
 
         if (existingEpisodes.length > 0) {
             // Episode exists, update it
             await existingEpisodes[0].update((episode) => {
-                episode.artist = episodeData.artist;
-                episode.description = episodeData.description;
-                episode.title = episodeData.title;
-                episode.url = episodeData.url;
-                episode.duration = episodeData.duration;
-                episode.position = episodeData.position;
-                episode.complete = episodeData.complete;
-                episode.podcastId = episodeData.podcastId;
-                episode.episodeId = episodeData.episodeId;
-                episode.updated_at = time
+                // Iterate over each entry in episodeData and only update if value is not undefined
+                Object.entries(episodeData).forEach(([key, value]) => {
+                    if (value !== undefined) {
+                        episode[key] = value;
+                    }
+                });
+                episode.episodeUpdatedAt = time;
             });
         } else {
             // Episode does not exist, create a new one
             await episodesCollection.create((newEpisode) => {
-                newEpisode.artist = episodeData.artist;
-                newEpisode.description = episodeData.description;
-                newEpisode.title = episodeData.title;
-                newEpisode.url = episodeData.url;
-                newEpisode.duration = episodeData.duration;
-                newEpisode.position = episodeData.position;
-                newEpisode.complete = episodeData.complete;
-                newEpisode.podcastId = episodeData.podcastId;
-                newEpisode.episodeId = episodeData.episodeId;
-                newEpisode.created_at = time
-                newEpisode.updated_at = time
+                Object.keys(newEpisode._raw).forEach(key => {
+                    // Only set the values if they exist in episodeData to avoid undefined values
+                    if (key in episodeData && episodeData[key] !== undefined) {
+                        newEpisode[key] = episodeData[key];
+                    }
+                });
+                newEpisode.episodeCreatedAt = time;
+                newEpisode.episodeUpdatedAt = time;
             });
         }
     });

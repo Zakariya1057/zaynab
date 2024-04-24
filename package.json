@@ -51,7 +51,9 @@
     "react-native-toast-message": "^2.2.0",
     "react-native-track-player": "^4.1.1",
     "react-native-web": "~0.19.6",
-    "tamagui": "^1.94.5"
+    "rn-fetch-blob": "^0.12.0",
+    "tamagui": "^1.94.5",
+    "@react-native-async-storage/async-storage": "1.21.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

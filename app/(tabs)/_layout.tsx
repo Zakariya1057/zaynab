@@ -23,6 +23,7 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="search"
                 options={{
+                    // href: null,
                     title: 'Search',
                     tabBarIcon: ({ color }) => <Search color={color} />,
                 }}
@@ -30,7 +31,7 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="bookmarks"
                 options={{
-                    title: 'Bookmarks',
+                    title: 'Bookmark',
                     tabBarIcon: ({ color }) => <Bookmark color={color} />,
                 }}
             />

@@ -7,7 +7,7 @@ export const getEpisodes = async (): Promise<EpisodeModel[]> => {
         const episodesCollection = database.get('episodes');
         // Sort episodes by 'updated_at' in descending order
         const sortedEpisodes = episodesCollection.query(
-            Q.sortBy('updated_at', Q.desc)
+            Q.sortBy('episodeUpdatedAt', Q.desc)
         );
         return await sortedEpisodes.fetch() as EpisodeModel[];
     } catch (error) {

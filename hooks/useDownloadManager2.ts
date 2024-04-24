@@ -1,0 +1,168 @@
+import {useRef, useCallback, useEffect, useState} from 'react';
+import * as FileSystem from 'expo-file-system';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {upsertDownload} from "@/utils/database/download/upsert-download";
+import {DownloadProgressData, DownloadResumable, FileSystemDownloadResult} from "expo-file-system";
+import {getDownloadById} from "@/utils/database/download/get-download-by-id";
+import {insertDownload} from "@/utils/database/download/insert-download";
+import {DownloadModel} from "@/utils/database/models/download-model";
+
+const useDownloadManager = () => {
+    const downloadResumableRef = useRef<DownloadResumable | null>(null);
+
+    const intervalRef = useRef(null);
+
+    const downloadAudio = async (episode: Partial<DownloadModel>): Promise<void> => {
+        // intervalRef.current = setInterval(() => {
+        //     if (downloadResumableRef.current) {
+        //         saveDownloadable(episode.episodeId);
+        //     }
+        // }, 30000);
+
+        const existingDownload = await getDownloadById(episode.episodeId);
+
+        if (existingDownload) {
+            if (existingDownload.downloaded) {
+                console.log('Download downloaded')
+            } else {
+                console.log('Resuming incomplete download');
+                await startOrResumeDownload(existingDownload.episodeId, existingDownload.url);
+            }
+        } else {
+            console.log('Starting new download:', episode);
+            await initializeNewDownload(episode);
+        }
+    };
+
+    const initializeNewDownload = async (episode: Partial<DownloadModel>): Promise<void> => {
+        const directoryUri = FileSystem.documentDirectory; // Base directory URI
+        const fileUri = `${directoryUri}${episode.episodeId}.mp3`; // Full file URI
+
+        if (!directoryUri) {
+            throw new Error('No such directory');
+        }
+
+        // Check if the directory exists, create if not
+        const dirInfo = await FileSystem.getInfoAsync(directoryUri);
+        if (!dirInfo.exists) {
+            console.log('Directory does not exist, creating now...');
+            await FileSystem.makeDirectoryAsync(directoryUri, { intermediates: true });
+        }
+
+        await insertDownload({...episode, uri: fileUri});
+        await startOrResumeDownload(episode.episodeId, episode.url);
+    };
+
+    const pause = async () => {
+        try {
+            await downloadResumableRef.current?.pauseAsync();
+            console.log('Paused download operation, saving for future retrieval');
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    const resume = async () => {
+        try {
+            await downloadResumableRef.current?.resumeAsync();
+            console.log('Resume download operation, saving for future retrieval');
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    const updateProgress = useCallback((id: string, progressData: DownloadProgressData): void => {
+        const {totalBytesWritten, totalBytesExpectedToWrite} = progressData;
+        const progress = totalBytesWritten / totalBytesExpectedToWrite;
+        console.log(`Download progress for ${id}: ${progress * 100}%`);
+
+        upsertDownload({episodeId: id, totalBytesWritten, totalBytesExpectedToWrite, downloaded: progress === 1});
+        // saveDownloadable(id)
+    }, []);
+
+    const saveDownloadable = async (id: string): Promise<void> => {
+        const downloadResumable = downloadResumableRef.current;
+        if (!downloadResumable) {
+            return; // If there's no download resumable, there's nothing to save or resume
+        }
+
+        // First, fetch the current state of the download to check if it has completed
+        const existingDownload = await getDownloadById(id);
+        if (existingDownload && existingDownload.downloaded) {
+            console.log(`Download for ${id} is already completed. No need to pause or resume.`);
+            clearInterval(intervalRef.current);
+            return; // Exit if download is already marked as completed
+        }
+
+        // Proceed to pause the download
+        await pause();
+
+        // Save the download state to AsyncStorage
+        const savableState = await downloadResumable.savable();
+        if (savableState.resumeData) {
+            console.log(`Storing Progress To: pausedDownload-${id}`);
+            await AsyncStorage.setItem(`pausedDownload-${id}`, JSON.stringify(savableState));
+        }
+
+        await resume();
+    };
+
+
+    const startOrResumeDownload = async (id: string, url: string): Promise<void> => {
+        const fileUri = `${FileSystem.documentDirectory}${id}.mp3`;
+        // const pausedDownloadState = await AsyncStorage.getItem(`pausedDownload-${id}`);
+
+        let downloadResumable
+
+        try {
+            // let downloadSnapshot = JSON.parse(pausedDownloadState ?? '{}')
+
+            console.log(fileUri)
+
+            // if (pausedDownloadState && 'resumeData' in downloadSnapshot) {
+            //     downloadResumable = new FileSystem.DownloadResumable(
+            //         downloadSnapshot.url,
+            //         downloadSnapshot.fileUri,
+            //         downloadSnapshot.options,
+            //         progressData => updateProgress(id, progressData),
+            //         downloadSnapshot.resumeData
+            //     );
+            //
+            //     downloadResumableRef.current = downloadResumable;
+            //
+            //     const result = await downloadResumable.resumeAsync();
+            //
+            //     await downloadCompleted(id, result)
+            //
+            //     return
+            // } else {
+                downloadResumable = FileSystem.createDownloadResumable(
+                    url,
+                    fileUri,
+                    {},
+                    progressData => updateProgress(id, progressData)
+                );
+
+                downloadResumableRef.current = downloadResumable;
+            // }
+
+            const result = await downloadResumable.downloadAsync();
+            await downloadCompleted(id, result)
+        } catch (error) {
+            console.error('Download failed:', error);
+        }
+    };
+
+    const downloadCompleted = async (id: string, result: FileSystemDownloadResult | undefined) => {
+        if (result) {
+            console.log('Download completed:', result.uri);
+            await upsertDownload({episodeId: id, downloaded: true});
+            await AsyncStorage.removeItem(`pausedDownload-${id}`);
+            // clearInterval(intervalRef.current);
+        }
+    }
+
+    return {downloadAudio};
+};
+
+export default useDownloadManager;

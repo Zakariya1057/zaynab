@@ -9,7 +9,7 @@ import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {ArrowLeft, Bookmark} from "@tamagui/lucide-icons";
 import Toast from 'react-native-toast-message';
 import '@/utils/database/setup'
-import { recordAudioPosition } from '@/utils/audio/record-audio-position'
+import {recordAudioPosition} from '@/utils/audio/record-audio-position'
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -70,10 +70,15 @@ function RootLayoutNav() {
                                     <Bookmark size={'$2'} color={'$color'}/>
                                 </TouchableOpacity>
                         }}/>
-                        <Stack.Screen name="episode"
-                                      options={{headerRight: () => <Bookmark size={'$2'} color={'$color'}/>}}/>
+                        <Stack.Screen
+                            name="episode"
+                            options={{
+                                headerRight: () =>
+                                    <TouchableOpacity><Bookmark size={'$2'} color={'$color'}/></TouchableOpacity>
+                            }}
+                        />
                     </Stack>
-                    <Toast />
+                    <Toast/>
                 </GestureHandlerRootView>
             </ThemeProvider>
         </TamaguiProvider>

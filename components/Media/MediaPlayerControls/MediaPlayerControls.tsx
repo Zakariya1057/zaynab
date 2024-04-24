@@ -9,6 +9,7 @@ interface Props {
     togglePlayPause: () => void;
     playNext?: () => void;
     playPrev?: () => void;
+    download?: () => void;
 
     loading?: boolean;
     buffering?: boolean;
@@ -23,6 +24,7 @@ const MediaPlayerControls: React.FC<Props> = ({
                                                   togglePlayPause,
                                                   playNext,
                                                   playPrev,
+                                                  download,
                                                   isFirst,
                                                   isLast,
                                                   variant,
@@ -88,8 +90,7 @@ const MediaPlayerControls: React.FC<Props> = ({
                         <FastForward size={size} color={isLast ? 'grey' : color} strokeWidth={strokeWidth}/>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => {
-                    }}>
+                    <TouchableOpacity onPress={download}>
                         <Download size={size} color={color} strokeWidth={strokeWidth}/>
                     </TouchableOpacity>
                 </>

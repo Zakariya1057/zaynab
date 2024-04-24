@@ -1,8 +1,13 @@
-import { Text, View } from 'tamagui'
+import {YStack} from 'tamagui'
+import DownloadsList from "@/components/Download/DownloadList";
+import CompactAudioPlayer from "@/components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
+import React from "react";
 
 export default function () {
     return (
-        <View flex={1} alignItems="center">
-        </View>
-    )
+        <YStack f={1}>
+            <DownloadsList></DownloadsList>
+            <CompactAudioPlayer edges={[]} />
+        </YStack>
+    );
 }

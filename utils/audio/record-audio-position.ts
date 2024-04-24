@@ -30,7 +30,7 @@ export const recordAudioPosition = () => {
                         episodeId,
                     });
 
-                    console.log('Progress updated for:', track.title, position, duration);
+                    // console.log('Progress updated for:', track.title, position, duration);
                 } catch (error) {
                     console.error('Error updating episode progress:', error);
                 }

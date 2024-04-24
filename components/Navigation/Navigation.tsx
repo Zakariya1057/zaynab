@@ -4,7 +4,7 @@ import React from "react";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {Theme} from "../../constants";
-import {ArrowLeft, Bookmark} from "@tamagui/lucide-icons";
+import {ArrowLeft, Bookmark, Download} from "@tamagui/lucide-icons";
 
 interface Props {
     goBack: () => void
@@ -19,6 +19,10 @@ export default function ({ goBack }: Props) {
                 </TouchableOpacity>
 
                 <View style={{ flex: 1}}/>
+
+                <TouchableOpacity onPress={goBack}>
+                    <Download size={30} color={'white'} />
+                </TouchableOpacity>
             </SafeAreaView>
         </View>
     )

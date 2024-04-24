@@ -4,6 +4,29 @@ import LottieView from 'lottie-react-native';
 import {State, usePlaybackState} from "react-native-track-player";
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
+const ConditionalLottie = ({ isPlaying }) => {
+    const animationRef = useRef(null);
+
+    useEffect(() => {
+        if (isPlaying) {
+            animationRef.current?.play();
+        } else {
+            animationRef.current?.reset();
+        }
+    }, [isPlaying]);
+
+    if (!isPlaying) return null;
+
+    return (
+        <LottieView
+            ref={animationRef}
+            style={{ width: 70, height: 50 }}
+            source={require('@/assets/animation/sound.json')}
+            loop
+        />
+    );
+};
+
 export default function SeriesEpisode({title, description, openEpisode, playing, percentage}: SeriesEpisodeProps) {
     const animation = useRef(null);
 
@@ -27,17 +50,18 @@ export default function SeriesEpisode({title, description, openEpisode, playing,
                     <Text fontSize={15} color={playing ? '$color.purple2' : '$charcoal'}>{description}</Text>
                 </YStack>
 
-                <YStack opacity={(playing && state !== State.Paused) ? 1 : 0} justifyContent={'center'}>
-                    <LottieView
-                        autoPlay
-                        ref={animation}
-                        style={{
-                            width: 70,
-                            height: 50,
-                        }}
-                        source={require('@/assets/animation/sound.json')}
-                    />
-                </YStack>
+                <ConditionalLottie isPlaying={playing && state !== State.Paused}/>
+                {/*<YStack opacity={(playing && state !== State.Paused) ? 1 : 0} justifyContent={'center'}>*/}
+                {/*    <LottieView*/}
+                {/*        autoPlay*/}
+                {/*        ref={animation}*/}
+                {/*        style={{*/}
+                {/*            width: 70,*/}
+                {/*            height: 50,*/}
+                {/*        }}*/}
+                {/*        source={require('@/assets/animation/sound.json')}*/}
+                {/*    />*/}
+                {/*</YStack>*/}
 
                 {
                     percentage ?

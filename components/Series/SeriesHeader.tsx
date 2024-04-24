@@ -49,7 +49,7 @@ export default function SeriesHeader({ image, title, description, play }: Series
                         alignSelf="center"
                         backgroundColor="rgba(0,0,0,0.60)"
                         borderColor={purple}
-                        borderWidth={'$0.3'}
+                        borderWidth={'$0.5'}
                     >
                         Play
                     </Button>

@@ -1,75 +1,75 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {FlatList, RefreshControl} from "react-native";
 import {router, useFocusEffect} from "expo-router";
 import SeriesEpisode from "./SeriesEpisode";
 import SeriesHeader from "./SeriesHeader";
 import {Podcast} from "@/interfaces/podcast";
 import {Episode} from "@/interfaces/episode";
-import {EpisodeModel} from "@/utils/database/models/episode-model";
 import {getPercentage} from "@/utils/percentage/get-percentage";
 import {useEpisodes} from "@/hooks/useEpisodes";
 import {useTheme} from "tamagui";
 
-export default function ({podcast, play, playingEpisodeId}: {
+export default function SeriesPage({podcast, play, playingEpisodeId}: {
     podcast: Podcast,
     playingEpisodeId?: string,
     play: () => void
 }) {
-    const {episodes, retry, loading } = useEpisodes();
-
+    const {episodes, retry, loading} = useEpisodes();
     const [refreshing, setRefreshing] = useState(false);
 
-    const setEpisodeHistory = () => {
-        for (const episode of episodes) {
-            podcast.episodes[episode.episodeId].duration = episode.duration
-            podcast.episodes[episode.episodeId].position = episode.position
+    const setEpisodeHistory = useCallback(() => {
+        if (episodes.length > 0) {
+            for (const episode of episodes) {
+                if (podcast.episodes[episode.episodeId]) {
+                    podcast.episodes[episode.episodeId].duration = episode.duration;
+                    podcast.episodes[episode.episodeId].position = episode.position;
+                }
+            }
         }
-    }
+    }, [episodes, podcast.episodes]);
 
-    const onRefresh = async () => {
+    const onRefresh = useCallback(async () => {
         setRefreshing(true);
-        await retry()
-        setEpisodeHistory()
+        await retry();
+        setEpisodeHistory();
         setRefreshing(false);
-    }
+    }, [retry, setEpisodeHistory]);
 
     useEffect(() => {
-        setEpisodeHistory()
-    }, [loading]);
+        setEpisodeHistory();
+    }, [loading, setEpisodeHistory]);
 
-    useFocusEffect(
-        useCallback(() => {
-            setEpisodeHistory()
-        }, [])
-    )
+    useFocusEffect(setEpisodeHistory);
 
     const theme = useTheme();
-    const purple = theme.purple.get()
+    const purple = theme.purple.get();
 
-    const ListHeader = () => (
+    const ListHeader = useMemo(() => (
         <SeriesHeader
             title={podcast.name}
             description={podcast.description}
             image={podcast.image}
             play={play}
         />
-    );
+    ), [podcast, play]);
 
-    const openEpisode = (episode: Episode) => router.push({
-        pathname: "/episode/",
-        params: {podcastId: podcast.id, episodeId: episode.id}
-    })
+    const openEpisode = useCallback((episodeId: string) => {
+        router.push({
+            pathname: "/episode/",
+            params: {podcastId: podcast.id, episodeId}
+        });
+    }, [podcast.id]);
 
-    const renderEpisodeItem = ({item}: { item: Episode }) => {
-        return <SeriesEpisode
+    const renderEpisodeItem = useCallback(({item}: { item: Episode }) => (
+        <SeriesEpisode
             key={item.id}
             title={`Episode ${item.number}`}
             description={item.description}
-            openEpisode={() => openEpisode(item)}
+            openEpisode={() => openEpisode(item.id)}
             playing={playingEpisodeId === item.id}
-            percentage={getPercentage(item?.position, item?.duration)}
+            percentage={getPercentage(item.position, item.duration)}
         />
-    }
+    ), [openEpisode, playingEpisodeId]);
 
     return (
         <FlatList
@@ -86,4 +86,4 @@ export default function ({podcast, play, playingEpisodeId}: {
             keyExtractor={item => item.id}
         />
     );
-};
+}

@@ -1,24 +1,80 @@
-import {Text, View, Input, Stack, ScrollView} from 'tamagui'
-import {Search} from "@tamagui/lucide-icons";
-import {Podcast} from "./index";
+import {
+    Text,
+    YStack,
+    XStack,
+    Image,
+    Stack,
+    H5,
+    Card,
+    H6, useTheme, Input
+} from 'tamagui';
+import {PlayCircle} from "@tamagui/lucide-icons";
+import {router} from "expo-router";
+import {FlatList, ImageSourcePropType, RefreshControl, TouchableOpacity, SectionList} from "react-native";
+import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
+import React, {useCallback, useRef, useState} from "react";
+import {Podcasts} from "@/utils/data/podcasts";
+import {Podcast} from "@/interfaces/podcast";
+import {useEpisodes} from "@/hooks/useEpisodes";
 
-export default function () {
+export default function App() {
+    const sections = [
+        {
+            title: "Popular Podcasts",
+            data: Object.values(Podcasts) // Assuming Podcasts is an array
+        }
+    ];
+
+    const renderItem = ({ item }) => {
+        return <PodcastElement {...item} />;
+    };
+
     return (
-        <Stack flex={1} alignItems="center" p={'$3'}>
+        <Stack f={1} backgroundColor={'$background'}>
             <Input width={'100%'} placeholder={'Search'}/>
 
-            <ScrollView mt={'$3'} space={'$3'} showsHorizontalScrollIndicator={false} width={'100%'}>
-                <Podcast title={'Controversy - Marriage App - New Quran and TikTok Refutations'} speaker={'Nouman Ali Khan'} image={"https://mymuslimincom.files.wordpress.com/2023/04/343539708_758348462500153_2932433872809281200_n.jpeg"} />
-                <Podcast title={'This book is NOT a new Quran'} speaker={'Zakir Naik'} image={"https://mymuslimincom.files.wordpress.com/2023/04/343539708_758348462500153_2932433872809281200_n.jpeg"} />
-                <Podcast title={'Reviving Your Heart'} speaker={'Hamza Yusuf'} image={"https://mymuslimincom.files.wordpress.com/2023/04/343539708_758348462500153_2932433872809281200_n.jpeg"} />
-                <Podcast title={'Life of the Prophet'} speaker={'Yasir Qadhi'} image={"https://mymuslimincom.files.wordpress.com/2023/04/343539708_758348462500153_2932433872809281200_n.jpeg"} />
-                <Podcast title={'The Middle Path'} speaker={'Omar Suleiman'} image={"https://mymuslimincom.files.wordpress.com/2023/04/343539708_758348462500153_2932433872809281200_n.jpeg"} />
-                <Podcast title={'Struggling with Sin'} speaker={'Suhaib Webb'} image={"https://mymuslimincom.files.wordpress.com/2023/04/343539708_758348462500153_2932433872809281200_n.jpeg"} />
-                <Podcast title={'Understanding Islam'} speaker={'Bilal Philips'} image={"https://mymuslimincom.files.wordpress.com/2023/04/343539708_758348462500153_2932433872809281200_n.jpeg"} />
-                <Podcast title={'Islam and Modernity'} speaker={'Tariq Ramadan'} image={"https://mymuslimincom.files.wordpress.com/2023/04/343539708_758348462500153_2932433872809281200_n.jpeg"} />
-                <Podcast title={'The Path to Wisdom'} speaker={'Ahmad Deedat'} image={"https://mymuslimincom.files.wordpress.com/2023/04/343539708_758348462500153_2932433872809281200_n.jpeg"} />
-                <Podcast title={'Finding Peace'} speaker={'Abdul Nasir Jangda'} image={"https://mymuslimincom.files.wordpress.com/2023/04/343539708_758348462500153_2932433872809281200_n.jpeg"} />
-            </ScrollView>
+            <SectionList
+                sections={sections}
+                keyExtractor={(item, index) => item.id || index.toString()}
+                renderItem={renderItem}
+                contentContainerStyle={{ paddingHorizontal: 10, rowGap: 10 }}
+                showsVerticalScrollIndicator={false}
+                backgroundColor={'$backgroundStrong'}
+            />
+            <CompactAudioPlayer edges={[]} />
         </Stack>
+    )
+}
+
+export const PodcastElement = (podcast: Podcast) => {
+    const {name, subTitle, image} = podcast
+
+    return (
+        <TouchableOpacity onPress={
+            () => router.push({pathname: "/series/", params: {id: podcast.id}})
+        } >
+            <XStack
+                gap="$3"
+                alignItems="center"
+                borderRadius="$3"
+            >
+                <Image
+                    src={image}
+                    width={80}
+                    aspectRatio={1}
+                    borderRadius={'$3'}
+                    overflow={'hidden'}
+                    resizeMode="cover"
+                />
+                <YStack f={1} justifyContent="center" space="$2">
+                    <H5 lineHeight="$4" numberOfLines={2}>{name}</H5>
+                    <Text fontSize={'$4'} numberOfLines={2}>{subTitle}</Text>
+                </YStack>
+                <TouchableOpacity
+                    onPress={() => router.push({pathname: "/series/", params: {id: podcast.id, play: true}})}>
+                    <PlayCircle size="$4" strokeWidth={1.3} color={'$color.purple'}/>
+                </TouchableOpacity>
+            </XStack>
+        </TouchableOpacity>
     )
 }

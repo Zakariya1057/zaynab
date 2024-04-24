@@ -12,7 +12,7 @@ export const Podcasts: Record<string, Podcast> = {
             "6605c3ca-cdc4-4904-a82a-178ffb8466f5": {
                 id: "6605c3ca-cdc4-4904-a82a-178ffb8466f5",
                 number: 1,
-                url: "https://archive.org/download/Lives/CD01.mp31",
+                url: "file:///Users/zakariyamohummed/Library/Developer/CoreSimulator/Devices/BCF6810D-A53E-48D6-B2D2-8426B0E09E93/data/Containers/Data/Application/ECB412C6-2CDF-4C4A-B49E-100BC445AB9B/Documents/15c09fa2-3f12-4492-8b98-1f9b6890b511.mp3",
                 description: "Introduction – Story Of Creation"
             },
             "15c09fa2-3f12-4492-8b98-1f9b6890b511": {
@@ -132,7 +132,7 @@ export const Podcasts: Record<string, Podcast> = {
             "6605c3ca-cdc4-4904-a82a-178ffb8466fd": {
                 id: "6605c3ca-cdc4-4904-a82a-178ffb8466fd",
                 number: 21,
-                url: "https://archive.org/download/Lives/CD21.mp3",
+                url: "https://download.samplelib.com/mp3/sample-15s.mp3",
                 description: "The Family Of Imran"
             }
         }

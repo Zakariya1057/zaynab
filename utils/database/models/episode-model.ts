@@ -4,6 +4,9 @@ import { field } from '@nozbe/watermelondb/decorators';
 export class EpisodeModel extends Model {
     static table = 'episodes';
 
+    @field('podcastId') podcastId;
+    @field('episodeId') episodeId;
+
     @field('artist') artist;
     @field('description') description;
     @field('title') title;
@@ -11,8 +14,9 @@ export class EpisodeModel extends Model {
     @field('duration') duration;
     @field('position') position;
     @field('complete') complete;
-    @field('podcastId') podcastId;
-    @field('episodeId') episodeId;
-    @field('updated_at') updated_at;
-    @field('created_at') created_at;
+
+    @field('bookmarked') bookmarked;
+
+    @field('episodeUpdatedAt') episodeUpdatedAt;
+    @field('episodeCreatedAt') episodeCreatedAt;
 }

@@ -9,12 +9,16 @@ import {Theme} from "../../constants";
 import {getPodcastById} from "@/utils/data/getPodcastById";
 import TrackPlayer, {State, Track, useActiveTrack, usePlaybackState, useProgress} from "react-native-track-player";
 import {Episode} from "@/interfaces/episode";
+import useDownloadManager2 from "@/hooks/useDownloadManager2";
+import Toast from "react-native-toast-message";
 
 export default function () {
     const {id, play: playAudio} = useLocalSearchParams<{ id: string, play?: string }>()
     const podcast = getPodcastById(id)
 
     const track = useActiveTrack()
+
+    const {downloadAudios} = useDownloadManager2()
 
     const play = async () => {
         try {
@@ -46,6 +50,29 @@ export default function () {
         await TrackPlayer.play()
     }
 
+    const download = async () => {
+        const episodes = Object.values(podcast.episodes)
+
+        Toast.show({
+            type: 'info', // Appropriate for informational messages
+            text1: 'Downloading Episodes', // A clear, concise title for the action
+            text2: 'Attempting to download all episodes in this series.', // More specific details about the action
+            position: 'bottom', // Position at the bottom so it does not block other UI elements
+            visibilityTime: 4000, // Duration in milliseconds the toast should be visible
+            autoHide: true, // The toast will disappear after the visibilityTime
+            bottomOffset: 40, // Spacing from the bottom, adjusted for visibility
+        });
+
+        await downloadAudios(
+            episodes.map((episode) => ({
+                    url: episode.url,
+                    episodeId: episode.id,
+                    podcastId: podcast.id,
+                })
+            )
+        )
+    }
+
     useEffect(() => {
         if (playAudio) {
             play()
@@ -58,9 +85,9 @@ export default function () {
                 headerShown: false
             }}/>
 
-            <Navigation goBack={() => router.back()}/>
+            <Navigation goBack={() => router.back()} download={download}/>
 
-            <Series podcast={podcast} play={play} playingEpisodeId={track?.id} />
+            <Series podcast={podcast} play={play} playingEpisodeId={track?.id}/>
 
             <CompactAudioPlayer/>
         </SafeAreaView>

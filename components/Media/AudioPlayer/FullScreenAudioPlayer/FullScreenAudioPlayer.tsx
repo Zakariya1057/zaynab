@@ -168,7 +168,7 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
             if (downloaded) {
                 Toast.show({
                     type: 'success', // Indicates a successful outcome
-                    text1: 'Download Complete', // More precise text
+                    text1: 'Episode Download Complete', // More precise text
                     text2: 'The episode is now ready for offline playback.', // Additional detail can be helpful
                     position: 'bottom', // Keeps it out of the way of primary interactions
                     visibilityTime: 4000, // Long enough to read comfortably
@@ -178,7 +178,7 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
             } else {
                 Toast.show({
                     type: 'info', // Change type if 'info' is available, to differentiate from complete success
-                    text1: 'Download Started', // Clear indication of action initiation
+                    text1: 'Episode Download Started', // Clear indication of action initiation
                     text2: 'Your episode is now downloading.', // Provides a bit more context
                     position: 'bottom', // Consistent positioning
                     visibilityTime: 4000, // Matching visibility duration

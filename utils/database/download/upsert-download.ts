@@ -23,7 +23,9 @@ export const upsertDownload = async (downloadData: Partial<DownloadModel>) => {
                 if (downloadData.downloaded) {
                     download.downloadCompletedAt = time; // Set completion time if the download is marked as completed
                 }
+
                 download.downloadUpdatedAt = time; // Always update the 'updatedAt' field
+                download.downloadStartedAt = download.downloadStartedAt ?? time;
             });
         } else {
             // Download does not exist, create a new one

@@ -8,9 +8,10 @@ import {ArrowLeft, Bookmark, Download} from "@tamagui/lucide-icons";
 
 interface Props {
     goBack: () => void
+    download: () => void
 }
 
-export default function ({ goBack }: Props) {
+export default function ({ goBack, download }: Props) {
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.container}>
@@ -20,7 +21,7 @@ export default function ({ goBack }: Props) {
 
                 <View style={{ flex: 1}}/>
 
-                <TouchableOpacity onPress={goBack}>
+                <TouchableOpacity onPress={download}>
                     <Download size={30} color={'white'} />
                 </TouchableOpacity>
             </SafeAreaView>

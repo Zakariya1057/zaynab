@@ -132,7 +132,7 @@ export const Podcasts: Record<string, Podcast> = {
             "6605c3ca-cdc4-4904-a82a-178ffb8466fd": {
                 id: "6605c3ca-cdc4-4904-a82a-178ffb8466fd",
                 number: 21,
-                url: "https://download.samplelib.com/mp3/sample-15s.mp3",
+                url: "https://archive.org/download/Lives/CD21.mp3",
                 description: "The Family Of Imran"
             }
         }

@@ -8,17 +8,43 @@ import {insertDownload} from "@/utils/database/download/insert-download";
 import {DownloadModel} from "@/utils/database/models/download-model";
 import {useDownloads} from "@/contexts/download-context";
 import Toast from "react-native-toast-message";
+import {useQueue} from "@/contexts/queue-context";
+import {debounce} from "@/utils/debounce/debounce";
 
 const useDownloadManager = () => {
     const downloadResumableRef = useRef<DownloadResumable | null>(null);
     const { addDownload, removeDownload, isDownloading } = useDownloads();
+    const { addToQueue, removeFromQueue, isInQueue, queueEmpty, getNextItem } = useQueue()
 
     const intervalRef = useRef(null);
+
+    const downloadAudios =  async (episodes: Partial<DownloadModel>[]): Promise<void> => {
+        for (const episode of episodes) {
+            await upsertDownload({...episode});
+        }
+
+        for (const episode of episodes) {
+            await downloadAudio(episode)
+        }
+    }
 
     const downloadAudio = async (episode: Partial<DownloadModel>): Promise<void> => {
         if (isDownloading(episode.episodeId)) {
             console.log('Download already in progress for this episode');
             return; // Prevents starting a new download if it's already in progress
+        }
+
+        if (isInQueue(episode.episodeId)) {
+            console.log('Download already waiting in Queue')
+            return
+        } else {
+            addToQueue(episode.episodeId, episode)
+
+            if (!queueEmpty()) {
+                console.log('Already downloading item in the queue.')
+                await upsertDownload({...episode});
+                return
+            }
         }
 
         addDownload(episode.episodeId);
@@ -75,14 +101,23 @@ const useDownloadManager = () => {
         }
     }
 
-    const updateProgress = useCallback((id: string, progressData: DownloadProgressData): void => {
-        const {totalBytesWritten, totalBytesExpectedToWrite} = progressData;
+    const updateProgress = debounce(async (id: string, progressData: DownloadProgressData) => {
+        const { totalBytesWritten, totalBytesExpectedToWrite } = progressData;
         const progress = totalBytesWritten / totalBytesExpectedToWrite;
-        console.log(`Download progress for ${id}: ${progress * 100}%`);
+        console.log(`Download progress for ${id}: ${progress * 100}%`, totalBytesWritten, totalBytesExpectedToWrite);
 
-        upsertDownload({episodeId: id, totalBytesWritten, totalBytesExpectedToWrite, downloaded: progress === 1});
+        await upsertDownload({ episodeId: id, totalBytesWritten, totalBytesExpectedToWrite, downloaded: progress === 1 });
         // saveDownloadable(id)
-    }, []);
+    }, 100)
+
+    // const updateProgress = useCallback(async (id: string, progressData: DownloadProgressData): void => {
+    //     const {totalBytesWritten, totalBytesExpectedToWrite} = progressData;
+    //     const progress = totalBytesWritten / totalBytesExpectedToWrite;
+    //     console.log(`Download progress for ${id}: ${progress * 100}%`, totalBytesWritten, totalBytesExpectedToWrite);
+    //
+    //     await upsertDownload({episodeId: id, totalBytesWritten, totalBytesExpectedToWrite, downloaded: progress === 1});
+    //     // saveDownloadable(id)
+    // }, []);
 
     const saveDownloadable = async (id: string): Promise<void> => {
         const downloadResumable = downloadResumableRef.current;
@@ -172,11 +207,18 @@ const useDownloadManager = () => {
                 topOffset: 30, // Spacing from the top, when position is 'top'
                 bottomOffset: 40, // Spacing from the bottom, useful when position is 'bottom'
             });
+
+            removeFromQueue(id)
+
+            const nextDownload = getNextItem()
+            if (nextDownload) {
+                downloadAudio(nextDownload)
+            }
             // clearInterval(intervalRef.current);
         }
     }
 
-    return {downloadAudio};
+    return {downloadAudio, downloadAudios};
 };
 
 export default useDownloadManager;

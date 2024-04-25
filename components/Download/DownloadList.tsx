@@ -1,5 +1,5 @@
-import React, {useRef} from 'react';
-import {FlatList, TouchableOpacity} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {FlatList, RefreshControl, SectionList, TouchableOpacity} from 'react-native';
 import {withDatabase} from '@nozbe/watermelondb/DatabaseProvider';
 import {withObservables} from '@nozbe/watermelondb/react';
 import {Database, Q} from '@nozbe/watermelondb';
@@ -15,15 +15,8 @@ interface DownloadItemProps {
     download: DownloadModel
 }
 
-// This component renders a single download item
-
 const DownloadItem: React.FC<DownloadItemProps> = ({download}) => {
-    const animation = useRef(null);
-
-    const theme = useTheme();
-    const purple = theme.purple.get()
-
-    const { podcastId, episodeId, totalBytesWritten, totalBytesExpectedToWrite, downloaded } = download
+    const {podcastId, episodeId, totalBytesWritten, totalBytesExpectedToWrite, downloaded} = download
 
     const percentage = totalBytesWritten / totalBytesExpectedToWrite;
     const isDownloading = downloaded === false;
@@ -51,35 +44,21 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download}) => {
                     </Text>
                 </YStack>
 
-                <YStack justifyContent="center">
-                    {/*{*/}
-                    {/*    isDownloading &&*/}
-                    {/*    <LottieView*/}
-                    {/*        autoPlay*/}
-                    {/*        loop*/}
-                    {/*        ref={animation}*/}
-                    {/*        style={{ width: 70, height: 50 }}*/}
-                    {/*        source={require('@/assets/animation/download.json')}  // Assuming you have a similar Lottie file*/}
-                    {/*    />*/}
-                    {/*}*/}
+                <YStack ml="$5">
+                    <AnimatedCircularProgress
+                        size={50}
+                        width={4}
+                        fill={(percentage ?? 0) * 100}
+                        tintColor={'rgb(189,0,0)'}
+                        backgroundColor={'rgba(154,0,0,0.47)'}
+                        rotation={0}
+                    >
+                        {(fill) => (
+                            <Text>{percentage ? Math.floor((percentage) * 100) : 0}%</Text>
+                        )}
+                    </AnimatedCircularProgress>
                 </YStack>
-
-                {percentage > 0 &&
-                    <YStack ml="$5">
-                        <AnimatedCircularProgress
-                            size={50}
-                            width={4}
-                            fill={percentage * 100}
-                            tintColor={'rgb(189,0,0)'}
-                            backgroundColor={'rgba(154,0,0,0.47)'}
-                            rotation={0}
-                        >
-                            {(fill) => (
-                                <Text>{Math.floor(percentage * 100)}%</Text>
-                            )}
-                        </AnimatedCircularProgress>
-                    </YStack>
-                }
+                {/*}*/}
 
             </XStack>
 
@@ -88,24 +67,66 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download}) => {
     );
 }
 
-interface DownloadsListProps {
-    downloads: DownloadModel[];
-}
-
 // Main component to display the list of downloads
-const DownloadsList: React.FC<DownloadsListProps> = ({downloads}) => (
-    <FlatList
-        data={downloads}
-        keyExtractor={(item) => item.id}
-        renderItem={({item}) => <DownloadItem download={item}/>}
-    />
-);
+const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) => {
+    const [refreshing, setRefreshing] = useState(false);
+    const [sections, setSections] = useState<{ title: string, data: DownloadModel[] }[]>([]);
+
+    const theme = useTheme();
+    const purple = theme.purple.get()
+
+    useEffect(() => {
+        const waitingToDownload = downloads.filter(d => !d.downloaded && d.totalBytesWritten === 0);
+        const completedDownloads = downloads.filter(d => d.downloaded);
+        const inProgressPaused = downloads.filter(d => !d.downloaded && d.totalBytesWritten > 0 && d.totalBytesWritten < d.totalBytesExpectedToWrite);
+
+        setSections(
+            [
+                {title: 'In Progress', data: inProgressPaused},
+                {title: 'Waiting to Download', data: waitingToDownload},
+                {title: 'Completed Download', data: completedDownloads},
+            ].filter(section => section.data.length > 0)
+        );
+    }, [downloads]);
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        console.log('Refresh action triggered');
+        // You might want to trigger a refetch or some update logic
+        // Here you would normally go and fetch new data or re-fetch existing data
+        setRefreshing(false);
+    };
+
+    return (
+        <SectionList
+            sections={sections}
+            keyExtractor={(item, index) => item.id + index}
+            renderItem={({item}) => <DownloadItem download={item}/>}
+            renderSectionHeader={({section: {title}}) => (
+                <YStack width="100%">
+                    <XStack justifyContent="space-between" alignItems="center" backgroundColor={'$background'}
+                            py={'$3'}>
+                        <Text fontSize={20} fontWeight="bold" pl={'$4'}>{title}</Text>
+                    </XStack>
+                </YStack>
+            )}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={['purple']} // Optional: you can set the colors of the indicator (Android)
+                    tintColor={purple} // Optional: set the color of the indicator (iOS)
+                />
+            }
+        />
+    );
+};
 
 // This function specifies which observables the component subscribes to and watches column changes
 const enhance = withObservables(['downloads'], () => ({
     downloads: database.collections.get<DownloadModel>('downloads')
         .query(
-            Q.sortBy('downloadStartedAt', Q.desc)
+            Q.sortBy('downloadUpdatedAt', Q.desc),
         )
         .observeWithColumns(['totalBytesWritten', 'downloaded'])
 

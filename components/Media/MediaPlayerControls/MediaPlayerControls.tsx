@@ -77,9 +77,8 @@ const MediaPlayerControls: React.FC<Props> = ({
 
     const downloaded = downloadModel?.downloaded
 
-    const { isDownloading } = useDownloads()
-
-    const currentlyDownloading = isDownloading(downloadModel?.episodeId ?? '')
+    const currentlyDownloading = downloadModel?.downloadUpdatedAt &&
+        (Date.now() - (downloadModel.downloadUpdatedAt*1000) <= 3000)
 
     let downloadIcon;
     if (downloaded) {

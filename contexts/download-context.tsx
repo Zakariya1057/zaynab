@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useState, ReactNode} from 'react';
+import React, {createContext, useContext, useState, ReactNode, useEffect} from 'react';
 
 interface DownloadContextType {
     activeDownloads: Set<string>;
@@ -17,20 +17,29 @@ export const DownloadProvider: React.FC<Props> = ({children}) => {
     const [activeDownloads, setActiveDownloads] = useState<Set<string>>(new Set());
 
     const addDownload = (episodeId: string) => {
-        setActiveDownloads(new Set(activeDownloads.add(episodeId)));
+        setActiveDownloads(prev => new Set(prev.add(episodeId)));
     };
 
     const removeDownload = (episodeId: string) => {
-        activeDownloads.delete(episodeId);
-        setActiveDownloads(new Set(activeDownloads));
+        setActiveDownloads(prev => {
+            const updated = new Set(prev);
+            updated.delete(episodeId);
+            return updated;
+        });
     };
 
     const isDownloading = (episodeId: string): boolean => {
+        console.log('Active', activeDownloads);
         return activeDownloads.has(episodeId);
     };
 
     return (
-        <DownloadContext.Provider value={{activeDownloads, addDownload, removeDownload, isDownloading}}>
+        <DownloadContext.Provider value={{
+            activeDownloads,
+            addDownload,
+            removeDownload,
+            isDownloading,
+        }}>
             {children}
         </DownloadContext.Provider>
     );
@@ -38,7 +47,7 @@ export const DownloadProvider: React.FC<Props> = ({children}) => {
 
 export const useDownloads = () => {
     const context = useContext(DownloadContext);
-    if (context === undefined) {
+    if (!context) {
         throw new Error('useDownloads must be used within a DownloadProvider');
     }
     return context;

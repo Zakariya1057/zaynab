@@ -15,12 +15,14 @@ import {Podcast} from "@/interfaces/podcast";
 import {Episode} from "@/interfaces/episode";
 import Toast from "react-native-toast-message";
 import {RefreshControl} from "react-native";
-import useDownloadManager from "@/hooks/useDownloadManager";
 import useDownloadManager2 from "@/hooks/useDownloadManager2";
+import {getDownloadById} from "@/utils/database/download/get-download-by-id";
 
 export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, episode: Episode }) {
     const track = useActiveTrack()
     const { state } = usePlaybackState()
+
+    const { downloadAudio } = useDownloadManager2()
 
     const {position, duration} = useProgress(1000); // Updates every 1000 ms
     const [loading, setLoading] = useState(false)
@@ -33,7 +35,6 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
     const firstEpisode = episodes.at(0)
     const lastEpisode = episodes.at(-1)
 
-    const [open, setOpen] = React.useState(false)
     const timerRef = React.useRef(0)
 
     React.useEffect(() => {
@@ -127,7 +128,7 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
         Toast.show({
             type: 'error', // Indicates that this toast is for an error message
             text1: 'Audio Load Failed', // A clear, concise title for the error
-            text2: 'Swipe down to refresh and try again.', // Specific instructions for the user
+            text2: 'Pull down page to refresh and try again.', // Specific instructions for the user
             position: 'bottom', // Position at the bottom so it does not block other UI elements
             visibilityTime: 4000, // Duration in milliseconds the toast should be visible
             autoHide: true, // The toast will disappear after the visibilityTime
@@ -155,34 +156,37 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
         await TrackPlayer.seekTo(position)
     }
 
-    // const { startOrResumeDownload, downloads } = useDownloadManager();
-    //
-    // const [percentageDownloaded, setPercentageDownlaoded] = useState()
-    //
-    // const download = async () => {
-    //     const track = await TrackPlayer.getActiveTrack()
-    //
-    //     if (track && track.url) {
-    //         const [ _, episodeId ] = (track.description?.split('|') ?? [])
-    //         await startOrResumeDownload(episodeId, track.url)
-    //     }
-    // }
-    //
-    // useEffect(() => {
-    //     const [ _, episodeId ] = (track.description?.split('|') ?? [])
-    //     const percentage = downloads.find((downloadItem) => downloadItem.id === episodeId)?.progress
-    //     if (percentage) {
-    //         setPercentageDownlaoded(download)
-    //     }
-    // }, [downloads]);
-
-    const { downloadAudio } = useDownloadManager2()
 
     const download = async () => {
         const track = await TrackPlayer.getActiveTrack()
 
         if (track && track.url) {
             const [ podcastId, episodeId ] = (track.description?.split('|') ?? [])
+
+            const { downloaded } = await getDownloadById(episodeId) ?? {}
+
+            if (downloaded) {
+                Toast.show({
+                    type: 'success', // Indicates a successful outcome
+                    text1: 'Download Complete', // More precise text
+                    text2: 'The episode is now ready for offline playback.', // Additional detail can be helpful
+                    position: 'bottom', // Keeps it out of the way of primary interactions
+                    visibilityTime: 4000, // Long enough to read comfortably
+                    autoHide: true, // Disappears after the set time
+                    bottomOffset: 40, // Spacing from the bottom
+                });
+            } else {
+                Toast.show({
+                    type: 'info', // Change type if 'info' is available, to differentiate from complete success
+                    text1: 'Download Started', // Clear indication of action initiation
+                    text2: 'Your episode is now downloading.', // Provides a bit more context
+                    position: 'bottom', // Consistent positioning
+                    visibilityTime: 4000, // Matching visibility duration
+                    autoHide: true, // Ensures it doesn't stay around too long
+                    bottomOffset: 40, // Consistent placement
+                });
+            }
+
             await downloadAudio({
                 ...track,
                 podcastId,
@@ -241,6 +245,7 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
                     isFirst={track?.id === firstEpisode?.id}
                     isLast={track?.id === lastEpisode?.id}
                     download={download}
+                    episodeId={track?.description?.split('|')[1]}
                 />
 
                 {/*<AboutEpisodeSheet*/}

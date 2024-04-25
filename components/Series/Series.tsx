@@ -8,13 +8,18 @@ import {Episode} from "@/interfaces/episode";
 import {getPercentage} from "@/utils/percentage/get-percentage";
 import {useEpisodes} from "@/hooks/useEpisodes";
 import {useTheme} from "tamagui";
+import {useDownloads} from "@/hooks/useDownloads";
 
-export default function SeriesPage({podcast, play, playingEpisodeId}: {
+interface Props {
     podcast: Podcast,
     playingEpisodeId?: string,
     play: () => void
-}) {
+}
+
+export default ({podcast, play, playingEpisodeId}: Props) => {
     const {episodes, retry, loading} = useEpisodes();
+    const { downloads } = useDownloads(podcast.id);
+
     const [refreshing, setRefreshing] = useState(false);
 
     const setEpisodeHistory = useCallback(() => {
@@ -25,8 +30,14 @@ export default function SeriesPage({podcast, play, playingEpisodeId}: {
                     podcast.episodes[episode.episodeId].position = episode.position;
                 }
             }
+
+            for (const download of downloads) {
+                if (podcast.episodes[download.episodeId]) {
+                    podcast.episodes[download.episodeId].downloaded = download.downloaded;
+                }
+            }
         }
-    }, [episodes, podcast.episodes]);
+    }, [episodes, podcast.episodes, downloads]);
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
@@ -68,6 +79,7 @@ export default function SeriesPage({podcast, play, playingEpisodeId}: {
             openEpisode={() => openEpisode(item.id)}
             playing={playingEpisodeId === item.id}
             percentage={getPercentage(item.position, item.duration)}
+            downloaded={item.downloaded ?? false}
         />
     ), [openEpisode, playingEpisodeId]);
 

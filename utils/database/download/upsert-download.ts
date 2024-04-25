@@ -15,34 +15,27 @@ export const upsertDownload = async (downloadData: Partial<DownloadModel>) => {
         if (existingDownloads.length > 0) {
             // Download exists, update it
             await existingDownloads[0].update((download) => {
-                // Only update fields that are explicitly provided
-                if (typeof downloadData.totalBytesWritten !== 'undefined') {
-                    download.totalBytesWritten = downloadData.totalBytesWritten;
-                }
-                if (typeof downloadData.totalBytesExpectedToWrite !== 'undefined') {
-                    download.totalBytesExpectedToWrite = downloadData.totalBytesExpectedToWrite;
-                }
-                if (typeof downloadData.downloaded !== 'undefined') {
-                    download.downloaded = downloadData.downloaded;
-                }
-                // Use a different field to track the time of update to avoid overwriting downloadCompletedAt unintentionally
+                Object.entries(downloadData).forEach(([key, value]) => {
+                    if (value !== undefined) {
+                        download[key] = value;
+                    }
+                });
                 if (downloadData.downloaded) {
-                    download.downloadCompletedAt = time; // Only set this when the download is marked as completed
+                    download.downloadCompletedAt = time; // Set completion time if the download is marked as completed
                 }
-
-                download.downloadUpdatedAt = time
+                download.downloadUpdatedAt = time; // Always update the 'updatedAt' field
             });
         } else {
             // Download does not exist, create a new one
             await downloadsCollection.create((newDownload) => {
-                newDownload.episodeId = downloadData.episodeId;
-                newDownload.podcastId = downloadData.podcastId
-                newDownload.totalBytesWritten = downloadData.totalBytesWritten || 0;
-                newDownload.totalBytesExpectedToWrite = downloadData.totalBytesExpectedToWrite || 0;
-                newDownload.downloaded = downloadData.downloaded || false;
-                newDownload.downloadStartedAt = time; // Use provided start time or current time
-                newDownload.downloadStartedAt = time; // Use provided start time or current time
-                newDownload.downloadCompletedAt = downloadData.downloaded ? time : null; // Set completed time if already downloaded
+                Object.keys(newDownload._raw).forEach(key => {
+                    if (key in downloadData && downloadData[key] !== undefined) {
+                        newDownload[key] = downloadData[key];
+                    }
+                });
+                newDownload.downloadStartedAt = downloadData.downloadStartedAt || time;
+                newDownload.downloadUpdatedAt = time;
+                newDownload.downloadCompletedAt = downloadData.downloaded ? time : null;
             });
         }
     });

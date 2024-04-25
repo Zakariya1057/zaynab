@@ -6,24 +6,28 @@ import {DownloadProgressData, DownloadResumable, FileSystemDownloadResult} from 
 import {getDownloadById} from "@/utils/database/download/get-download-by-id";
 import {insertDownload} from "@/utils/database/download/insert-download";
 import {DownloadModel} from "@/utils/database/models/download-model";
+import {useDownloads} from "@/contexts/download-context";
+import Toast from "react-native-toast-message";
 
 const useDownloadManager = () => {
     const downloadResumableRef = useRef<DownloadResumable | null>(null);
+    const { addDownload, removeDownload, isDownloading } = useDownloads();
 
     const intervalRef = useRef(null);
 
     const downloadAudio = async (episode: Partial<DownloadModel>): Promise<void> => {
-        // intervalRef.current = setInterval(() => {
-        //     if (downloadResumableRef.current) {
-        //         saveDownloadable(episode.episodeId);
-        //     }
-        // }, 30000);
+        if (isDownloading(episode.episodeId)) {
+            console.log('Download already in progress for this episode');
+            return; // Prevents starting a new download if it's already in progress
+        }
+
+        addDownload(episode.episodeId);
 
         const existingDownload = await getDownloadById(episode.episodeId);
-
         if (existingDownload) {
             if (existingDownload.downloaded) {
-                console.log('Download downloaded')
+                console.log('Episode already downloaded');
+                return;
             } else {
                 console.log('Resuming incomplete download');
                 await startOrResumeDownload(existingDownload.episodeId, existingDownload.url);
@@ -156,8 +160,18 @@ const useDownloadManager = () => {
     const downloadCompleted = async (id: string, result: FileSystemDownloadResult | undefined) => {
         if (result) {
             console.log('Download completed:', result.uri);
-            await upsertDownload({episodeId: id, downloaded: true});
+            await upsertDownload({episodeId: id, downloaded: true, uri: result.uri });
             await AsyncStorage.removeItem(`pausedDownload-${id}`);
+
+            Toast.show({
+                type: 'success', // Indicates that this toast is for an error message
+                text1: 'Download Complete!', // A clear, concise title for the error
+                position: 'bottom', // Position at the bottom so it does not block other UI elements
+                visibilityTime: 4000, // Duration in milliseconds the toast should be visible
+                autoHide: true, // The toast will disappear after the visibilityTime
+                topOffset: 30, // Spacing from the top, when position is 'top'
+                bottomOffset: 40, // Spacing from the bottom, useful when position is 'bottom'
+            });
             // clearInterval(intervalRef.current);
         }
     }

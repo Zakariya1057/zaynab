@@ -54,7 +54,13 @@ export default function EpisodePlayer({ edges = ['bottom'] }: { edges?: Edges })
                                 { track?.artist }
                             </Text>
                         </YStack>
-                        <MediaPlayerControls variant="small" togglePlayPause={togglePlayPause} isPlaying={isPlaying} loading={isLoading} />
+                        <MediaPlayerControls
+                            variant="small"
+                            togglePlayPause={togglePlayPause}
+                            isPlaying={isPlaying}
+                            loading={isLoading}
+                            episodeId={track?.description?.split('|')[1]}
+                        />
                     </XStack>
                 </YStack>
             </TouchableOpacity>

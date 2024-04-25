@@ -7,6 +7,7 @@ export interface Episode {
     description: string;
     duration?: number;
     position?: number;
+    downloaded?: boolean;
     image?: ImageSourcePropType;
     background?: ImageSourcePropType;
     author?: string

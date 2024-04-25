@@ -1,8 +1,17 @@
-import React from 'react';
-import {Spinner, useTheme, View, YStack} from 'tamagui';
+import React, {useEffect, useRef} from 'react';
+import {Spinner, useTheme, View, YStack, Text} from 'tamagui';
 import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
 import {Pressable, TouchableOpacity} from "react-native";
 import {Download, FastForward, Rewind} from '@tamagui/lucide-icons'
+import {withObservables} from "@nozbe/watermelondb/react";
+import {database} from "@/utils/database/setup";
+import {DownloadModel} from "@/utils/database/models/download-model";
+import {catchError, map, of} from "rxjs";
+import {Q} from "@nozbe/watermelondb";
+import LottieView from "lottie-react-native";
+import {useDownloads} from "@/contexts/download-context";
+import episode from "@/app/episode";
+import {useActiveTrack} from "react-native-track-player";
 
 interface Props {
     isPlaying: boolean;
@@ -11,6 +20,8 @@ interface Props {
     playPrev?: () => void;
     download?: () => void;
 
+    downloadModel?: DownloadModel | null;
+
     loading?: boolean;
     buffering?: boolean;
     variant: 'small' | 'medium' | 'large';
@@ -18,6 +29,28 @@ interface Props {
     isLast?: boolean;  // Indicates if the current track is the last one
 }
 
+const ConditionalLottie = ({ isDownloading }) => {
+    const animationRef = useRef(null);
+
+    useEffect(() => {
+        if (isDownloading) {
+            animationRef.current?.play();
+        } else {
+            animationRef.current?.reset();
+        }
+    }, [isDownloading]);
+
+    if (!isDownloading) return null;
+
+    return (
+        <LottieView
+            ref={animationRef}
+            style={{ width: 100, height: 100 }}
+            source={require('@/assets/animation/download.json')}
+            loop
+        />
+    );
+};
 
 const MediaPlayerControls: React.FC<Props> = ({
                                                   isPlaying,
@@ -25,6 +58,7 @@ const MediaPlayerControls: React.FC<Props> = ({
                                                   playNext,
                                                   playPrev,
                                                   download,
+                                                  downloadModel,
                                                   isFirst,
                                                   isLast,
                                                   variant,
@@ -38,6 +72,24 @@ const MediaPlayerControls: React.FC<Props> = ({
     const purple = theme.purple.get()
 
     const strokeWidth = 1.7
+
+    const downloadProgress = downloadModel ? (downloadModel.totalBytesWritten / downloadModel.totalBytesExpectedToWrite * 100) : 0
+
+    const downloaded = downloadModel?.downloaded
+
+    const { isDownloading } = useDownloads()
+
+    const currentlyDownloading = isDownloading(downloadModel?.episodeId ?? '')
+
+    let downloadIcon;
+    if (downloaded) {
+        downloadIcon = <Ionicons name="cloud-done" size={size+6} color={color} strokeWidth={strokeWidth}/>;
+    } else if (currentlyDownloading) {
+        downloadIcon = <Ionicons name="cloud-download-outline" size={size+4} color={color} strokeWidth={strokeWidth} />
+    } else {
+        downloadIcon = <Download size={size} color={color} strokeWidth={strokeWidth}/>;
+    }
+
 
     return (
         <YStack flexDirection="row" alignItems="center" justifyContent="space-between">
@@ -91,7 +143,10 @@ const MediaPlayerControls: React.FC<Props> = ({
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={download}>
-                        <Download size={size} color={color} strokeWidth={strokeWidth}/>
+                        <YStack alignItems="center">
+                            {downloadIcon}
+                            { (currentlyDownloading && !downloaded && downloadProgress) ? <Text mt={'$2'}>{Math.floor(downloadProgress)}%</Text> : undefined }
+                        </YStack>
                     </TouchableOpacity>
                 </>
             )}
@@ -99,4 +154,14 @@ const MediaPlayerControls: React.FC<Props> = ({
     );
 };
 
-export default MediaPlayerControls;
+// Continue using the enhanced function as it was
+const enhance = withObservables(['episodeId'], ({ episodeId }) => ({
+    downloadModel: episodeId ? database.get<DownloadModel>('downloads').query(
+        Q.where('episodeId', episodeId)
+    ).observe().pipe(
+        map(downloads => downloads.length > 0 ? downloads[0] : null),
+        catchError(() => of(null))
+    ) : of(null) // Return null immediately if episodeId is undefined
+}));
+
+export default enhance(MediaPlayerControls);

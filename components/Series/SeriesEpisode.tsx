@@ -2,9 +2,10 @@ import React, {useEffect, useRef} from 'react';
 import {YStack, Text, Separator, XStack, useTheme} from 'tamagui';
 import LottieView from 'lottie-react-native';
 import {State, usePlaybackState} from "react-native-track-player";
-import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import {AnimatedCircularProgress} from 'react-native-circular-progress';
+import {Ionicons} from "@expo/vector-icons";
 
-const ConditionalLottie = ({ isPlaying }) => {
+const ConditionalLottie = ({isPlaying}) => {
     const animationRef = useRef(null);
 
     useEffect(() => {
@@ -20,20 +21,21 @@ const ConditionalLottie = ({ isPlaying }) => {
     return (
         <LottieView
             ref={animationRef}
-            style={{ width: 70, height: 50 }}
+            style={{width: 70, height: 50}}
             source={require('@/assets/animation/sound.json')}
             loop
         />
     );
 };
 
-export default function SeriesEpisode({title, description, openEpisode, playing, percentage}: SeriesEpisodeProps) {
+export default function SeriesEpisode({title, description, openEpisode, playing, percentage, downloaded}: SeriesEpisodeProps) {
     const animation = useRef(null);
 
     const {state} = usePlaybackState()
 
     const theme = useTheme();
     const purple = theme.purple.get()
+    const color = theme.color.get()
 
     return (
         <>
@@ -45,27 +47,26 @@ export default function SeriesEpisode({title, description, openEpisode, playing,
                 paddingBottom={'$2'}
             >
                 <YStack f={1}>
-                    <Text fontSize={17} fontWeight="bold" mb={'$1.5'}
-                          color={playing ? '$color.purple' : '$color'}>{title}</Text>
+                    <Text fontSize={17} fontWeight="bold" mb={'$1.5'} color={playing ? '$color.purple' : '$color'}
+                          alignItems="center">
+                        {title}
+                        {
+                            downloaded && <YStack justifyContent={'flex-end'} pl={'$2'}>
+                                <Ionicons name="cloud-done" size={20} color={color} strokeWidth={1.7}/>
+                            </YStack>
+                        }
+
+                    </Text>
                     <Text fontSize={15} color={playing ? '$color.purple2' : '$charcoal'}>{description}</Text>
                 </YStack>
 
-                <ConditionalLottie isPlaying={playing && state !== State.Paused}/>
-                {/*<YStack opacity={(playing && state !== State.Paused) ? 1 : 0} justifyContent={'center'}>*/}
-                {/*    <LottieView*/}
-                {/*        autoPlay*/}
-                {/*        ref={animation}*/}
-                {/*        style={{*/}
-                {/*            width: 70,*/}
-                {/*            height: 50,*/}
-                {/*        }}*/}
-                {/*        source={require('@/assets/animation/sound.json')}*/}
-                {/*    />*/}
-                {/*</YStack>*/}
+                <YStack justifyContent={'center'}>
+                    <ConditionalLottie isPlaying={playing && state !== State.Paused}/>
+                </YStack>
 
                 {
                     percentage ?
-                        <Text justifyContent={'center'} ml={'$5'}>
+                        <YStack justifyContent={'center'} ml={'$5'}>
                             <AnimatedCircularProgress
                                 size={50}
                                 width={5}
@@ -73,7 +74,7 @@ export default function SeriesEpisode({title, description, openEpisode, playing,
                                 tintColor={purple}
                                 backgroundColor={'rgba(111,67,241,0.47)'}
                                 rotation={0}
-                                 >
+                            >
                                 {
                                     (fill) => (
                                         <Text>
@@ -82,7 +83,7 @@ export default function SeriesEpisode({title, description, openEpisode, playing,
                                     )
                                 }
                             </AnimatedCircularProgress>
-                        </Text>
+                        </YStack>
                         : <></>
                 }
 
@@ -99,6 +100,7 @@ interface SeriesEpisodeProps {
     title: string;
     description: string;
     playing: boolean;
+    downloaded: boolean;
     percentage: number | null;
     openEpisode: () => void;
 }

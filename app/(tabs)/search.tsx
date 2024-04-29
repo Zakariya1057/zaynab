@@ -39,9 +39,8 @@ export default function App() {
                 renderItem={renderItem}
                 contentContainerStyle={{ paddingHorizontal: 10, rowGap: 10 }}
                 showsVerticalScrollIndicator={false}
-                backgroundColor={'$backgroundStrong'}
             />
-            <CompactAudioPlayer edges={[]} />
+            <CompactAudioPlayer />
         </Stack>
     )
 }

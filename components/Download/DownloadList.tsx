@@ -1,19 +1,54 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, RefreshControl, SectionList, TouchableOpacity} from 'react-native';
+import {FlatList, RefreshControl, SectionList, TouchableOpacity, Modal, TouchableWithoutFeedback} from 'react-native';
 import {withDatabase} from '@nozbe/watermelondb/DatabaseProvider';
 import {withObservables} from '@nozbe/watermelondb/react';
 import {Database, Q} from '@nozbe/watermelondb';
 import {DownloadModel} from "@/utils/database/models/download-model";
 import {database} from "@/utils/database/setup";
-import {YStack, Text, useTheme, XStack, Separator} from "tamagui";
+import {YStack, Text, useTheme, XStack, Separator, View, Button} from "tamagui";
 import {AnimatedCircularProgress} from "react-native-circular-progress";
 import {getPodcastById} from "@/utils/data/getPodcastById";
 import {getEpisodeById} from "@/utils/data/getEpisodeById";
 import {router} from "expo-router";
+import {SimpleLineIcons} from "@expo/vector-icons";
 
 interface DownloadItemProps {
     download: DownloadModel
 }
+
+const DownloadItemModal = ({ modalVisible, setModalVisible, handlePauseDownload, handleDeleteDownload }) => {
+    return (
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor="rgba(0, 0, 0, 0.5)">
+                    <YStack width={320} minHeight={200} padding={20} backgroundColor={'$background'} borderRadius={12} alignItems="center" elevation={5} gap={'$6'}>
+                        <Text fontSize={'$7'} fontWeight="bold" color={'$text'}>
+                            Manage Download
+                        </Text>
+
+                        <YStack gap={'$4'} alignItems={'center'} width={'100%'}>
+                            <Button backgroundColor="$blue5" borderRadius={10} width="100%" onPress={handlePauseDownload}>
+                                <Text fontSize={'$5'}>Pause Download</Text>
+                            </Button>
+                            <Button onPress={handleDeleteDownload} backgroundColor="$red5" borderRadius={10} width="100%">
+                                <Text fontSize={'$5'}>Delete Download</Text>
+                            </Button>
+                        </YStack>
+
+                        <Button onPress={() => setModalVisible(false)} backgroundColor="$gray5" borderRadius={10}  width="100%">
+                            <Text fontSize={'$5'}>Cancel</Text>
+                        </Button>
+                    </YStack>
+                </YStack>
+            </Modal>
+        </TouchableWithoutFeedback>
+    );
+};
 
 const DownloadItem: React.FC<DownloadItemProps> = ({download}) => {
     const {podcastId, episodeId, totalBytesWritten, totalBytesExpectedToWrite, downloaded} = download
@@ -26,6 +61,23 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download}) => {
 
     const openEpisode = () => router.push({pathname: "/episode/", params: {podcastId, episodeId}});
 
+    const theme = useTheme()
+    const color = theme.color.get()
+
+    const [modalVisible, setModalVisible] = useState(false);
+
+    const handlePauseDownload = () => {
+        console.log('Pausing the download');
+        // Add logic to pause the download
+        setModalVisible(false);
+    };
+
+    const handleDeleteDownload = () => {
+        console.log('Deleting the download');
+        // Add logic to delete the download
+        setModalVisible(false);
+    };
+
     return (
         <TouchableOpacity onPress={openEpisode}>
             <XStack
@@ -35,19 +87,10 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download}) => {
                 paddingBottom="$2"
                 alignItems="center"
             >
-                <YStack f={1}>
-                    <Text fontSize={17} fontWeight="bold" mb="$1.5" color={'$charcoal'}>
-                        {episode.number}. {episode.description}
-                    </Text>
-                    <Text fontSize={15} color={'$charcoal'}>
-                        {podcast.name}
-                    </Text>
-                </YStack>
-
-                <YStack ml="$5">
+                <YStack>
                     <AnimatedCircularProgress
                         size={50}
-                        width={4}
+                        width={3}
                         fill={(percentage ?? 0) * 100}
                         tintColor={'rgb(189,0,0)'}
                         backgroundColor={'rgba(154,0,0,0.47)'}
@@ -58,11 +101,30 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download}) => {
                         )}
                     </AnimatedCircularProgress>
                 </YStack>
-                {/*}*/}
 
+                <YStack f={1} mx={'$3'}>
+                    <Text fontSize={17} fontWeight="bold" mb="$1.5" color={'$charcoal'} numberOfLines={1}>
+                        {episode.number}. {episode.description}
+                    </Text>
+                    <Text fontSize={15} color={'$charcoal'}>
+                        {podcast.name}
+                    </Text>
+                </YStack>
+
+                <TouchableOpacity onPress={() => setModalVisible(true)}>
+                    <SimpleLineIcons name="options-vertical" size={22} color={color} />
+                </TouchableOpacity>
             </XStack>
 
             <Separator alignSelf="stretch" vertical={false}/>
+
+            <DownloadItemModal
+                modalVisible={modalVisible}
+                setModalVisible={setModalVisible}
+                handlePauseDownload={handlePauseDownload}
+                handleDeleteDownload={handleDeleteDownload}
+            />
+
         </TouchableOpacity>
     );
 }

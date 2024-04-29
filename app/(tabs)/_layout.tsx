@@ -10,6 +10,9 @@ export default function TabLayout() {
         <Tabs
             screenOptions={{
                 tabBarActiveTintColor: '#5e2cf3',
+                tabBarLabelStyle: {
+                    fontSize: 12,
+                }
             }}
         >
             <Tabs.Screen
@@ -23,7 +26,7 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="search"
                 options={{
-                    // href: null,
+                    href: null,
                     title: 'Search',
                     tabBarIcon: ({ color }) => <Search color={color} />,
                 }}
@@ -31,6 +34,7 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="bookmarks"
                 options={{
+                    href: null,
                     title: 'Bookmark',
                     tabBarIcon: ({ color }) => <Bookmark color={color} />,
                 }}

@@ -200,7 +200,7 @@ const useDownloadManager = () => {
 
             Toast.show({
                 type: 'success', // Indicates that this toast is for an error message
-                text1: 'Download Complete!', // A clear, concise title for the error
+                text1: 'Episode Download Complete!', // A clear, concise title for the error
                 position: 'bottom', // Position at the bottom so it does not block other UI elements
                 visibilityTime: 4000, // Duration in milliseconds the toast should be visible
                 autoHide: true, // The toast will disappear after the visibilityTime

@@ -1,16 +1,25 @@
 import React, {useEffect, useState} from "react";
-import {StyleSheet} from "react-native";
-import {SafeAreaView} from "react-native-safe-area-context";
+import {Platform, StyleSheet} from "react-native";
 import {router, Stack, useLocalSearchParams} from "expo-router";
 import Navigation from "../../components/Navigation/Navigation";
 import Series from "../../components/Series/Series";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
 import {Theme} from "../../constants";
 import {getPodcastById} from "@/utils/data/getPodcastById";
-import TrackPlayer, {State, Track, useActiveTrack, usePlaybackState, useProgress} from "react-native-track-player";
+import TrackPlayer, {
+    AppKilledPlaybackBehavior,
+    Capability,
+    State,
+    Track,
+    useActiveTrack,
+    usePlaybackState,
+    useProgress
+} from "react-native-track-player";
 import {Episode} from "@/interfaces/episode";
 import useDownloadManager2 from "@/hooks/useDownloadManager2";
 import Toast from "react-native-toast-message";
+import {getDownloadsByPodcastId} from "@/utils/database/download/get-downloads-by-podcast-id";
+import {SafeAreaView} from "react-native-safe-area-context";
 
 export default function () {
     const {id, play: playAudio} = useLocalSearchParams<{ id: string, play?: string }>()
@@ -24,6 +33,23 @@ export default function () {
         try {
             await TrackPlayer.setupPlayer();
             await TrackPlayer.reset()
+            await TrackPlayer.updateOptions({
+                    // Media controls capabilities
+                    capabilities: [
+                        Capability.Play,
+                        Capability.Pause,
+                        Capability.SkipToNext,
+                        Capability.SkipToPrevious,
+                        Capability.Stop,
+                    ],
+                    android: {
+                        // This is the default behavior
+                        appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
+                    },
+                    // Capabilities that will show up when the notification.click is in the compact form on Android
+                    compactCapabilities: [Capability.Play, Capability.Pause],
+                }
+            )
         } catch {
         }
 
@@ -36,15 +62,25 @@ export default function () {
             }
         }
 
+        const downloads = await getDownloadsByPodcastId(podcast.id)
+        const downloadsById: Record<string, string> = downloads.reduce((acc: Record<string, string>, download) => {
+            console.log(download)
+            acc[download.episodeId] = download.uri;
+            return acc;
+        }, {});
+
         const tracks = Object.values(podcast.episodes).map((episode: Episode): Track => {
             return {
                 id: episode.id,
-                url: episode.url,
+                url: downloadsById[episode.id] || episode.url,
                 title: `${episode.number}. ${episode.description}`,
                 description: `${podcast.id}|${episode.id}`,
-                artist: podcast.name
+                artist: podcast.name,
+                artwork: 'https://drive.usercontent.google.com/uc?id=1O3c70KmqV9znxyU-pZuSB84E9rvMu9Mf&export=download',
             }
         })
+
+        console.log(tracks.map((track) => track.url))
 
         await TrackPlayer.setQueue(tracks);
         await TrackPlayer.play()
@@ -89,7 +125,7 @@ export default function () {
 
             <Series podcast={podcast} play={play} playingEpisodeId={track?.id}/>
 
-            <CompactAudioPlayer/>
+            <CompactAudioPlayer edges={Platform.OS === 'android' ? [] : ['bottom']}/>
         </SafeAreaView>
     );
 };

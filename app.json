@@ -17,7 +17,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "zakariyamohummed.zaynab.com"
+      "bundleIdentifier": "zakariyamohummed.zaynab.com",
     },
     "android": {
       "adaptiveIcon": {
@@ -34,7 +34,9 @@
     "plugins": [
       "expo-router",
       "expo-build-properties",
-      ["@morrowdigital/watermelondb-expo-plugin"],
+      [
+        "@morrowdigital/watermelondb-expo-plugin"
+      ],
       [
         "expo-build-properties",
         {
@@ -51,6 +53,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "950794c4-275a-4f87-a0a3-c5df8c91c6a1"
+      }
     }
   }
 }

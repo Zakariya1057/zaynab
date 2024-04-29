@@ -17,6 +17,7 @@ import Toast from "react-native-toast-message";
 import {RefreshControl} from "react-native";
 import useDownloadManager2 from "@/hooks/useDownloadManager2";
 import {getDownloadById} from "@/utils/database/download/get-download-by-id";
+import {getEpisodeById as getRecordedEpisodeById} from "@/utils/database/episode/get-episode-by-id";
 
 export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, episode: Episode }) {
     const track = useActiveTrack()
@@ -82,12 +83,29 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
 
     const playNext = async () => {
         setAudioLoaded(false)
-
+        const currentPosition = await TrackPlayer.getActiveTrackIndex() ?? 0
+        
         if (audioFailedToLoad) {
-            const currentPosition = await TrackPlayer.getActiveTrackIndex()
-            await replaceFailedTrack(currentPosition ?? 0)
+            await replaceFailedTrack(currentPosition)
         } else {
+            // Load history of next one and skip to that
+            const newPosition  = await getTrackIndexHistory(currentPosition+1)
+
             await TrackPlayer.skipToNext()
+
+            if (newPosition) {
+                await TrackPlayer.seekTo(newPosition.position)
+            }
+        }
+    }
+
+    const getTrackIndexHistory = async (index: number) => {
+        const queue = await TrackPlayer.getQueue()
+        const nextItem = queue[index]
+
+        if (nextItem) {
+            const [ podcastId, episodeId ] = (nextItem.description?.split('|') ?? [])
+            return await getRecordedEpisodeById(episodeId)
         }
     }
 
@@ -103,13 +121,20 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
 
     const playPrev = async () => {
         setAudioLoaded(false)
+        const currentPosition = await TrackPlayer.getActiveTrackIndex()
+        let newPosition = currentPosition ? currentPosition - 1 : 0
 
         if (audioFailedToLoad) {
-            const currentPosition = await TrackPlayer.getActiveTrackIndex()
-            let newPosition = currentPosition ? currentPosition - 1 : 0
             await replaceFailedTrack(newPosition)
         } else {
+            // Load history of the previous one and skip to that
+            const { position }  = await getTrackIndexHistory(newPosition) ?? {}
+
             await TrackPlayer.skipToPrevious()
+
+            if (position) {
+                await TrackPlayer.seekTo(position)
+            }
         }
     }
 
@@ -150,6 +175,7 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
             url: episode.url,
             title: `${episode.number}. ${episode.description}`,
             description: `${podcast.id}|${episode.id}`,
+            artwork: episode.image || podcast.image,
             artist: podcast.name
         });
 

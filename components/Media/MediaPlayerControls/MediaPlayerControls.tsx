@@ -157,7 +157,7 @@ const MediaPlayerControls: React.FC<Props> = ({
 const enhance = withObservables(['episodeId'], ({ episodeId }) => ({
     downloadModel: episodeId ? database.get<DownloadModel>('downloads').query(
         Q.where('episodeId', episodeId)
-    ).observe().pipe(
+    ).observeWithColumns(['totalBytesWritten', 'downloaded']).pipe(
         map(downloads => downloads.length > 0 ? downloads[0] : null),
         catchError(() => of(null))
     ) : of(null) // Return null immediately if episodeId is undefined

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {Platform, StyleSheet} from "react-native";
 import {router, Stack, useLocalSearchParams} from "expo-router";
 import Navigation from "../../components/Navigation/Navigation";
@@ -6,20 +6,12 @@ import Series from "../../components/Series/Series";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
 import {Theme} from "../../constants";
 import {getPodcastById} from "@/utils/data/getPodcastById";
-import TrackPlayer, {
-    AppKilledPlaybackBehavior,
-    Capability,
-    State,
-    Track,
-    useActiveTrack,
-    usePlaybackState,
-    useProgress
-} from "react-native-track-player";
-import {Episode} from "@/interfaces/episode";
-import useDownloadManager2 from "@/hooks/useDownloadManager";
-import Toast from "react-native-toast-message";
-import {getDownloadsByPodcastId} from "@/utils/database/download/get-downloads-by-podcast-id";
+import TrackPlayer, { useActiveTrack } from "react-native-track-player";
 import {SafeAreaView} from "react-native-safe-area-context";
+import {setupPlayer} from "@/utils/track/setup-player";
+import {playingCurrentPodcast} from "@/utils/track/playing-current-podcast";
+import {getTracksWithDownloads} from "@/utils/track/get-tracks-with-downloads";
+import {useDownloadPodcastEpisodes} from "@/hooks/useDownloadPodcastEpisodes";
 
 export default function () {
     const {id, play: playAudio} = useLocalSearchParams<{ id: string, play?: string }>()
@@ -27,83 +19,29 @@ export default function () {
 
     const track = useActiveTrack()
 
-    const {downloadAudios} = useDownloadManager2()
+    const downloadEpisodes = useDownloadPodcastEpisodes();
 
     const play = async () => {
-        try {
-            await TrackPlayer.setupPlayer();
-            await TrackPlayer.reset()
-            await TrackPlayer.updateOptions({
-                    // Media controls capabilities
-                    capabilities: [
-                        Capability.Play,
-                        Capability.Pause,
-                        Capability.SkipToNext,
-                        Capability.SkipToPrevious,
-                        Capability.Stop,
-                    ],
-                    android: {
-                        // This is the default behavior
-                        appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
-                    },
-                    // Capabilities that will show up when the notification.click is in the compact form on Android
-                    compactCapabilities: [Capability.Play, Capability.Pause],
-                }
-            )
-        } catch {
+        await setupPlayer()
+
+        const playingPodcast = await playingCurrentPodcast(podcast.id)
+
+        if (playingPodcast) {
+            await TrackPlayer.play()
+            return
         }
 
-        const track = await TrackPlayer.getActiveTrack()
-        if (track) {
-            const [podcastId] = (track?.description?.split('|') ?? [])
-            if (podcastId === podcast.id) {
-                TrackPlayer.play()
-                return
-            }
-        }
+        const tracks = await getTracksWithDownloads(podcast)
 
-        const downloads = await getDownloadsByPodcastId(podcast.id)
-        const downloadsById: Record<string, string> = downloads.reduce((acc: Record<string, string>, download) => {
-            acc[download.episodeId] = download.uri;
-            return acc;
-        }, {});
-
-        const tracks = Object.values(podcast.episodes).map((episode: Episode): Track => {
-            return {
-                id: episode.id,
-                url: downloadsById[episode.id] || episode.url,
-                title: `${episode.number}. ${episode.description}`,
-                description: `${podcast.id}|${episode.id}`,
-                artist: podcast.name,
-                artwork: episode.remoteImage ?? podcast.remoteImage,
-            }
-        })
+        // TODO: Get Tracks with History
 
         await TrackPlayer.setQueue(tracks);
+
         await TrackPlayer.play()
     }
 
     const download = async () => {
-        const episodes = Object.values(podcast.episodes)
-
-        Toast.show({
-            type: 'info', // Appropriate for informational messages
-            text1: 'Downloading Episodes', // A clear, concise title for the action
-            text2: 'Attempting to download all episodes in this series.', // More specific details about the action
-            position: 'bottom', // Position at the bottom so it does not block other UI elements
-            visibilityTime: 4000, // Duration in milliseconds the toast should be visible
-            autoHide: true, // The toast will disappear after the visibilityTime
-            bottomOffset: 40, // Spacing from the bottom, adjusted for visibility
-        });
-
-        await downloadAudios(
-            episodes.map((episode) => ({
-                    url: episode.url,
-                    episodeId: episode.id,
-                    podcastId: podcast.id,
-                })
-            )
-        )
+        await downloadEpisodes(podcast)
     }
 
     useEffect(() => {

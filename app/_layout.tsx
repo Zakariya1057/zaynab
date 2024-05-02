@@ -1,18 +1,17 @@
-import {DarkTheme, DefaultTheme, ThemeProvider} from '@react-navigation/native'
-import {Redirect, router, SplashScreen, Stack, usePathname} from 'expo-router'
+import {DarkTheme, ThemeProvider} from '@react-navigation/native'
+import {router, SplashScreen, Stack, usePathname} from 'expo-router'
 import {TouchableOpacity, useColorScheme} from 'react-native'
 import {TamaguiProvider} from 'tamagui'
 import config from '../tamagui.config'
 import {useFonts} from 'expo-font'
 import React, {useEffect} from 'react'
 import {GestureHandlerRootView} from "react-native-gesture-handler";
-import {ArrowLeft, Bookmark} from "@tamagui/lucide-icons";
+import {ArrowLeft} from "@tamagui/lucide-icons";
 import Toast from 'react-native-toast-message';
 import '@/utils/database/setup'
 import {recordAudioPosition} from '@/utils/audio/record-audio-position'
 import {DownloadProvider} from "@/contexts/download-context";
 import {QueueProvider} from "@/contexts/queue-context";
-import {useNavigationState} from "@react-navigation/core";
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -32,14 +31,6 @@ export default function RootLayout() {
         Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
         InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
     })
-
-    const path = usePathname()
-
-    // if (path === '/notification.click') {
-    //     return <Redirect href={'/episode'} />
-    // }
-
-    // console.log('Current Route:', path);
 
     recordAudioPosition()
 
@@ -77,19 +68,7 @@ function RootLayoutNav() {
                             >
                                 <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
                                 <Stack.Screen name="series" options={{headerShown: false}}/>
-                                <Stack.Screen name="speaker" options={{
-                                    headerShown: true,
-                                    // headerRight: () =>
-                                    //     <TouchableOpacity onPress={() => router.back()}>
-                                    //         <Bookmark size={'$2'} color={'$color'}/>
-                                    //     </TouchableOpacity>
-                                }}/>
-                                <Stack.Screen
-                                    name="episode"
-                                    options={{
-                                        // headerRight: () => <TouchableOpacity><Bookmark size={'$2'} color={'$color'}/></TouchableOpacity>
-                                    }}
-                                />
+                                <Stack.Screen name="episode"/>
                             </Stack>
                             <Toast/>
 

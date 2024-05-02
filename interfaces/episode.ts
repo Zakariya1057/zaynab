@@ -9,6 +9,7 @@ export interface Episode {
     position?: number;
     downloaded?: boolean;
     image?: ImageSourcePropType;
+    remoteImage?: string;
     background?: ImageSourcePropType;
     author?: string
 }

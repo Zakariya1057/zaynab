@@ -87,9 +87,7 @@ function RootLayoutNav() {
                                 <Stack.Screen
                                     name="episode"
                                     options={{
-                                        headerRight: () =>
-                                            <TouchableOpacity><Bookmark size={'$2'}
-                                                                        color={'$color'}/></TouchableOpacity>
+                                        // headerRight: () => <TouchableOpacity><Bookmark size={'$2'} color={'$color'}/></TouchableOpacity>
                                     }}
                                 />
                             </Stack>

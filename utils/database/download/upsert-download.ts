@@ -21,6 +21,7 @@ export const upsertDownload = async (downloadData: Partial<DownloadModel>) => {
                     }
                 });
                 if (downloadData.downloaded) {
+                    download.totalBytesWritten = download.totalBytesExpectedToWrite
                     download.downloadCompletedAt = time; // Set completion time if the download is marked as completed
                 }
 

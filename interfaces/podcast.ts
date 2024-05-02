@@ -5,6 +5,7 @@ export interface Podcast {
     id: string;
     name: string;
     image: ImageSourcePropType;
+    remoteImage: string;
     background: ImageSourcePropType;
     description: string;
     subTitle: string;

@@ -16,7 +16,7 @@ import TrackPlayer, {
     useProgress
 } from "react-native-track-player";
 import {Episode} from "@/interfaces/episode";
-import useDownloadManager2 from "@/hooks/useDownloadManager2";
+import useDownloadManager2 from "@/hooks/useDownloadManager";
 import Toast from "react-native-toast-message";
 import {getDownloadsByPodcastId} from "@/utils/database/download/get-downloads-by-podcast-id";
 import {SafeAreaView} from "react-native-safe-area-context";
@@ -64,7 +64,6 @@ export default function () {
 
         const downloads = await getDownloadsByPodcastId(podcast.id)
         const downloadsById: Record<string, string> = downloads.reduce((acc: Record<string, string>, download) => {
-            console.log(download)
             acc[download.episodeId] = download.uri;
             return acc;
         }, {});
@@ -76,11 +75,9 @@ export default function () {
                 title: `${episode.number}. ${episode.description}`,
                 description: `${podcast.id}|${episode.id}`,
                 artist: podcast.name,
-                artwork: 'https://drive.usercontent.google.com/uc?id=1O3c70KmqV9znxyU-pZuSB84E9rvMu9Mf&export=download',
+                artwork: episode.remoteImage ?? podcast.remoteImage,
             }
         })
-
-        console.log(tracks.map((track) => track.url))
 
         await TrackPlayer.setQueue(tracks);
         await TrackPlayer.play()

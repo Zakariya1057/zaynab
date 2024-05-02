@@ -76,5 +76,5 @@ export default function EpisodePlayer({ edges = [] }: { edges?: Edge[] }) {
         </TouchableOpacity>
     )
 
-    return edges.length === 0 ? player : <View style={{ backgroundColor: background }}>{player}</View>
+    return edges.length === 0 ? player : <SafeAreaView style={{ backgroundColor: background }} edges={edges}>{player}</SafeAreaView>
 }

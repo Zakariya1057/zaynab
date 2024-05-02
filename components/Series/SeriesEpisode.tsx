@@ -28,7 +28,7 @@ const ConditionalLottie = ({isPlaying}) => {
     );
 };
 
-export default function SeriesEpisode({title, description, openEpisode, playing, percentage, downloaded}: SeriesEpisodeProps) {
+export default function SeriesEpisode({title, description, openEpisode, active, playing, percentage, downloaded}: SeriesEpisodeProps) {
     const animation = useRef(null);
 
     const {state} = usePlaybackState()
@@ -47,7 +47,7 @@ export default function SeriesEpisode({title, description, openEpisode, playing,
                 paddingBottom={'$2'}
             >
                 <YStack f={1}>
-                    <Text fontSize={17} fontWeight="bold" mb={'$1.5'} color={playing ? '$color.purple' : '$color'}
+                    <Text fontSize={17} fontWeight="bold" mb={'$1.5'} color={active ? '$color.purple' : '$color'}
                           alignItems="center">
                         {title}
                         {
@@ -57,7 +57,7 @@ export default function SeriesEpisode({title, description, openEpisode, playing,
                         }
 
                     </Text>
-                    <Text fontSize={15} color={playing ? '$color.purple2' : '$charcoal'}>{description}</Text>
+                    <Text fontSize={15} color={active ? '$color.purple2' : '$charcoal'}>{description}</Text>
                 </YStack>
 
                 <YStack justifyContent={'center'}>
@@ -99,6 +99,7 @@ export default function SeriesEpisode({title, description, openEpisode, playing,
 interface SeriesEpisodeProps {
     title: string;
     description: string;
+    active: boolean;
     playing: boolean;
     downloaded: boolean;
     percentage: number | null;

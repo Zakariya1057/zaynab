@@ -5,7 +5,13 @@ import {Episode} from "@/interfaces/episode";
 import {getPodcastById} from "@/utils/data/getPodcastById";
 import {getEpisodeById} from "@/utils/data/getEpisodeById";
 import {getEpisodeById as getRecordedEpisodeById} from "@/utils/database/episode/get-episode-by-id";
-import TrackPlayer, {Capability, State, Track, useActiveTrack} from "react-native-track-player";
+import TrackPlayer, {
+    AppKilledPlaybackBehavior,
+    Capability,
+    State,
+    Track,
+    useActiveTrack
+} from "react-native-track-player";
 import {getDownloadsByPodcastId} from "@/utils/database/download/get-downloads-by-podcast-id";
 
 export default function ({podcastId, episodeId}: { podcastId: string, episodeId: string }) {
@@ -30,6 +36,11 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
                             Capability.Stop,
                         ],
 
+                        android: {
+                            // This is the default behavior
+                            appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
+                        },
+
                         // Capabilities that will show up when the notification.click is in the compact form on Android
                         compactCapabilities: [Capability.Play, Capability.Pause],
                     }
@@ -43,13 +54,11 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
 
             const downloads = await getDownloadsByPodcastId(podcastId)
             const downloadsById: Record<string, string> = downloads.reduce((acc: Record<string, string>, download) => {
-                console.log(download)
                 acc[download.episodeId] = download.uri;
                 return acc;
             }, {});
 
             const recordedEpisode = await getRecordedEpisodeById(episodeId)
-            console.log('SSS', track?.url, downloadsById[episode.id])
 
             if (track && track.url === downloadsById[episode.id]) {
                 console.log('Returning')
@@ -79,12 +88,6 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
 
             const completed = (Math.floor(recordedEpisode?.duration) - Math.floor(recordedEpisode?.position)) < 4
 
-            // for each that has a completed downloading - replace the url with local url
-
-
-            console.log('--------')
-            console.log(downloadsById)
-            console.log('------')
 
             if (existingTrackIndex && existingTrackIndex > -1) {
 
@@ -93,11 +96,10 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
 
                 await TrackPlayer.skip(existingTrackIndex, completed ? 0 : recordedEpisode?.position ?? 0);
 
-                const downloadedEpisode = downloadsById[track.id]
+                const downloadedEpisode = downloadsById[track?.id]
                 const newTrack = existingTracks[existingTrackIndex]
 
                 if (newTrack && downloadedEpisode && (newTrack.url !== downloadedEpisode)) {
-                    console.log(newTrack.url, downloadedEpisode)
                     await TrackPlayer.load({
                         ...newTrack,
                         url: downloadsById[episode.id]
@@ -106,7 +108,6 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
 
                 await TrackPlayer.play();
 
-                console.log((await TrackPlayer.getActiveTrack())?.url)
 
                 console.log('Set From Existing Tracks')
                 return
@@ -119,7 +120,7 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
                     title: `${episode.number}. ${episode.description}`,
                     description: `${podcast.id}|${episode.id}`,
                     artist: podcast.name,
-                    // artwork: episode.image ?? podcast.image
+                    artwork: episode.remoteImage ?? podcast.remoteImage,
                 }
             })
 
@@ -129,7 +130,7 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
                 title: `${episode.number}. ${episode.description}`,
                 description: `${podcast.id}|${episode.id}`,
                 artist: podcast.name,
-                // artwork: episode.image ?? podcast.image
+                artwork: episode.remoteImage ?? podcast.remoteImage,
             }]);
 
             await TrackPlayer.add(tracks.filter((track) => track.id !== episode.id))
@@ -143,7 +144,6 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
                 await TrackPlayer.play()
             }
 
-            // console.log(( await TrackPlayer.getQueue()).map(a => a.url ))
         }
 
         setupPlayer();

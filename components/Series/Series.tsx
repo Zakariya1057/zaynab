@@ -9,6 +9,7 @@ import {getPercentage} from "@/utils/percentage/get-percentage";
 import {useEpisodes} from "@/hooks/useEpisodes";
 import {useTheme} from "tamagui";
 import {useDownloads} from "@/hooks/useDownloads";
+import {State, usePlaybackState} from "react-native-track-player";
 
 interface Props {
     podcast: Podcast,
@@ -19,6 +20,8 @@ interface Props {
 export default ({podcast, play, playingEpisodeId}: Props) => {
     const {episodes, retry, loading} = useEpisodes();
     const { downloads } = useDownloads(podcast.id);
+
+    const { state } = usePlaybackState();
 
     const [refreshing, setRefreshing] = useState(false);
 
@@ -77,7 +80,8 @@ export default ({podcast, play, playingEpisodeId}: Props) => {
             title={`Episode ${item.number}`}
             description={item.description}
             openEpisode={() => openEpisode(item.id)}
-            playing={playingEpisodeId === item.id}
+            active={playingEpisodeId === item.id}
+            playing={state === State.Playing && playingEpisodeId === item.id}
             percentage={getPercentage(item.position, item.duration)}
             downloaded={item.downloaded ?? false}
         />

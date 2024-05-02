@@ -15,7 +15,7 @@ import {Podcast} from "@/interfaces/podcast";
 import {Episode} from "@/interfaces/episode";
 import Toast from "react-native-toast-message";
 import {RefreshControl} from "react-native";
-import useDownloadManager2 from "@/hooks/useDownloadManager2";
+import useDownloadManager2 from "@/hooks/useDownloadManager";
 import {getDownloadById} from "@/utils/database/download/get-download-by-id";
 import {getEpisodeById as getRecordedEpisodeById} from "@/utils/database/episode/get-episode-by-id";
 
@@ -175,7 +175,7 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
             url: episode.url,
             title: `${episode.number}. ${episode.description}`,
             description: `${podcast.id}|${episode.id}`,
-            artwork: episode.image || podcast.image,
+            artwork: episode.remoteImage ?? podcast.remoteImage,
             artist: podcast.name
         });
 
@@ -272,6 +272,7 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
                     isLast={track?.id === lastEpisode?.id}
                     download={download}
                     episodeId={track?.description?.split('|')[1]}
+                    loading={state === State.Loading || state === State.Buffering}
                 />
 
                 {/*<AboutEpisodeSheet*/}

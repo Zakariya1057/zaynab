@@ -1,35 +1,37 @@
 {
   "expo": {
-    "name": "zaynab",
+    "name": "Zaynab",
     "slug": "zaynab",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "dark",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "ios": {
+      "icon": "./assets/logo.png",
       "supportsTablet": true,
-      "bundleIdentifier": "zakariyamohummed.zaynab.com",
+      "bundleIdentifier": "zakariyamohummed.zaynab.com"
     },
     "android": {
+      "icon":  "./assets/android-logo.png",
+      "splash": {
+        "image":  "./assets/android-logo.png",
+        "resizeMode": "contain",
+        "backgroundColor":"#9039cf"
+      },
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/android-logo.png",
+        "backgroundColor": "#9039cf"
       },
       "package": "zakariyamohummed.zaynab.com"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       "expo-router",

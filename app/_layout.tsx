@@ -12,6 +12,7 @@ import '@/utils/database/setup'
 import {recordAudioPosition} from '@/utils/audio/record-audio-position'
 import {DownloadProvider} from "@/contexts/download-context";
 import {QueueProvider} from "@/contexts/queue-context";
+import {trackChangeAndSeekPosition} from "@/hooks/trackChangeAndSeekPosition";
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -32,6 +33,7 @@ export default function RootLayout() {
         InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
     })
 
+    trackChangeAndSeekPosition()
     recordAudioPosition()
 
     useEffect(() => {

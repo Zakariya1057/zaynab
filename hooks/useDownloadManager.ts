@@ -206,7 +206,9 @@ const useDownloadManager = () => {
                 bottomOffset: 40, // Spacing from the bottom, useful when position is 'bottom'
             });
 
-            await startOrResumeDownload(id, url)
+            // Maybe wait a little try again 3 times then mark as failed to download and proceed to next item in the list
+
+            // await startOrResumeDownload(id, url)
         }
     };
 

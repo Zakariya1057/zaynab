@@ -1,5 +1,4 @@
-import React, {useEffect} from "react";
-import {Stack, router, useLocalSearchParams} from "expo-router";
+import { useLocalSearchParams} from "expo-router";
 import Episode from '@/components/Episode/Episode'
 
 export default function () {

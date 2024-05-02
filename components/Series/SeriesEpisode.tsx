@@ -70,7 +70,7 @@ export default function SeriesEpisode({title, description, openEpisode, active, 
                             <AnimatedCircularProgress
                                 size={50}
                                 width={5}
-                                fill={(percentage * 100)}
+                                fill={Math.round(percentage * 100)}
                                 tintColor={purple}
                                 backgroundColor={'rgba(111,67,241,0.47)'}
                                 rotation={0}
@@ -78,7 +78,7 @@ export default function SeriesEpisode({title, description, openEpisode, active, 
                                 {
                                     (fill) => (
                                         <Text>
-                                            {Math.ceil(percentage * 100)}%
+                                            {Math.round(percentage * 100)}%
                                         </Text>
                                     )
                                 }

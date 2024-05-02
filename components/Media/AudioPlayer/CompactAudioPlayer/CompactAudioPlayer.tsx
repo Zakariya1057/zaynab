@@ -1,12 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {Image, Text, useTheme, View, XStack, YStack} from 'tamagui';
+import {Image, Text, useTheme, XStack, YStack} from 'tamagui';
 import MediaPlayerControls from '../../MediaPlayerControls/MediaPlayerControls';
-import PlaceholderImage from '../../../../assets/images/img_3.png';
-import {Edge, Edges, SafeAreaView} from "react-native-safe-area-context";
+import {Edge, SafeAreaView} from "react-native-safe-area-context";
 import TrackPlayer, {
-    isPlaying,
     State,
-    Track,
     useActiveTrack,
     usePlaybackState,
     useProgress
@@ -28,7 +24,7 @@ export default function EpisodePlayer({ edges = [] }: { edges?: Edge[] }) {
 
     const togglePlayPause = async () => {
         if (Math.ceil(position) === Math.ceil(duration)) {
-            await TrackPlayer.seekTo(0)
+            // await TrackPlayer.seekTo(0)
         }
 
         if (state !== State.Playing) {

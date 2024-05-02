@@ -91,13 +91,13 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download}) => {
                     <AnimatedCircularProgress
                         size={50}
                         width={3}
-                        fill={(percentage ?? 0) * 100}
+                        fill={Math.round((percentage ?? 0) * 100)}
                         tintColor={'rgb(189,0,0)'}
                         backgroundColor={'rgba(154,0,0,0.47)'}
                         rotation={0}
                     >
                         {(fill) => (
-                            <Text>{percentage ? Math.floor((percentage) * 100) : 0}%</Text>
+                            <Text>{percentage ? Math.round((percentage) * 100) : 0}%</Text>
                         )}
                     </AnimatedCircularProgress>
                 </YStack>

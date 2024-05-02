@@ -126,7 +126,7 @@ const MediaPlayerControls: React.FC<Props> = ({
                             padding={variant === 'large' ? 20 : 5}
                         >
                             {
-                                buffering ?
+                                buffering || loading ?
                                     (
                                         <Spinner size="large" color={'white'}/>
                                     ) : (

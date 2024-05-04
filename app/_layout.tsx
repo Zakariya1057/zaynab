@@ -13,6 +13,7 @@ import {recordAudioPosition} from '@/utils/audio/record-audio-position'
 import {DownloadProvider} from "@/contexts/download-context";
 import {QueueProvider} from "@/contexts/queue-context";
 import {trackChangeAndSeekPosition} from "@/hooks/trackChangeAndSeekPosition";
+import {setupPlayer} from "@/utils/track/setup-player";
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -35,6 +36,15 @@ export default function RootLayout() {
 
     trackChangeAndSeekPosition()
     recordAudioPosition()
+
+    useEffect(() => {
+        async function initApp() {
+            await setupPlayer()
+        }
+
+        initApp();
+    }, []);
+
 
     useEffect(() => {
         if (interLoaded || interError) {

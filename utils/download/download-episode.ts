@@ -1,35 +1,22 @@
 import TrackPlayer from "react-native-track-player";
 import {getDownloadById} from "@/utils/database/download/get-download-by-id";
-import Toast from "react-native-toast-message";
+import {showToast} from "@/utils/toast/show-toast";
+import useDownloadManager from "@/hooks/useDownloadManager";
 
 export const downloadEpisode = async () => {
+    const { downloadAudio } = useDownloadManager();
+
     const track = await TrackPlayer.getActiveTrack()
 
     if (track && track.url) {
-        const [ podcastId, episodeId ] = (track.description?.split('|') ?? [])
+        const [podcastId, episodeId] = (track.description?.split('|') ?? [])
 
-        const { downloaded } = await getDownloadById(episodeId) ?? {}
+        const {downloaded} = await getDownloadById(episodeId) ?? {}
 
         if (downloaded) {
-            Toast.show({
-                type: 'success', // Indicates a successful outcome
-                text1: 'Episode Download Complete', // More precise text
-                text2: 'The episode is now ready for offline playback.', // Additional detail can be helpful
-                position: 'bottom', // Keeps it out of the way of primary interactions
-                visibilityTime: 4000, // Long enough to read comfortably
-                autoHide: true, // Disappears after the set time
-                bottomOffset: 40, // Spacing from the bottom
-            });
+            showToast('success', 'Episode Download Complete', 'The episode is now ready for offline playback.');
         } else {
-            Toast.show({
-                type: 'info', // Change type if 'info' is available, to differentiate from complete success
-                text1: 'Episode Download Started', // Clear indication of action initiation
-                text2: 'Your episode is now downloading.', // Provides a bit more context
-                position: 'bottom', // Consistent positioning
-                visibilityTime: 4000, // Matching visibility duration
-                autoHide: true, // Ensures it doesn't stay around too long
-                bottomOffset: 40, // Consistent placement
-            });
+            showToast('info', 'Episode Download Started', 'Your episode is now downloading.');
         }
 
         await downloadAudio({

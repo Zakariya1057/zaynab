@@ -31,6 +31,7 @@ export const schema = appSchema({
                 { name: 'totalBytesWritten', type: 'number' },
                 { name: 'totalBytesExpectedToWrite', type: 'number' },
                 { name: 'downloaded', type: 'boolean' },
+                { name: 'error', type: 'string' },
                 { name: 'downloadStartedAt', type: 'number' },
                 { name: 'downloadUpdatedAt', type: 'number' },
                 { name: 'downloadCompletedAt', type: 'number' },

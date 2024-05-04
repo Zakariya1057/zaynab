@@ -15,23 +15,25 @@ import {useDownloads} from "@/contexts/download-context";
 import Toast from "react-native-toast-message";
 import {useQueue} from "@/contexts/queue-context";
 import {debounce} from "@/utils/debounce/debounce";
+import {showToast} from "@/utils/toast/show-toast";
+import {getDownloadInProgress} from "@/utils/database/download/get-download-in-progress";
 
 const useDownloadManager = () => {
-    const downloadResumableRef = useRef<DownloadResumable | null>(null);
-    const { addDownload, removeDownload, isDownloading } = useDownloads();
-    const { addToQueue, removeFromQueue, isInQueue, queueEmpty, getNextItem } = useQueue()
+    const {addDownload, removeDownload, isDownloading, setDownloadResumable, isDeleted} = useDownloads();
+    const {addToQueue, removeFromQueue, isInQueue, queueEmpty, getNextItem} = useQueue()
 
-    const intervalRef = useRef(null);
+    const downloadAudios = async (episodes: Partial<DownloadModel>[]): Promise<void> => {
+        if (episodes.length === 0) {
+            return
+        }
 
-    const downloadAudios =  async (episodes: Partial<DownloadModel>[]): Promise<void> => {
         for (const episode of episodes) {
+            addToQueue(episode.episodeId, episode);
             await upsertDownload({...episode});
         }
 
-        for (const episode of episodes) {
-            await downloadAudio(episode)
-        }
-    }
+        await startNextDownload()
+    };
 
     const downloadAudio = async (episode: Partial<DownloadModel>): Promise<void> => {
         if (isDownloading(episode.episodeId)) {
@@ -81,76 +83,26 @@ const useDownloadManager = () => {
         const dirInfo = await FileSystem.getInfoAsync(directoryUri);
         if (!dirInfo.exists) {
             console.log('Directory does not exist, creating now...');
-            await FileSystem.makeDirectoryAsync(directoryUri, { intermediates: true });
+            await FileSystem.makeDirectoryAsync(directoryUri, {intermediates: true});
         }
 
         await insertDownload({...episode, uri: fileUri});
         await startOrResumeDownload(episode.episodeId, episode.url);
     };
 
-    const pause = async () => {
-        try {
-            await downloadResumableRef.current?.pauseAsync();
-            console.log('Paused download operation, saving for future retrieval');
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    const resume = async () => {
-        try {
-            await downloadResumableRef.current?.resumeAsync();
-            console.log('Resume download operation, saving for future retrieval');
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
     const updateProgress = debounce(async (id: string, progressData: DownloadProgressData) => {
-        const { totalBytesWritten, totalBytesExpectedToWrite } = progressData;
+        const {totalBytesWritten, totalBytesExpectedToWrite} = progressData;
         const progress = totalBytesWritten / totalBytesExpectedToWrite;
         console.log(`Download progress for ${id}: ${progress * 100}%`, totalBytesWritten, totalBytesExpectedToWrite);
 
-        await upsertDownload({ episodeId: id, totalBytesWritten, totalBytesExpectedToWrite, downloaded: progress === 1 });
-        // saveDownloadable(id)
+        await upsertDownload({
+            episodeId: id,
+            totalBytesWritten,
+            totalBytesExpectedToWrite,
+            downloaded: progress === 1,
+            error: null
+        }, true);
     }, 100)
-
-    // const updateProgress = useCallback(async (id: string, progressData: DownloadProgressData): void => {
-    //     const {totalBytesWritten, totalBytesExpectedToWrite} = progressData;
-    //     const progress = totalBytesWritten / totalBytesExpectedToWrite;
-    //     console.log(`Download progress for ${id}: ${progress * 100}%`, totalBytesWritten, totalBytesExpectedToWrite);
-    //
-    //     await upsertDownload({episodeId: id, totalBytesWritten, totalBytesExpectedToWrite, downloaded: progress === 1});
-    //     // saveDownloadable(id)
-    // }, []);
-
-    const saveDownloadable = async (id: string): Promise<void> => {
-        const downloadResumable = downloadResumableRef.current;
-        if (!downloadResumable) {
-            return; // If there's no download resumable, there's nothing to save or resume
-        }
-
-        // First, fetch the current state of the download to check if it has completed
-        const existingDownload = await getDownloadById(id);
-        if (existingDownload && existingDownload.downloaded) {
-            console.log(`Download for ${id} is already completed. No need to pause or resume.`);
-            clearInterval(intervalRef.current);
-            return; // Exit if download is already marked as completed
-        }
-
-        // Proceed to pause the download
-        await pause();
-
-        // Save the download state to AsyncStorage
-        const savableState = await downloadResumable.savable();
-        if (savableState.resumeData) {
-            console.log(`Storing Progress To: pausedDownload-${id}`);
-            await AsyncStorage.setItem(`pausedDownload-${id}`, JSON.stringify(savableState));
-        }
-
-        await resume();
-    };
-
 
     const startOrResumeDownload = async (id: string, url: string): Promise<void> => {
         const fileUri = `${FileSystem.documentDirectory}${id}.mp3`;
@@ -163,50 +115,30 @@ const useDownloadManager = () => {
 
             console.log(fileUri)
 
-            // if (pausedDownloadState && 'resumeData' in downloadSnapshot) {
-            //     downloadResumable = new FileSystem.DownloadResumable(
-            //         downloadSnapshot.url,
-            //         downloadSnapshot.fileUri,
-            //         downloadSnapshot.options,
-            //         progressData => updateProgress(id, progressData),
-            //         downloadSnapshot.resumeData
-            //     );
-            //
-            //     downloadResumableRef.current = downloadResumable;
-            //
-            //     const result = await downloadResumable.resumeAsync();
-            //
-            //     await downloadCompleted(id, result)
-            //
-            //     return
-            // } else {
-                downloadResumable = FileSystem.createDownloadResumable(
-                    url,
-                    fileUri,
-                    { cache: true, sessionType: FileSystemSessionType.BACKGROUND },
-                    progressData => updateProgress(id, progressData)
-                );
+            downloadResumable = FileSystem.createDownloadResumable(
+                url,
+                fileUri,
+                {cache: true, sessionType: FileSystemSessionType.BACKGROUND},
+                progressData => updateProgress(id, progressData)
+            );
 
-                downloadResumableRef.current = downloadResumable;
-            // }
+            setDownloadResumable(id, downloadResumable)
+
+            // removeFromQueue(id)
 
             const result = await downloadResumable.downloadAsync();
             await downloadCompleted(id, result)
-        } catch (error) {
+        } catch (error: Error) {
             console.error('Download failed:', error);
 
-            Toast.show({
-                type: 'error', // Indicates that this toast is for an error message
-                text1: 'Download Failed', // A clear, concise title for the error
-                text2: 'Restarting download',
-                position: 'bottom', // Position at the bottom so it does not block other UI elements
-                visibilityTime: 4000, // Duration in milliseconds the toast should be visible
-                autoHide: true, // The toast will disappear after the visibilityTime
-                topOffset: 30, // Spacing from the top, when position is 'top'
-                bottomOffset: 40, // Spacing from the bottom, useful when position is 'bottom'
-            });
-
             // Maybe wait a little try again 3 times then mark as failed to download and proceed to next item in the list
+
+            showToast('error', 'Download Failed', 'Failed to download episode!')
+
+            await upsertDownload({episodeId: id, error: error.message});
+
+            removeDownload(id)
+            removeFromQueue(id)
 
             // await startOrResumeDownload(id, url)
         }
@@ -215,7 +147,7 @@ const useDownloadManager = () => {
     const downloadCompleted = async (id: string, result: FileSystemDownloadResult | undefined) => {
         if (result) {
             console.log('Download completed:', result.uri);
-            await upsertDownload({episodeId: id, downloaded: true, uri: result.uri });
+            await upsertDownload({episodeId: id, downloaded: true, uri: result.uri});
             await AsyncStorage.removeItem(`pausedDownload-${id}`);
 
             Toast.show({
@@ -227,14 +159,22 @@ const useDownloadManager = () => {
                 topOffset: 30, // Spacing from the top, when position is 'top'
                 bottomOffset: 40, // Spacing from the bottom, useful when position is 'bottom'
             });
+        } else {
+            console.log('Download aborted for:', id)
+        }
 
-            removeFromQueue(id)
+        removeFromQueue(id)
+        removeDownload(id)
 
-            const nextDownload = getNextItem()
-            if (nextDownload) {
-                downloadAudio(nextDownload)
-            }
-            // clearInterval(intervalRef.current);
+        await startNextDownload()
+    }
+
+    const startNextDownload = async () => {
+        const downloadsInProgress = await getDownloadInProgress();
+        const nextDownload = downloadsInProgress[0]
+
+        if (nextDownload) {
+            await downloadAudio(nextDownload)
         }
     }
 

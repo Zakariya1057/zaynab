@@ -13,11 +13,10 @@ import {Podcast} from "@/interfaces/podcast";
 import {Episode} from "@/interfaces/episode";
 import {RefreshControl} from "react-native";
 import {useTrackManager} from "@/hooks/useTrackManager";
-import {getDownloadById} from "@/utils/database/download/get-download-by-id";
-import useDownloadManager from "@/hooks/useDownloadManager";
 import {showToast} from "@/utils/toast/show-toast";
 import {playNextTrack} from "@/utils/track/play-next-track";
 import {playPrevTrack} from "@/utils/track/play-prev-track";
+import useDownloadEpisode from "@/hooks/useDownloadEpisode";
 
 export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, episode: Episode }) {
     const track = useActiveTrack()
@@ -28,7 +27,7 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
 
     const { togglePlayPause, audioLoaded, buffering, audioFailedToLoad, setAudioFailedToLoad } = useTrackManager();
 
-    const { downloadAudio } = useDownloadManager();
+    const downloadEpisode = useDownloadEpisode();
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
@@ -50,147 +49,6 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
     const firstEpisode = episodes.at(0)
     const lastEpisode = episodes.at(-1)
 
-    //
-    // const { downloadAudio } = useDownloadManager2()
-    //
-    // const {position, duration} = useProgress(1000); // Updates every 1000 ms
-    // const [loading, setLoading] = useState(false)
-    // const [buffering, setBuffering] = useState<boolean>(false);
-    // const [audioLoaded, setAudioLoaded] = useState(state === State.Playing);
-    // const [refreshing, setRefreshing] = useState(false);
-    // const [audioFailedToLoad, setAudioFailedToLoad] = useState(false);
-    //
-    // const episodes = Object.values(podcast.episodes)
-    // const firstEpisode = episodes.at(0)
-    // const lastEpisode = episodes.at(-1)
-    //
-    // const timerRef = React.useRef(0)
-    //
-    // React.useEffect(() => {
-    //     return () => clearTimeout(timerRef.current)
-    // }, [])
-    //
-    // useTrackPlayerEvents([Event.PlaybackState], (event) => {
-    //     console.log(event)
-    //
-    //     if ('error' in event) {
-    //         setAudioFailedToLoad(true)
-    //         showToast()
-    //     } else {
-    //         setAudioFailedToLoad(false)
-    //     }
-    //
-    //     // Handle the loading state directly
-    //     setLoading(event.state === State.Loading);
-    //
-    //     // Handle the playing and buffering states
-    //     if (event.state === State.Buffering) {
-    //         setBuffering(true);
-    //     } else {
-    //         setBuffering(false);
-    //     }
-    //
-    //     // Simplify ready state handling
-    //     if (event.state === State.Ready) {
-    //         setAudioLoaded(true)
-    //         setLoading(false);
-    //     }
-    // });
-    //
-    // const togglePlayPause = async () => {
-    //     if (Math.ceil(position) === Math.ceil(duration)) {
-    //         await TrackPlayer.seekTo(0)
-    //     }
-    //
-    //     if (state !== State.Playing) {
-    //         TrackPlayer.play();
-    //     } else {
-    //         TrackPlayer.pause();
-    //     }
-    // };
-    //
-    // const playNext = async () => {
-    //     setAudioLoaded(false)
-    //     const currentPosition = await TrackPlayer.getActiveTrackIndex() ?? 0
-    //
-    //     if (audioFailedToLoad) {
-    //         await replaceFailedTrack(currentPosition)
-    //     } else {
-    //         // Load history of next one and skip to that
-    //         const newPosition  = await getTrackIndexHistory(currentPosition+1)
-    //
-    //         await TrackPlayer.skipToNext()
-    //
-    //         if (newPosition) {
-    //             await TrackPlayer.seekTo(newPosition.position)
-    //         }
-    //     }
-    // }
-    //
-    // const getTrackIndexHistory = async (index: number) => {
-    //     const queue = await TrackPlayer.getQueue()
-    //     const nextItem = queue[index]
-    //
-    //     if (nextItem) {
-    //         const [ podcastId, episodeId ] = (nextItem.description?.split('|') ?? [])
-    //         return await getRecordedEpisodeById(episodeId)
-    //     }
-    // }
-    //
-    // const replaceFailedTrack = async (newTrackPosition: number) => {
-    //     // Remove the current track from the queue and play next one
-    //     const tracks = await TrackPlayer.getQueue()
-    //     const activeTrack = await TrackPlayer.getActiveTrack()
-    //     const newTracks = tracks.filter( (track) => track.id !== activeTrack?.id )
-    //     await TrackPlayer.setQueue(newTracks)
-    //     await TrackPlayer.skip(newTrackPosition)
-    //     await TrackPlayer.play()
-    // }
-    //
-    // const playPrev = async () => {
-    //     setAudioLoaded(false)
-    //     const currentPosition = await TrackPlayer.getActiveTrackIndex()
-    //     let newPosition = currentPosition ? currentPosition - 1 : 0
-    //
-    //     if (audioFailedToLoad) {
-    //         await replaceFailedTrack(newPosition)
-    //     } else {
-    //         // Load history of the previous one and skip to that
-    //         const { position }  = await getTrackIndexHistory(newPosition) ?? {}
-    //
-    //         await TrackPlayer.skipToPrevious()
-    //
-    //         if (position) {
-    //             await TrackPlayer.seekTo(position)
-    //         }
-    //     }
-    // }
-
-    // const onRefresh = useCallback(async () => {
-    //     setRefreshing(true);
-    //     try {
-    //         await replaceTrack()
-    //     } catch (error) {
-    //         console.error('Error during refresh:', error);
-    //     }
-    //     setRefreshing(false);
-    // }, []);
-
-
-    // const showToast = () => {
-    //     Toast.show({
-    //         type: 'error', // Indicates that this toast is for an error message
-    //         text1: 'Audio Load Failed', // A clear, concise title for the error
-    //         text2: 'Pull down page to refresh and try again.', // Specific instructions for the user
-    //         position: 'bottom', // Position at the bottom so it does not block other UI elements
-    //         visibilityTime: 4000, // Duration in milliseconds the toast should be visible
-    //         autoHide: true, // The toast will disappear after the visibilityTime
-    //         topOffset: 30, // Spacing from the top, when position is 'top'
-    //         bottomOffset: 40, // Spacing from the bottom, useful when position is 'bottom'
-    //     });
-    // }
-    //
-
     const replaceTrack = async () => {
         const { duration: audioDuration } = await TrackPlayer.getProgress()
 
@@ -208,33 +66,8 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
             artwork: episode.remoteImage ?? podcast.remoteImage,
             artist: podcast.name
         });
-
-        // await TrackPlayer.seekTo(position)
     }
 
-    const download = async () => {
-        const track = await TrackPlayer.getActiveTrack()
-
-        if (track && track.url) {
-            const [ podcastId, episodeId ] = (track.description?.split('|') ?? [])
-
-            const { downloaded } = await getDownloadById(episodeId) ?? {}
-
-            if (downloaded) {
-                showToast('success', 'Episode Download Complete', 'The episode is now ready for offline playback.');
-            } else {
-                showToast('info', 'Episode Download Started', 'Your episode is now downloading.');
-            }
-
-            await downloadAudio({
-                ...track,
-                podcastId,
-                episodeId,
-            })
-        }
-    }
-
-    // return <></>
     return (
         <ScrollView
             refreshControl={
@@ -284,7 +117,7 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
                     isPlaying={state === State.Playing}
                     isFirst={track?.id === firstEpisode?.id}
                     isLast={track?.id === lastEpisode?.id}
-                    download={download}
+                    download={() => downloadEpisode()}
                     episodeId={track?.description?.split('|')[1]}
                     loading={duration !== 0 && (state === State.Loading || state === State.Buffering)}
                 />

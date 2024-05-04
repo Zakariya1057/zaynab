@@ -18,6 +18,8 @@ export class DownloadModel extends Model {
 
     @field('downloaded') downloaded;
 
+    @field('error') error;
+
     @field('downloadStartedAt') downloadStartedAt;
     @field('downloadUpdatedAt') downloadUpdatedAt;
     @field('downloadCompletedAt') downloadCompletedAt;

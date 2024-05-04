@@ -3,7 +3,7 @@ import {DownloadModel} from "@/utils/database/models/download-model";
 import {database} from "@/utils/database/setup";
 import {getCurrentUnixTime} from "@/utils/date/get-current-unix-time";
 
-export const upsertDownload = async (downloadData: Partial<DownloadModel>) => {
+export const upsertDownload = async (downloadData: Partial<DownloadModel>, updateOnly: boolean = false) => {
     await database.write(async () => {
         const downloadsCollection = database.get('downloads');
         const existingDownloads = await downloadsCollection.query(
@@ -29,6 +29,10 @@ export const upsertDownload = async (downloadData: Partial<DownloadModel>) => {
                 download.downloadStartedAt = download.downloadStartedAt ?? time;
             });
         } else {
+            if (updateOnly) {
+                return
+            }
+
             // Download does not exist, create a new one
             await downloadsCollection.create((newDownload) => {
                 Object.keys(newDownload._raw).forEach(key => {

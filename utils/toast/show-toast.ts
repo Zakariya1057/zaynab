@@ -5,8 +5,11 @@ export const showToast = (type: "error" | "success" | "info", title: string, mes
         type,
         text1: title,
         text2: message,
+        text2Style: {
+            fontSize: 11
+        },
         position: 'bottom',
-        visibilityTime: 4000,
+        visibilityTime: 3000,
         autoHide: true,
         bottomOffset: 40,
     });

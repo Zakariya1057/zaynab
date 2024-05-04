@@ -24,10 +24,10 @@ export const QueueProvider: React.FC<Props> = ({children}) => {
     const [queue, setQueue] = useState<QueueItem[]>([]);
 
     const addToQueue = (episodeId: string, download: Partial<DownloadModel>) => {
+        console.log('Adding to queue:', episodeId);
         setQueue(prevQueue => {
             return [...prevQueue, { episodeId, download }]
         });
-        console.log(episodeId)
     };
 
     const removeFromQueue = (episodeId: string) => {
@@ -45,6 +45,7 @@ export const QueueProvider: React.FC<Props> = ({children}) => {
     };
 
     const getNextItem = (): QueueItem | undefined => {
+        console.log(queue)
         return queue[0];
     };
 

@@ -27,13 +27,10 @@ export default function () {
         const playingPodcast = await playingCurrentPodcast(podcast.id)
 
         if (playingPodcast) {
-            await TrackPlayer.play()
             return
         }
 
         const tracks = await getTracksWithDownloads(podcast)
-
-        // TODO: Get Tracks with History
 
         await TrackPlayer.setQueue(tracks);
 

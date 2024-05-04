@@ -16,13 +16,4 @@ export const setupNewQueue = async (podcast: Podcast, episode: Episode, download
     await TrackPlayer.setQueue([tracks.find(t => t.id === episode.id)!]);
     await TrackPlayer.add(tracks.filter(t => t.id !== episode.id));
     await TrackPlayer.move(0, episode.number - 1);
-
-    const newPosition = recordedEpisode?.position ?? 0
-
-    // if (completed) {
-    //     await TrackPlayer.seekTo(newPosition-5);
-    // } else {
-    //     await TrackPlayer.seekTo(newPosition);
-    //     await TrackPlayer.play();
-    // }
 }

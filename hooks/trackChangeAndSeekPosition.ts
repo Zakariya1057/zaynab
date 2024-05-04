@@ -23,6 +23,8 @@ export const trackChangeAndSeekPosition = () => {
                     console.log('Found history for episode. Changing time...', position)
                     await TrackPlayer.seekTo(newTrackPosition);
                     await TrackPlayer.play()
+                } else {
+                    await TrackPlayer.play()
                 }
             }
         };

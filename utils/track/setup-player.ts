@@ -1,6 +1,10 @@
 import TrackPlayer, {AppKilledPlaybackBehavior, Capability} from "react-native-track-player";
 
+let playerSetup = false
+
 export const setupPlayer = async (): Promise<void> => {
+    if (playerSetup) return
+
     try {
         console.log('Setting Up Player')
 
@@ -15,6 +19,7 @@ export const setupPlayer = async (): Promise<void> => {
                     Capability.SkipToPrevious,
                     Capability.Stop,
                 ],
+                progressUpdateEventInterval: 1,
                 android: {
                     // This is the default behavior
                     appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
@@ -23,7 +28,9 @@ export const setupPlayer = async (): Promise<void> => {
                 compactCapabilities: [Capability.Play, Capability.Pause],
             }
         )
-    } catch(error: any) {
+
+        playerSetup = true
+    } catch (error: any) {
         console.log(`Failed To Set Up Player: ${error.message}`, error)
     }
 

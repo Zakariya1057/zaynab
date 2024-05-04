@@ -17,18 +17,22 @@
     },
     "ios": {
       "icon": "./assets/logo.png",
+      "splash": {
+        "image": "./assets/android-splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#9039cf"
+      },
       "supportsTablet": true,
       "bundleIdentifier": "zakariyamohummed.zaynab.com"
     },
     "android": {
-      "icon":  "./assets/android-logo.png",
       "splash": {
-        "image":  "./assets/android-logo.png",
+        "image": "./assets/android-splash.png",
         "resizeMode": "contain",
-        "backgroundColor":"#9039cf"
+        "backgroundColor": "#9039cf"
       },
       "adaptiveIcon": {
-        "foregroundImage": "./assets/android-logo.png",
+        "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#9039cf"
       },
       "package": "zakariyamohummed.zaynab.com"

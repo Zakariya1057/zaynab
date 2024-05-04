@@ -10,13 +10,20 @@ import {AnimatedCircularProgress} from "react-native-circular-progress";
 import {getPodcastById} from "@/utils/data/getPodcastById";
 import {getEpisodeById} from "@/utils/data/getEpisodeById";
 import {router} from "expo-router";
-import {SimpleLineIcons} from "@expo/vector-icons";
+import {Entypo, Ionicons, MaterialIcons, Octicons, SimpleLineIcons} from "@expo/vector-icons";
+import useDownloadEpisode from "@/hooks/useDownloadEpisode";
+import {DownloadStatus} from "@/interfaces/download-status";
+import {deleteDownload} from "@/utils/download/delete-download";
+import {cancelDownload} from "@/utils/download/cancel-download";
+import {useDownloads} from "@/contexts/download-context";
+import {useQueue} from "@/contexts/queue-context";
 
 interface DownloadItemProps {
     download: DownloadModel
+    status: DownloadStatus
 }
 
-const DownloadItemModal = ({ modalVisible, setModalVisible, handlePauseDownload, handleDeleteDownload }) => {
+const DownloadItemModal = ({modalVisible, setModalVisible, handlePauseDownload, handleDeleteDownload}) => {
     return (
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
             <Modal
@@ -26,21 +33,25 @@ const DownloadItemModal = ({ modalVisible, setModalVisible, handlePauseDownload,
                 onRequestClose={() => setModalVisible(false)}
             >
                 <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor="rgba(0, 0, 0, 0.5)">
-                    <YStack width={320} minHeight={200} padding={20} backgroundColor={'$background'} borderRadius={12} alignItems="center" elevation={5} gap={'$6'}>
+                    <YStack width={320} minHeight={200} padding={20} backgroundColor={'$background'} borderRadius={12}
+                            alignItems="center" elevation={5} gap={'$6'}>
                         <Text fontSize={'$7'} fontWeight="bold" color={'$text'}>
                             Manage Download
                         </Text>
 
                         <YStack gap={'$4'} alignItems={'center'} width={'100%'}>
-                            <Button backgroundColor="$blue5" borderRadius={10} width="100%" onPress={handlePauseDownload}>
+                            <Button backgroundColor="$blue5" borderRadius={10} width="100%"
+                                    onPress={handlePauseDownload}>
                                 <Text fontSize={'$5'}>Pause Download</Text>
                             </Button>
-                            <Button onPress={handleDeleteDownload} backgroundColor="$red5" borderRadius={10} width="100%">
+                            <Button onPress={handleDeleteDownload} backgroundColor="$red5" borderRadius={10}
+                                    width="100%">
                                 <Text fontSize={'$5'}>Delete Download</Text>
                             </Button>
                         </YStack>
 
-                        <Button onPress={() => setModalVisible(false)} backgroundColor="$gray5" borderRadius={10}  width="100%">
+                        <Button onPress={() => setModalVisible(false)} backgroundColor="$gray5" borderRadius={10}
+                                width="100%">
                             <Text fontSize={'$5'}>Cancel</Text>
                         </Button>
                     </YStack>
@@ -50,11 +61,18 @@ const DownloadItemModal = ({ modalVisible, setModalVisible, handlePauseDownload,
     );
 };
 
-const DownloadItem: React.FC<DownloadItemProps> = ({download}) => {
-    const {podcastId, episodeId, totalBytesWritten, totalBytesExpectedToWrite, downloaded} = download
+const DownloadItem: React.FC<DownloadItemProps> = ({download, status}) => {
+    const {podcastId, episodeId, totalBytesWritten, totalBytesExpectedToWrite, downloaded, error} = download
+
+    const { getDownloadResumable, removeDownload, addToDeleted } = useDownloads();
+    const { removeFromQueue } = useQueue()
+
 
     const percentage = totalBytesWritten / totalBytesExpectedToWrite;
-    const isDownloading = downloaded === false;
+
+    if (!podcastId || !episodeId){
+        return null
+    }
 
     const podcast = getPodcastById(podcastId)
     const episode = getEpisodeById(podcast, episodeId)
@@ -77,6 +95,17 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download}) => {
         // Add logic to delete the download
         setModalVisible(false);
     };
+
+    const downloadEpisode = useDownloadEpisode();
+
+    const onDelete = async () => {
+        const resumable = getDownloadResumable(episodeId)
+        await resumable?.cancelAsync()
+
+        removeDownload(episodeId)
+        addToDeleted(episodeId)
+        removeFromQueue(episodeId)
+    }
 
     return (
         <TouchableOpacity onPress={openEpisode}>
@@ -111,9 +140,30 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download}) => {
                     </Text>
                 </YStack>
 
-                <TouchableOpacity onPress={() => setModalVisible(true)}>
-                    <SimpleLineIcons name="options-vertical" size={22} color={color} />
-                </TouchableOpacity>
+                {status === DownloadStatus.DownloadFailed && (
+                    <TouchableOpacity onPress={() => downloadEpisode(download)}>
+                        <Ionicons name="reload" size={25} color={color} />
+                    </TouchableOpacity>
+                )}
+
+                {status === DownloadStatus.CompletedDownload && (
+                    <TouchableOpacity onPress={() => deleteDownload(download)}>
+                        <Ionicons name="trash-outline" size={28} color={color} />
+                    </TouchableOpacity>
+                )}
+
+                {status === DownloadStatus.InProgress && (
+                    <TouchableOpacity onPress={() => cancelDownload(download, onDelete)}>
+                        <Octicons name="x" size={28} color={color} />
+                    </TouchableOpacity>
+                )}
+
+                {status === DownloadStatus.WaitingToDownload && (
+                    <TouchableOpacity onPress={() => cancelDownload(download, onDelete)}>
+                        <Octicons name="x" size={28} color={color} />
+                    </TouchableOpacity>
+                )}
+
             </XStack>
 
             <Separator alignSelf="stretch" vertical={false}/>
@@ -131,25 +181,26 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download}) => {
 
 // Main component to display the list of downloads
 const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) => {
-    const [refreshing, setRefreshing] = useState(false);
-    const [sections, setSections] = useState<{ title: string, data: DownloadModel[] }[]>([]);
-
     const theme = useTheme();
     const purple = theme.purple.get()
 
+    const [refreshing, setRefreshing] = useState(false);
+    const [sections, setSections] = useState<{ title: DownloadStatus, data: DownloadModel[] }[]>([]);
+
     useEffect(() => {
-        const waitingToDownload = downloads.filter(d => !d.downloaded && d.totalBytesWritten === 0);
+        const waitingToDownload = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten === 0);
         const completedDownloads = downloads.filter(d => d.downloaded);
         const inProgressPaused = downloads.filter(d => !d.downloaded && d.totalBytesWritten > 0 && d.totalBytesWritten < d.totalBytesExpectedToWrite);
+        const failedToDownload = downloads.filter(d => d.error);
 
-        setSections(
-            [
-                {title: 'In Progress', data: inProgressPaused},
-                {title: 'Waiting to Download', data: waitingToDownload},
-                {title: 'Completed Download', data: completedDownloads},
-            ].filter(section => section.data.length > 0)
-        );
+        setSections([
+            { title: DownloadStatus.InProgress, data: inProgressPaused },
+            { title: DownloadStatus.DownloadFailed, data: failedToDownload },
+            { title: DownloadStatus.WaitingToDownload, data: waitingToDownload },
+            { title: DownloadStatus.CompletedDownload, data: completedDownloads },
+        ].filter(section => section.data.length > 0));
     }, [downloads]);
+
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -163,7 +214,7 @@ const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) =>
         <SectionList
             sections={sections}
             keyExtractor={(item, index) => item.id + index}
-            renderItem={({item}) => <DownloadItem download={item}/>}
+            renderItem={({item, section: { title }}) => <DownloadItem download={item} status={title}/>}
             renderSectionHeader={({section: {title}}) => (
                 <YStack width="100%">
                     <XStack justifyContent="space-between" alignItems="center" backgroundColor={'$background'}

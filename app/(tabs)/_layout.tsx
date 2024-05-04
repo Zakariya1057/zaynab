@@ -4,8 +4,11 @@ import {
     Search,
     Download, Bookmark,
 } from "@tamagui/lucide-icons";
+import {useRestartDownloadsOnBoot} from "@/hooks/useRestartDownloadOnBoot";
 
 export default function TabLayout() {
+    useRestartDownloadsOnBoot();
+
     return (
         <Tabs
             screenOptions={{

@@ -4,7 +4,6 @@ import {EpisodeModel} from "@/utils/database/models/episode-model";
 
 export const updateExistingTracks = async (existingTracks: Track[], episode: Episode, recordedEpisode: EpisodeModel | null, downloadsById: Record<string, string>, completed: boolean): Promise<boolean> => {
     const existingTrackIndex = existingTracks.findIndex((t) => t.id === episode.id);
-    // console.log('Recorded Episode', recordedEpisode, recordedEpisode?.position);
 
     if (existingTrackIndex > -1) {
         console.log('Setting From Existing Tracks');
@@ -20,10 +19,6 @@ export const updateExistingTracks = async (existingTracks: Track[], episode: Epi
                 ...newTrack,
                 url: downloadedEpisode
             });
-        }
-
-        if (!completed) {
-            await TrackPlayer.play();
         }
 
         console.log('Set From Existing Tracks');

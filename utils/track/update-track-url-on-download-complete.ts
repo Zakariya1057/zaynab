@@ -1,5 +1,6 @@
 import TrackPlayer, { Track } from 'react-native-track-player';
 import { getDownloadById } from "@/utils/database/download/get-download-by-id";
+import {showToast} from "@/utils/toast/show-toast";
 
 // Function to update track URLs from remote to local upon download completion
 export const updateTrackUrlOnDownloadComplete = async () => {
@@ -44,6 +45,7 @@ export const updateTrackUrlOnDownloadComplete = async () => {
         console.log('URL update completed. Tracks now point to local files.');
         // Optionally, skip back to the active track if it was one of the updated tracks
         if (activeTrackUpdated && activeTrackIndex) {
+            showToast('info', 'Enhanced Playback', 'Switching to downloaded audio for smoother performance.');
             console.log(`Skipping back to the active track at index ${activeTrackIndex}`);
             await TrackPlayer.skip(activeTrackIndex);
         }

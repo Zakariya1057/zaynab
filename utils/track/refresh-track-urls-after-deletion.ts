@@ -2,6 +2,7 @@ import TrackPlayer, { Track } from 'react-native-track-player';
 import { getDownloadById } from "@/utils/database/download/get-download-by-id";
 import { getPodcastById } from "@/utils/data/getPodcastById";
 import { getEpisodeById } from "@/utils/data/getEpisodeById";
+import {showToast} from "@/utils/toast/show-toast";
 
 // Function to handle track updates when a download has been deleted
 export const refreshTrackUrlsAfterDeletion = async () => {
@@ -64,6 +65,7 @@ export const refreshTrackUrlsAfterDeletion = async () => {
         // Optionally, skip back to the active track if it was one of the updated tracks
         if (activeTrackUpdated) {
             console.log(`Skipping back to the active track at index ${activeTrackIndex}`);
+            showToast('info', 'Audio Update', 'Local file deleted. Switching to online streaming.');
             await TrackPlayer.skip(activeTrackIndex);
         }
     }

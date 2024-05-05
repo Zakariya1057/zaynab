@@ -16,6 +16,7 @@ import {shuffleArray} from "@/utils/shuffle/shuffle-array";
 import {fetchLastListenedEpisodeByPodcastId} from "@/utils/database/episode/fetch-last-listened-episode-by-podcast-id";
 import {generateTrackFromEpisode} from "@/utils/track/generate-track-from-episode";
 import {getEpisodeNumberFromTitle} from "@/utils/episode/get-episode-number-from-title";
+import {checkAndShowDownloadMessage} from "@/utils/notify/check-and-show-download-message";
 
 export default function () {
     const {id, play: playAudio} = useLocalSearchParams<{ id: string, play?: string }>()
@@ -58,6 +59,8 @@ export default function () {
     }
 
     useEffect(() => {
+        checkAndShowDownloadMessage()
+
         if (playAudio) {
             play()
         }

@@ -31,7 +31,7 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download}) => {
     const podcast = getPodcastById(podcastId)
     const episode = getEpisodeById(podcast, episodeId)
 
-    const openEpisode = () => router.push({pathname: "/episode/", params: {podcastId, episodeId}});
+    const openEpisode = () => router.push({pathname: "/notification.click/", params: {podcastId, episodeId}});
 
     return (
         <TouchableOpacity onPress={openEpisode}>

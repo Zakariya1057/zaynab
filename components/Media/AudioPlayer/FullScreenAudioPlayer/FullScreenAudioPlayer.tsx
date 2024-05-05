@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {H4, Image, Paragraph, YStack, View, Button,ScrollView } from 'tamagui';
+import {H4, Image, Paragraph, YStack, View, Button, ScrollView} from 'tamagui';
 import TrackPlayer, {
     State, useActiveTrack,
     usePlaybackState,
@@ -18,14 +18,14 @@ import {playNextTrack} from "@/utils/track/play-next-track";
 import {playPrevTrack} from "@/utils/track/play-prev-track";
 import useDownloadEpisode from "@/hooks/useDownloadEpisode";
 
-export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, episode: Episode }) {
+export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, episode: Episode }) {
     const track = useActiveTrack()
-    const { state } = usePlaybackState()
+    const {state} = usePlaybackState()
 
     const [refreshing, setRefreshing] = useState(false);
-    const { position, duration } = useProgress(1000);
+    const {position, duration} = useProgress(1000);
 
-    const { togglePlayPause, audioLoaded, buffering, audioFailedToLoad, setAudioFailedToLoad } = useTrackManager();
+    const {togglePlayPause, audioLoaded, buffering, audioFailedToLoad, setAudioFailedToLoad} = useTrackManager();
 
     const downloadEpisode = useDownloadEpisode();
 
@@ -49,10 +49,39 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
     const firstEpisode = episodes.at(0)
     const lastEpisode = episodes.at(-1)
 
-    const replaceTrack = async () => {
-        const { duration: audioDuration } = await TrackPlayer.getProgress()
+    const [isFirstEpisode, setIsFirstEpisode] = useState(episode.id === firstEpisode?.id)
+    const [isLastEpisode, setIsLastEpisode] = useState(episode.id === lastEpisode?.id)
 
-        if (audioLoaded || audioDuration > 0){
+    // Get the queue and determine the position of the current episode
+    useEffect(() => {
+        const checkQueuePosition = async () => {
+            console.log('Checking last and first episodes')
+            const queue = await TrackPlayer.getQueue();
+            const track = await TrackPlayer.getActiveTrack()
+
+            if (queue.length !== episodes.length) {
+                return
+            }
+
+            const [_, episodeId] = track?.description?.split('|') ?? [];
+
+            const firstEpisode = queue.at(0);
+            const lastEpisode = queue.at(-1);
+            const isCurrentFirst = episodeId === firstEpisode?.id;
+            const isCurrentLast = episodeId === lastEpisode?.id;
+
+            setIsFirstEpisode(isCurrentFirst)
+            setIsLastEpisode(isCurrentLast)
+        };
+
+        checkQueuePosition();
+    }, [track]);
+
+
+    const replaceTrack = async () => {
+        const {duration: audioDuration} = await TrackPlayer.getProgress()
+
+        if (audioLoaded || audioDuration > 0) {
             return
         }
 
@@ -76,14 +105,15 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
                     onRefresh={onRefresh}
                 />
             }
-            style={{ flex: 1 }}
-            contentContainerStyle={{ flexGrow: 1 }}
+            style={{flex: 1}}
+            contentContainerStyle={{flexGrow: 1}}
             showsVerticalScrollIndicator={false}
         >
             <YStack f={1} p={Theme.spacing.large} pt={Theme.spacing.normal} space="$4">
                 <YStack position="absolute" t={0} b={0} r={0} l={0}>
-                    <Image src={episode.background ?? podcast.background} width="100%" aspectRatio={1} position="absolute" top={0} bottom={0}
-                           right={0} left={0} resizeMode={'cover'} />
+                    <Image src={episode.background ?? podcast.background} width="100%" aspectRatio={1}
+                           position="absolute" top={0} bottom={0}
+                           right={0} left={0} resizeMode={'cover'}/>
                     <YStack position="absolute" t={0} b={0} r={0} l={0} opacity={0.85}
                             backgroundColor="$background" width={'100%'}></YStack>
                 </YStack>
@@ -92,10 +122,10 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
 
                 <YStack mt="$2" space="$1">
                     <H4 textAlign="center" color={'$color'} numberOfLines={1}>
-                        { track?.title }
+                        {track?.title}
                     </H4>
                     <Paragraph textAlign="center" color={'$color'} numberOfLines={1}>
-                        { track?.artist }
+                        {track?.artist}
                     </Paragraph>
                 </YStack>
 
@@ -115,8 +145,8 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
                     playPrev={() => playPrevTrack(audioFailedToLoad)}
                     buffering={audioLoaded && buffering}
                     isPlaying={state === State.Playing}
-                    isFirst={track?.id === firstEpisode?.id}
-                    isLast={track?.id === lastEpisode?.id}
+                    isFirst={isFirstEpisode}
+                    isLast={isLastEpisode}
                     download={() => downloadEpisode()}
                     episodeId={track?.description?.split('|')[1]}
                     loading={duration !== 0 && (state === State.Loading || state === State.Buffering)}
@@ -127,6 +157,6 @@ export default function EpisodePlayer({podcast, episode }: { podcast: Podcast, e
                 {/*/>*/}
 
             </YStack>
-         </ScrollView>
+        </ScrollView>
     );
 }

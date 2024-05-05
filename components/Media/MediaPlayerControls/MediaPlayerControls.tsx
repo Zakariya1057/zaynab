@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Spinner, useTheme, View, YStack, Text} from 'tamagui';
 import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
 import {Pressable, TouchableOpacity} from "react-native";
@@ -12,6 +12,11 @@ import LottieView from "lottie-react-native";
 import {useDownloads} from "@/contexts/download-context";
 import episode from "@/app/episode";
 import {useActiveTrack} from "react-native-track-player";
+import {fetchShuffleStatus} from "@/utils/shuffle/fetch-shuffle-status";
+import {storeShuffleStatus} from "@/utils/shuffle/store-shuffle-status";
+import {shuffleTracks} from "@/utils/shuffle/shuffle-tracks";
+import {sortTracks} from "@/utils/shuffle/sort-tracks";
+import useShuffle from "@/hooks/useShuffle";
 
 interface Props {
     isPlaying: boolean;
@@ -90,10 +95,12 @@ const MediaPlayerControls: React.FC<Props> = ({
     }
 
 
+   const { shuffleOn, toggleShuffle } = useShuffle()
+
     return (
         <YStack flexDirection="row" alignItems="center" justifyContent="space-between">
             {variant === 'small' ? (
-                <TouchableOpacity onPress={togglePlayPause}>
+                <TouchableOpacity onPress={togglePlayPause} style={{ padding: 5}}>
                     {
                         !loading ? (
                                 <Ionicons name={isPlaying ? 'pause' : 'play'} size={size} color={purple}/>
@@ -106,9 +113,8 @@ const MediaPlayerControls: React.FC<Props> = ({
                 </TouchableOpacity>
             ) : (
                 <>
-                    <TouchableOpacity onPress={() => {
-                    }}>
-                        <Ionicons name="shuffle" size={size + 5} color={color} strokeWidth={strokeWidth}/>
+                    <TouchableOpacity onPress={toggleShuffle}>
+                        <Ionicons name="shuffle" size={size + 5} color={shuffleOn ? purple : color} strokeWidth={strokeWidth}/>
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={playPrev} disabled={isFirst}>

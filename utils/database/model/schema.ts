@@ -9,7 +9,11 @@ export const schema = appSchema({
             columns: [
                 { name: 'episodeId', type: 'string', isIndexed: true },
                 { name: 'podcastId', type: 'string', isIndexed: true },
+
                 { name: 'url', type: 'string' },
+
+                { name: 'number', type: 'number' },
+                { name: 'remoteImage', type: 'string' },
                 { name: 'artist', type: 'string' },
                 { name: 'description', type: 'string' },
                 { name: 'title', type: 'string' },

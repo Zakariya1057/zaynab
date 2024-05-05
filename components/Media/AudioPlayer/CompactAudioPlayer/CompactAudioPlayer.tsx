@@ -38,7 +38,7 @@ export default function EpisodePlayer({ edges = [] }: { edges?: Edge[] }) {
 
     if (!podcastId || !episodeId) return null
 
-    const openEpisode = () => router.push({ pathname: "/episode/", params: { podcastId, episodeId } })
+    const openEpisode = () => router.push({ pathname: "/notification.click/", params: { podcastId, episodeId } })
 
     const podcast = getPodcastById(podcastId)
     const episode = getEpisodeById(podcast, episodeId)

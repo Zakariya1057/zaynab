@@ -17,19 +17,23 @@ import {useQueue} from "@/contexts/queue-context";
 import {debounce} from "@/utils/debounce/debounce";
 import {showToast} from "@/utils/toast/show-toast";
 import {getDownloadInProgress} from "@/utils/database/download/get-download-in-progress";
+import {updateTrackUrlOnDownloadComplete} from "@/utils/track/update-track-url-on-download-complete";
 
 const useDownloadManager = () => {
     const {addDownload, removeDownload, isDownloading, setDownloadResumable, isDeleted} = useDownloads();
     const {addToQueue, removeFromQueue, isInQueue, queueEmpty, getNextItem} = useQueue()
 
-    const downloadAudios = async (episodes: Partial<DownloadModel>[]): Promise<void> => {
+    const downloadAudios = async (episodes: Partial<DownloadModel>[], upsert: boolean = true): Promise<void> => {
         if (episodes.length === 0) {
             return
         }
 
         for (const episode of episodes) {
-            addToQueue(episode.episodeId, episode);
-            await upsertDownload({...episode});
+            // addToQueue(episode.episodeId, episode);
+
+            if (upsert && !episode.downloaded) {
+                await upsertDownload({...episode});
+            }
         }
 
         await startNextDownload()
@@ -41,18 +45,18 @@ const useDownloadManager = () => {
             return; // Prevents starting a new download if it's already in progress
         }
 
-        if (isInQueue(episode.episodeId)) {
-            console.log('Download already waiting in Queue')
-            return
-        } else {
-            addToQueue(episode.episodeId, episode)
-
-            if (!queueEmpty()) {
-                console.log('Already downloading item in the queue.')
-                await upsertDownload({...episode});
-                return
-            }
-        }
+        // if (isInQueue(episode.episodeId)) {
+        //     console.log('Download already waiting in Queue')
+        //     return
+        // } else {
+        //     addToQueue(episode.episodeId, episode)
+        //
+        //     if (!queueEmpty()) {
+        //         console.log('Already downloading item in the queue.')
+        //         await upsertDownload({...episode});
+        //         return
+        //     }
+        // }
 
         addDownload(episode.episodeId);
 
@@ -113,7 +117,7 @@ const useDownloadManager = () => {
         try {
             // let downloadSnapshot = JSON.parse(pausedDownloadState ?? '{}')
 
-            console.log(fileUri)
+            console.log(url, fileUri)
 
             downloadResumable = FileSystem.createDownloadResumable(
                 url,
@@ -124,9 +128,8 @@ const useDownloadManager = () => {
 
             setDownloadResumable(id, downloadResumable)
 
-            // removeFromQueue(id)
-
             const result = await downloadResumable.downloadAsync();
+
             await downloadCompleted(id, result)
         } catch (error: Error) {
             console.error('Download failed:', error);
@@ -150,15 +153,9 @@ const useDownloadManager = () => {
             await upsertDownload({episodeId: id, downloaded: true, uri: result.uri});
             await AsyncStorage.removeItem(`pausedDownload-${id}`);
 
-            Toast.show({
-                type: 'success', // Indicates that this toast is for an error message
-                text1: 'Episode Download Complete!', // A clear, concise title for the error
-                position: 'bottom', // Position at the bottom so it does not block other UI elements
-                visibilityTime: 4000, // Duration in milliseconds the toast should be visible
-                autoHide: true, // The toast will disappear after the visibilityTime
-                topOffset: 30, // Spacing from the top, when position is 'top'
-                bottomOffset: 40, // Spacing from the bottom, useful when position is 'bottom'
-            });
+            await updateTrackUrlOnDownloadComplete()
+
+            showToast('success', 'Download Successful', 'The episode has been downloaded successfully.')
         } else {
             console.log('Download aborted for:', id)
         }
@@ -178,7 +175,7 @@ const useDownloadManager = () => {
         }
     }
 
-    return {downloadAudio, downloadAudios};
+    return {downloadAudio, downloadAudios, startNextDownload};
 };
 
 export default useDownloadManager;

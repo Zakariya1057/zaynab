@@ -1,17 +1,36 @@
-import Episode from '@/components/Episode/Episode'
-import {useActiveTrack} from "react-native-track-player";
-import {Spinner} from "tamagui";
-import {Router} from "@tamagui/lucide-icons";
-import {router} from "expo-router";
-import {useEffect} from "react";
+import React, { useEffect, useState } from 'react';
+import Episode from '@/components/Episode/Episode';
+import { useActiveTrack } from "react-native-track-player";
+import { Spinner } from "tamagui";
+import { useLocalSearchParams } from "expo-router";
 
-export default function () {
-    const track = useActiveTrack()
-    const [ podcastId, episodeId ] = (track?.description?.split('|') ?? [])
+export default function PodcastEpisode() {
+    const [loading, setLoading] = useState(true);
+    const { podcastId: initialPodcastId, episodeId: initialEpisodeId } = useLocalSearchParams<{podcastId: string, episodeId: string}>();
+    const track = useActiveTrack();
+    const [podcastId, setPodcastId] = useState(initialPodcastId);
+    const [episodeId, setEpisodeId] = useState(initialEpisodeId);
 
     useEffect(() => {
-        console.log(track)
-    }, [track]);
+        if (!podcastId || !episodeId) {
+            if (track) {
+                const [trackPodcastId, trackEpisodeId] = track.description?.split('|') ?? [];
+                if (trackPodcastId && trackEpisodeId) {
+                    setPodcastId(trackPodcastId);
+                    setEpisodeId(trackEpisodeId);
+                }
+            }
+        }
+        setLoading(false);
+    }, [track, podcastId, episodeId]);
 
-    return track ?  <Episode podcastId={podcastId} episodeId={episodeId} /> : <Spinner />
+    if (loading) {
+        return <Spinner />;
+    }
+
+    return podcastId && episodeId ? (
+        <Episode podcastId={podcastId} episodeId={episodeId} />
+    ) : (
+        <Spinner />
+    );
 }

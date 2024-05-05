@@ -21,7 +21,7 @@ export const useRestartDownloadsOnBoot = () => {
                 if (downloads.length > 0) {
                     showToast('info', 'Resuming Downloads', 'Carrying on downloading where you left off...');
 
-                    await downloadAudios(downloads);
+                    await downloadAudios(downloads, false);
                 }
             } catch (error) {
                 console.error('Failed to restart downloads on boot:', error);

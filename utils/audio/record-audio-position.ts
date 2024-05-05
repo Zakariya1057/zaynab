@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import TrackPlayer, {useActiveTrack, useProgress, State, Event} from "react-native-track-player";
 import { upsertEpisode } from "@/utils/database/episode/upsert-episode";
+import {getEpisodeNumberFromTitle} from "@/utils/episode/get-episode-number-from-title";
+import {field} from "@nozbe/watermelondb/decorators";
 
 export const recordAudioPosition = () => {
     useEffect(() => {
@@ -26,6 +28,8 @@ export const recordAudioPosition = () => {
 
                         if (!podcastId || !episodeId) return null
 
+                        const episodeNumber = getEpisodeNumberFromTitle(track.title)
+
                         await upsertEpisode({
                             ...track,
                             position: position,
@@ -33,6 +37,8 @@ export const recordAudioPosition = () => {
                             complete: (position === duration).toString(),
                             podcastId,
                             episodeId,
+                            number: episodeNumber,
+                            remoteImage: track.artwork
                         });
 
                         // console.log('Progress updated for:', track.title, position, duration);

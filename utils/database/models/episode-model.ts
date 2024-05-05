@@ -7,6 +7,9 @@ export class EpisodeModel extends Model {
     @field('podcastId') podcastId;
     @field('episodeId') episodeId;
 
+    @field('number') number;
+    @field('remoteImage') remoteImage;
+
     @field('artist') artist;
     @field('description') description;
     @field('title') title;

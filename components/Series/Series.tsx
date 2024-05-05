@@ -31,6 +31,7 @@ export default ({podcast, play, playingEpisodeId}: Props) => {
                 if (podcast.episodes[episode.episodeId]) {
                     podcast.episodes[episode.episodeId].duration = episode.duration;
                     podcast.episodes[episode.episodeId].position = episode.position;
+                    podcast.episodes[episode.episodeId].downloaded = false;
                 }
             }
 
@@ -69,7 +70,7 @@ export default ({podcast, play, playingEpisodeId}: Props) => {
 
     const openEpisode = useCallback((episodeId: string) => {
         router.push({
-            pathname: "/episode/",
+            pathname: "/notification.click/",
             params: {podcastId: podcast.id, episodeId}
         });
     }, [podcast.id]);

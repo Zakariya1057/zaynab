@@ -8,8 +8,7 @@ export const updateExistingTracks = async (existingTracks: Track[], episode: Epi
     if (existingTrackIndex > -1) {
         console.log('Setting From Existing Tracks');
 
-        const newSeekPosition = recordedEpisode?.position ?? 0
-        await TrackPlayer.skip(existingTrackIndex, completed ? newSeekPosition - 5 : newSeekPosition);
+        await TrackPlayer.skip(existingTrackIndex);
 
         const downloadedEpisode = downloadsById[episode.id];
         const newTrack = existingTracks[existingTrackIndex];

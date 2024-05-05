@@ -1,22 +1,24 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, RefreshControl, SectionList, TouchableOpacity, Modal, TouchableWithoutFeedback} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Modal, RefreshControl, SectionList, TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
 import {withDatabase} from '@nozbe/watermelondb/DatabaseProvider';
 import {withObservables} from '@nozbe/watermelondb/react';
-import {Database, Q} from '@nozbe/watermelondb';
+import {Q} from '@nozbe/watermelondb';
 import {DownloadModel} from "@/utils/database/models/download-model";
 import {database} from "@/utils/database/setup";
-import {YStack, Text, useTheme, XStack, Separator, View, Button} from "tamagui";
+import {Button, Separator, Text, useTheme, XStack, YStack} from "tamagui";
 import {AnimatedCircularProgress} from "react-native-circular-progress";
 import {getPodcastById} from "@/utils/data/getPodcastById";
 import {getEpisodeById} from "@/utils/data/getEpisodeById";
 import {router} from "expo-router";
-import {Entypo, Ionicons, MaterialIcons, Octicons, SimpleLineIcons} from "@expo/vector-icons";
+import {Ionicons, Octicons} from "@expo/vector-icons";
 import useDownloadEpisode from "@/hooks/useDownloadEpisode";
 import {DownloadStatus} from "@/interfaces/download-status";
 import {deleteDownload} from "@/utils/download/delete-download";
 import {cancelDownload} from "@/utils/download/cancel-download";
 import {useDownloads} from "@/contexts/download-context";
 import {useQueue} from "@/contexts/queue-context";
+import useDownloadManager from "@/hooks/useDownloadManager";
+import {refreshTrackUrlsAfterDeletion} from "@/utils/track/refresh-track-urls-after-deletion";
 
 interface DownloadItemProps {
     download: DownloadModel
@@ -67,8 +69,7 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status}) => {
     const { getDownloadResumable, removeDownload, addToDeleted } = useDownloads();
     const { removeFromQueue } = useQueue()
 
-
-    const percentage = totalBytesWritten / totalBytesExpectedToWrite;
+    const { downloadAudio, startNextDownload } = useDownloadManager();
 
     if (!podcastId || !episodeId){
         return null
@@ -77,7 +78,7 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status}) => {
     const podcast = getPodcastById(podcastId)
     const episode = getEpisodeById(podcast, episodeId)
 
-    const openEpisode = () => router.push({pathname: "/episode/", params: {podcastId, episodeId}});
+    const openEpisode = () => router.push({pathname: "/notification.click/", params: {podcastId, episodeId}});
 
     const theme = useTheme()
     const color = theme.color.get()
@@ -96,7 +97,9 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status}) => {
         setModalVisible(false);
     };
 
-    const downloadEpisode = useDownloadEpisode();
+    const downloadEpisode = async (download: DownloadModel) => {
+        await downloadAudio(download)
+    }
 
     const onDelete = async () => {
         const resumable = getDownloadResumable(episodeId)
@@ -105,13 +108,19 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status}) => {
         removeDownload(episodeId)
         addToDeleted(episodeId)
         removeFromQueue(episodeId)
+
+        await startNextDownload()
     }
+
+    const percentage = (totalBytesWritten / totalBytesExpectedToWrite);
+    const percentageCompleted = download.downloaded ? 100 : ( Number.isNaN(percentage) ? 0 : Math.round((percentage) * 100) )
 
     return (
         <TouchableOpacity onPress={openEpisode}>
             <XStack
                 borderBottomWidth={1}
-                paddingHorizontal="$4"
+                paddingLeft="$4"
+                paddingRight="$2"
                 paddingTop="$3"
                 paddingBottom="$2"
                 alignItems="center"
@@ -120,13 +129,13 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status}) => {
                     <AnimatedCircularProgress
                         size={50}
                         width={3}
-                        fill={Math.round((percentage ?? 0) * 100)}
+                        fill={percentageCompleted}
                         tintColor={'rgb(189,0,0)'}
                         backgroundColor={'rgba(154,0,0,0.47)'}
                         rotation={0}
                     >
                         {(fill) => (
-                            <Text>{percentage ? Math.round((percentage) * 100) : 0}%</Text>
+                            <Text>{percentageCompleted}%</Text>
                         )}
                     </AnimatedCircularProgress>
                 </YStack>
@@ -137,29 +146,24 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status}) => {
                     </Text>
                     <Text fontSize={15} color={'$charcoal'}>
                         {podcast.name}
+                        {/*{percentage} - {totalBytesWritten} / {totalBytesExpectedToWrite}*/}
                     </Text>
                 </YStack>
 
                 {status === DownloadStatus.DownloadFailed && (
-                    <TouchableOpacity onPress={() => downloadEpisode(download)}>
+                    <TouchableOpacity onPress={() => downloadEpisode(download)} style={{padding: 10}}>
                         <Ionicons name="reload" size={25} color={color} />
                     </TouchableOpacity>
                 )}
 
-                {status === DownloadStatus.CompletedDownload && (
-                    <TouchableOpacity onPress={() => deleteDownload(download)}>
+                {(status === DownloadStatus.CompletedDownload || (status === DownloadStatus.DownloadFailed) ) && (
+                    <TouchableOpacity onPress={() => deleteDownload(download, startNextDownload)} style={{ padding: 10, marginLeft: status === DownloadStatus.DownloadFailed ? 10 : 0}}>
                         <Ionicons name="trash-outline" size={28} color={color} />
                     </TouchableOpacity>
                 )}
 
-                {status === DownloadStatus.InProgress && (
-                    <TouchableOpacity onPress={() => cancelDownload(download, onDelete)}>
-                        <Octicons name="x" size={28} color={color} />
-                    </TouchableOpacity>
-                )}
-
-                {status === DownloadStatus.WaitingToDownload && (
-                    <TouchableOpacity onPress={() => cancelDownload(download, onDelete)}>
+                {(status === DownloadStatus.InProgress || status === DownloadStatus.WaitingToDownload) && (
+                    <TouchableOpacity onPress={() => cancelDownload(download, onDelete)} style={{padding: 10, paddingRight: 13}}>
                         <Octicons name="x" size={28} color={color} />
                     </TouchableOpacity>
                 )}
@@ -190,7 +194,7 @@ const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) =>
     useEffect(() => {
         const waitingToDownload = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten === 0);
         const completedDownloads = downloads.filter(d => d.downloaded);
-        const inProgressPaused = downloads.filter(d => !d.downloaded && d.totalBytesWritten > 0 && d.totalBytesWritten < d.totalBytesExpectedToWrite);
+        const inProgressPaused = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten > 0 && d.totalBytesWritten < d.totalBytesExpectedToWrite);
         const failedToDownload = downloads.filter(d => d.error);
 
         setSections([
@@ -241,7 +245,7 @@ const enhance = withObservables(['downloads'], () => ({
         .query(
             Q.sortBy('downloadUpdatedAt', Q.desc),
         )
-        .observeWithColumns(['totalBytesWritten', 'downloaded'])
+        .observeWithColumns(['totalBytesWritten', 'totalBytesExpectedToWrite', 'downloaded', 'error'])
 
 }));
 

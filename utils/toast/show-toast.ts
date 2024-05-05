@@ -1,4 +1,5 @@
 import Toast from "react-native-toast-message";
+import { StatusBar } from 'react-native';
 
 export const showToast = (type: "error" | "success" | "info", title: string, message: string) => {
     Toast.show({
@@ -8,9 +9,9 @@ export const showToast = (type: "error" | "success" | "info", title: string, mes
         text2Style: {
             fontSize: 11
         },
-        position: 'bottom',
+        position: 'top',
         visibilityTime: 3000,
         autoHide: true,
-        bottomOffset: 40,
+        topOffset: StatusBar.currentHeight ? StatusBar.currentHeight + 20 : 80, // Adds 20 for additional spacing
     });
 }

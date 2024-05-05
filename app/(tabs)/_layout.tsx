@@ -15,6 +15,9 @@ export default function TabLayout() {
                 tabBarActiveTintColor: '#5e2cf3',
                 tabBarLabelStyle: {
                     fontSize: 12,
+                },
+                tabBarIconStyle: {
+                    marginTop: 5
                 }
             }}
         >

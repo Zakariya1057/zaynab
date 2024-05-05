@@ -47,16 +47,16 @@ export default function SeriesEpisode({title, description, openEpisode, active, 
                 paddingBottom={'$2'}
             >
                 <YStack f={1}>
-                    <Text fontSize={17} fontWeight="bold" mb={'$1.5'} color={active ? '$color.purple' : '$color'}
-                          alignItems="center">
-                        {title}
+                    <XStack  mb={'$1.5'}>
+                        <Text fontSize={17} fontWeight="bold" color={active ? '$color.purple' : '$color'}>
+                            {title}
+                        </Text>
                         {
-                            downloaded && <YStack justifyContent={'flex-end'} pl={'$2'}>
-                                <Ionicons name="cloud-done" size={20} color={color} strokeWidth={1.7}/>
+                            downloaded && <YStack pl={'$2'} h={'100%'}>
+                                <Ionicons name="cloud-done" size={22} color={color} strokeWidth={1.7}/>
                             </YStack>
                         }
-
-                    </Text>
+                    </XStack>
                     <Text fontSize={15} color={active ? '$color.purple2' : '$charcoal'}>{description}</Text>
                 </YStack>
 

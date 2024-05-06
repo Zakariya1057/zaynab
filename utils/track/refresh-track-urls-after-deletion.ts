@@ -37,10 +37,10 @@ export const refreshTrackUrlsAfterDeletion = async () => {
             if (!download) {
                 const episode = getEpisodeById(podcast, episodeId);
                 if (episode) {
-                    console.log(`Updating URL for track ${index}: ${episode.url}`);
+                    console.log(`Updating URL for track ${index}: ${episode.stream}`);
                     const newTrack: Track = {
                         ...track,
-                        url: episode.url // Updating URL
+                        url: episode.stream // Updating URL
                     };
 
                     updatesNeeded.push({ index, newTrack });

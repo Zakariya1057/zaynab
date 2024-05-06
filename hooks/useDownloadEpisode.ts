@@ -26,7 +26,7 @@ const useDownloadEpisode = () => {
                     const episode = getEpisodeById(podcast, episodeId)
 
                     if (episode) {
-                        track.url = episode.url
+                        track.url = episode.download
                     }
                 }
             }

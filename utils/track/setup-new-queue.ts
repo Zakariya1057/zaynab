@@ -8,7 +8,7 @@ import {shuffleArray} from "@/utils/shuffle/shuffle-array";
 export const setupNewQueue = async (podcast: Podcast, episode: Episode, downloadsById: Record<string, string>, recordedEpisode: EpisodeModel | null, completed: boolean): Promise<void> => {
     const tracks = Object.values(podcast.episodes).map((ep): Track => ({
         id: ep.id,
-        url: downloadsById[ep.id] || ep.url,
+        url: downloadsById[ep.id] || ep.stream,
         title: `${ep.number}. ${ep.description}`,
         description: `${podcast.id}|${ep.id}`,
         artist: podcast.name,

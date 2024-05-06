@@ -16,6 +16,7 @@ import {debounce} from "@/utils/debounce/debounce";
 import {showToast} from "@/utils/toast/show-toast";
 import {getDownloadInProgress} from "@/utils/database/download/get-download-in-progress";
 import {updateTrackUrlOnDownloadComplete} from "@/utils/track/update-track-url-on-download-complete";
+import {getFileExtension} from "@/utils/url/get-file-extension";
 
 const useDownloadManager = () => {
     const {addDownload, removeDownload, isDownloading, setDownloadResumable, isDeleted} = useDownloads();
@@ -73,8 +74,10 @@ const useDownloadManager = () => {
     };
 
     const initializeNewDownload = async (episode: Partial<DownloadModel>): Promise<void> => {
+        const extension = getFileExtension(episode.url)
+
         const directoryUri = FileSystem.documentDirectory; // Base directory URI
-        const fileUri = `${directoryUri}${episode.episodeId}.mp3`; // Full file URI
+        const fileUri = `${directoryUri}${episode.episodeId}.${extension}`; // Full file URI
 
         if (!directoryUri) {
             throw new Error('No such directory');
@@ -106,7 +109,8 @@ const useDownloadManager = () => {
     }, 100)
 
     const startOrResumeDownload = async (id: string, url: string): Promise<void> => {
-        const fileUri = `${FileSystem.documentDirectory}${id}.mp3`;
+        const extension = getFileExtension(url)
+        const fileUri = `${FileSystem.documentDirectory}${id}.${extension}`;
         // const pausedDownloadState = await AsyncStorage.getItem(`pausedDownload-${id}`);
 
         let downloadResumable

@@ -10,10 +10,13 @@ export class EpisodeModel extends Model {
     @field('number') number;
     @field('remoteImage') remoteImage;
 
+    @field('stream') stream;
+    @field('download') download;
+
+
     @field('artist') artist;
     @field('description') description;
     @field('title') title;
-    @field('url') url;
     @field('duration') duration;
     @field('position') position;
     @field('complete') complete;

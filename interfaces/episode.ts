@@ -3,7 +3,10 @@ import {ImageSourcePropType} from "react-native";
 export interface Episode {
     id: string;
     number: number;
-    url: string;
+
+    stream: string;
+    download: string;
+
     description: string;
     duration?: number;
     position?: number;

@@ -88,7 +88,7 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
 
         await TrackPlayer.load({
             id: episode.id,
-            url: episode.url,
+            url: episode.stream,
             title: `${episode.number}. ${episode.description}`,
             description: `${podcast.id}|${episode.id}`,
             artwork: episode.remoteImage ?? podcast.remoteImage,

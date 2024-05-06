@@ -53,6 +53,7 @@ export default function () {
         if (shuffleOn) {
             shuffleArray(tracks);
         }
+
         await TrackPlayer.setQueue(tracks);
 
         if (lastEpisode) {

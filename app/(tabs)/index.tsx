@@ -5,20 +5,16 @@ import {
     Image,
     Stack,
     H5,
-    Card,
-    H6, useTheme
+    useTheme
 } from 'tamagui';
 import {PlayCircle} from "@tamagui/lucide-icons";
 import {router} from "expo-router";
-import {FlatList, RefreshControl, TouchableOpacity, SectionList} from "react-native";
+import {RefreshControl, TouchableOpacity, SectionList} from "react-native";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
 import React, {useCallback, useState} from "react";
 import {Podcasts} from "@/utils/data/podcasts";
 import {Podcast} from "@/interfaces/podcast";
 import {useEpisodes} from "@/hooks/useEpisodes";
-import {getPercentage} from "@/utils/percentage/get-percentage";
-import {AnimatedCircularProgress} from "react-native-circular-progress";
-import {getPodcastById} from "@/utils/data/getPodcastById";
 import ContinueListening from "@/components/ContinueListening/ContinueListening";
 
 export default function App() {

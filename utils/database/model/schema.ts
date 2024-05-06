@@ -10,7 +10,8 @@ export const schema = appSchema({
                 { name: 'episodeId', type: 'string', isIndexed: true },
                 { name: 'podcastId', type: 'string', isIndexed: true },
 
-                { name: 'url', type: 'string' },
+                { name: 'stream', type: 'string' },
+                { name: 'download', type: 'string' },
 
                 { name: 'number', type: 'number' },
                 { name: 'remoteImage', type: 'string' },

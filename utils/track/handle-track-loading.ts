@@ -8,7 +8,7 @@ export const handleTrackLoading = async (track: Track | undefined, downloadsById
         return true;
     }
 
-    if (track && track.url === episode.url) {
+    if (track && track.url === episode.stream) {
         const localUrl = downloadsById[episode.id];
         if (localUrl && localUrl !== track.url) {
             await TrackPlayer.load({

@@ -13,7 +13,7 @@ export const getTracksWithDownloads = async (podcast: Podcast): Promise<Track[]>
     return Object.values(podcast.episodes).map((episode: Episode): Track => {
         return {
             id: episode.id,
-            url: downloadsById[episode.id] || episode.url,
+            url: downloadsById[episode.id] || episode.stream,
             title: `${episode.number}. ${episode.description}`,
             description: `${podcast.id}|${episode.id}`,
             artist: podcast.name,

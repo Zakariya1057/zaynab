@@ -19,7 +19,7 @@ export const useDownloadPodcastEpisodes = () => {
             showToast('info', 'Downloading Episodes', `Downloading ${episodesToDownload.length} new episodes in background...`);
             await downloadAudios(
                 episodesToDownload.map(episode => ({
-                    url: episode.url,
+                    url: episode.download,
                     episodeId: episode.id,
                     podcastId: podcast.id,
                     title: `${episode.number}. ${episode.description}`

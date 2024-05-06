@@ -23,6 +23,6 @@ export const cancelDownload = async (download: DownloadModel, onCancel = () => {
                 }
             }
         ],
-        { cancelable: false }
+        { cancelable: true }
     );
 };

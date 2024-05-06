@@ -8,6 +8,8 @@ export class DownloadModel extends Model {
 
     @field('podcastId') podcastId;
 
+    @field('title') title;
+
     @field('url') url;
 
     @field('uri') uri;

@@ -26,6 +26,7 @@ export const trackChangeAndSeekPosition = () => {
                 if (position) {
                     if ((duration - position) < 5) {
                         if (lastTrack?.description === activeTrack?.description) {
+                            await TrackPlayer.seekTo(newTrackPosition);
                             await TrackPlayer.pause()
                             return
                         }

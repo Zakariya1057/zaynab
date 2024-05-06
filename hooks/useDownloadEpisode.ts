@@ -4,7 +4,9 @@ import { getDownloadById } from "@/utils/database/download/get-download-by-id";
 import { showToast } from "@/utils/toast/show-toast";
 import useDownloadManager from "@/hooks/useDownloadManager";
 import { DownloadModel } from "@/utils/database/models/download-model";
-import {getEpisodeById} from "@/utils/database/episode/get-episode-by-id";
+import {getPodcastById} from "@/utils/data/getPodcastById";
+import {getEpisodeById} from "@/utils/data/getEpisodeById";
+import episode from "@/app/episode";
 
 const useDownloadEpisode = () => {
     const { downloadAudio } = useDownloadManager();
@@ -20,7 +22,8 @@ const useDownloadEpisode = () => {
                 track = await TrackPlayer.getActiveTrack();
                 if (track && track.description) {
                     [podcastId, episodeId] = track.description.split('|');
-                    const episode = await getEpisodeById(episodeId)
+                    const podcast = getPodcastById(podcastId)
+                    const episode = getEpisodeById(podcast, episodeId)
 
                     if (episode) {
                         track.url = episode.url
@@ -44,7 +47,7 @@ const useDownloadEpisode = () => {
             await downloadAudio({
                 podcastId,
                 episodeId,
-                ...(download || track)
+                ...(track)
             });
         } catch (error) {
             showToast('error', 'Download Error', `An error occurred while downloading: ${error.message}`);

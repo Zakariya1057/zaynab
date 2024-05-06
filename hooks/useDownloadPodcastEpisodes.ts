@@ -22,6 +22,7 @@ export const useDownloadPodcastEpisodes = () => {
                     url: episode.url,
                     episodeId: episode.id,
                     podcastId: podcast.id,
+                    title: `${episode.number}. ${episode.description}`
                 }))
             );
         } else {

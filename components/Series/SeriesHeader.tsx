@@ -1,9 +1,11 @@
 import React from 'react';
-import {YStack, Text, Image, Button, useTheme, H1, H2} from 'tamagui';
+import {Button, H2, Image, Text, useTheme, YStack} from 'tamagui';
 import EpisodeHeader from './EpisodeHeader';
-import { Play } from '@tamagui/lucide-icons'; // Ensure you have the correct icon import
+import {Play, Pause} from '@tamagui/lucide-icons';
+import {State, usePlaybackState} from "react-native-track-player"; // Ensure you have the correct icon import
 
-export default function SeriesHeader({ image, title, description, play }: SeriesHeaderProps) {
+export default function SeriesHeader({ image, title, description, continuePlaying, play }: SeriesHeaderProps) {
+    const { state } = usePlaybackState()
     const theme = useTheme();
     const purple = theme.purple.get()
 
@@ -41,17 +43,19 @@ export default function SeriesHeader({ image, title, description, play }: Series
                     </H2>
 
                     <Button
-                        icon={<Play color={purple} fill={purple} size={'$1'} />} // Adjust the color according to your theme
+                        icon={
+                            state === State.Playing ? (  <Pause color={purple} fill={purple} size={'$1'} /> ) : (  <Play color={purple} fill={purple} size={'$1'} /> )
+                    } // Adjust the color according to your theme
                         onPress={play}
                         size="$4"
-                        fontSize="$7" // Adjust based on your theme
+                        fontSize="$6" // Adjust based on your theme
                         width={'$12'}
                         alignSelf="center"
                         backgroundColor="rgba(0,0,0,0.60)"
                         borderColor={purple}
                         borderWidth={'$0.5'}
                     >
-                        Play
+                        { state === State.Playing ? 'Pause' :  ( continuePlaying ? 'Resume' : 'Play' ) }
                     </Button>
 
                     <Text
@@ -73,5 +77,6 @@ interface SeriesHeaderProps {
     image: any; // Adjust the type to match your image source type, e.g., string for URI
     title: string;
     description: string;
+    continuePlaying: boolean;
     play: () => void;
 }

@@ -19,6 +19,7 @@ import {useDownloads} from "@/contexts/download-context";
 import {useQueue} from "@/contexts/queue-context";
 import useDownloadManager from "@/hooks/useDownloadManager";
 import {refreshTrackUrlsAfterDeletion} from "@/utils/track/refresh-track-urls-after-deletion";
+import {getEpisodeNumberFromTitle} from "@/utils/episode/get-episode-number-from-title";
 
 interface DownloadItemProps {
     download: DownloadModel
@@ -193,9 +194,16 @@ const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) =>
 
     useEffect(() => {
         const waitingToDownload = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten === 0);
-        const completedDownloads = downloads.filter(d => d.downloaded);
         const inProgressPaused = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten > 0 && d.totalBytesWritten < d.totalBytesExpectedToWrite);
         const failedToDownload = downloads.filter(d => d.error);
+        const completedDownloads = downloads
+            .filter(d => d.downloaded)
+            .sort((a, b) => {
+                if (a.podcastId < b.podcastId) return -1;
+                if (a.podcastId > b.podcastId) return 1;
+
+                return getEpisodeNumberFromTitle(a.title) - getEpisodeNumberFromTitle(b.title)
+            });
 
         setSections([
             { title: DownloadStatus.InProgress, data: inProgressPaused },

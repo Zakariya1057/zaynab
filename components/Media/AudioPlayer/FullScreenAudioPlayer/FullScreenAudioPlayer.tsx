@@ -55,7 +55,6 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
     // Get the queue and determine the position of the current episode
     useEffect(() => {
         const checkQueuePosition = async () => {
-            console.log('Checking last and first episodes')
             const queue = await TrackPlayer.getQueue();
             const track = await TrackPlayer.getActiveTrack()
 

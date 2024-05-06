@@ -7,19 +7,9 @@ export const sortTracks = async (): Promise<void> => {
         // Get the ID and index of the currently playing track and the current queue
         const queue = await TrackPlayer.getQueue();
         const activeTrack = await TrackPlayer.getActiveTrack();
-        const index = await TrackPlayer.getActiveTrackIndex()
-
-        // console.log(activeTrack);
-        // console.log(index)
-        // console.log(queue.map((a) => a.title + "\n" ))
 
         const newIndex = getEpisodeNumberFromTitle(activeTrack?.title)-1
-        //
-        // const activeTitle = activeTrack?.title;
-        //
-        const { position } = await TrackPlayer.getProgress()
-        // const activeTrackIndex = queue.findIndex(track => track.id === activeTrack?.id);
-        //
+
         // // Filter out the currently playing track and sort the rest of the queue based on episode numbers
         const sortedQueue = queue
             .sort((a, b) => {

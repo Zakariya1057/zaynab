@@ -1,12 +1,18 @@
 import TrackPlayer, { Track } from 'react-native-track-player';
 import { getDownloadById } from "@/utils/database/download/get-download-by-id";
 import {showToast} from "@/utils/toast/show-toast";
+import {fetchShuffleStatus} from "@/utils/shuffle/fetch-shuffle-status";
+import {shuffleArray} from "@/utils/shuffle/shuffle-array";
+import {shuffleTracks} from "@/utils/shuffle/shuffle-tracks";
 
 // Function to update track URLs from remote to local upon download completion
 export const updateTrackUrlOnDownloadComplete = async () => {
     console.log('Starting track URL update post-download completion');
     const tracks = await TrackPlayer.getQueue();
-    const activeTrackIndex = await TrackPlayer.getCurrentTrack();
+    const activeTrack = await TrackPlayer.getActiveTrack();
+    const activeTrackIndex = await TrackPlayer.getActiveTrackIndex();
+
+    const shuffleOn = await fetchShuffleStatus()
 
     let updatesNeeded: { index: number, newTrack: Track }[] = [];
 
@@ -34,11 +40,17 @@ export const updateTrackUrlOnDownloadComplete = async () => {
     let activeTrackUpdated = false;
     for (const update of updatesNeeded) {
         console.log(`Updating track at index ${update.index}`);
+        await TrackPlayer.pause()
         await TrackPlayer.remove(update.index);
         await TrackPlayer.add(update.newTrack, update.index);
         if (update.index === activeTrackIndex) {
             activeTrackUpdated = true;
         }
+    }
+
+    if (shuffleOn) {
+        await shuffleTracks()
+        await TrackPlayer.pause()
     }
 
     if (updatesNeeded.length > 0) {
@@ -47,7 +59,11 @@ export const updateTrackUrlOnDownloadComplete = async () => {
         if (activeTrackUpdated && activeTrackIndex) {
             showToast('info', 'Enhanced Playback', 'Switching to downloaded audio for smoother performance.');
             console.log(`Skipping back to the active track at index ${activeTrackIndex}`);
-            await TrackPlayer.skip(activeTrackIndex);
+
+            const queueTracks = await TrackPlayer.getQueue();
+            const index = queueTracks.findIndex((track) => track.id === activeTrack?.id);
+
+            await TrackPlayer.skip(index);
         }
     }
 };

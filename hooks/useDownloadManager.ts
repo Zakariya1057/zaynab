@@ -12,8 +12,6 @@ import {getDownloadById} from "@/utils/database/download/get-download-by-id";
 import {insertDownload} from "@/utils/database/download/insert-download";
 import {DownloadModel} from "@/utils/database/models/download-model";
 import {useDownloads} from "@/contexts/download-context";
-import Toast from "react-native-toast-message";
-import {useQueue} from "@/contexts/queue-context";
 import {debounce} from "@/utils/debounce/debounce";
 import {showToast} from "@/utils/toast/show-toast";
 import {getDownloadInProgress} from "@/utils/database/download/get-download-in-progress";
@@ -21,7 +19,6 @@ import {updateTrackUrlOnDownloadComplete} from "@/utils/track/update-track-url-o
 
 const useDownloadManager = () => {
     const {addDownload, removeDownload, isDownloading, setDownloadResumable, isDeleted} = useDownloads();
-    const {addToQueue, removeFromQueue, isInQueue, queueEmpty, getNextItem} = useQueue()
 
     const downloadAudios = async (episodes: Partial<DownloadModel>[], upsert: boolean = true): Promise<void> => {
         if (episodes.length === 0) {
@@ -67,7 +64,7 @@ const useDownloadManager = () => {
                 return;
             } else {
                 console.log('Resuming incomplete download');
-                await startOrResumeDownload(existingDownload.episodeId, existingDownload.url);
+                await startOrResumeDownload(episode.episodeId, episode.url);
             }
         } else {
             console.log('Starting new download:', episode);
@@ -141,9 +138,6 @@ const useDownloadManager = () => {
             await upsertDownload({episodeId: id, error: error.message});
 
             removeDownload(id)
-            removeFromQueue(id)
-
-            // await startOrResumeDownload(id, url)
         }
     };
 
@@ -160,7 +154,6 @@ const useDownloadManager = () => {
             console.log('Download aborted for:', id)
         }
 
-        removeFromQueue(id)
         removeDownload(id)
 
         await startNextDownload()

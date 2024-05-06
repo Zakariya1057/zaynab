@@ -10,7 +10,6 @@ export const upsertEpisode = async (episodeData: Partial<EpisodeModel>) => {
             Q.where('episodeId', episodeData.episodeId)
         ).fetch();
 
-        // console.log(episodeData)
         const time = getCurrentUnixTime();
 
         if (existingEpisodes.length > 0) {

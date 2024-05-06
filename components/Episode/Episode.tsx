@@ -22,6 +22,8 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
             const recordedEpisode = await getRecordedEpisodeById(episodeId);
             const episode = podcast.episodes[episodeId];
 
+            console.log(downloadsById[episodeId])
+
             if (await handleTrackLoading(track, downloadsById, episode, recordedEpisode)) {
                 return;
             }

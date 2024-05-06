@@ -5,7 +5,6 @@ import {trackChangeAndSeekPosition} from "@/hooks/trackChangeAndSeekPosition";  
 
 export const handleTrackLoading = async (track: Track | undefined, downloadsById: Record<string, string>, episode: Episode, recordedEpisode: EpisodeModel | null): Promise<boolean> => {
     if (track && track.url === downloadsById[episode.id]) {
-        console.log('Returning');
         return true;
     }
 

@@ -32,6 +32,7 @@ export const schema = appSchema({
                 { name: 'episodeId', type: 'string', isIndexed: true },
                 { name: 'url', type: 'string' },
                 { name: 'uri', type: 'string' },
+                { name: 'title', type: 'string' },
                 { name: 'totalBytesWritten', type: 'number' },
                 { name: 'totalBytesExpectedToWrite', type: 'number' },
                 { name: 'downloaded', type: 'boolean' },

@@ -53,6 +53,7 @@ export const refreshTrackUrlsAfterDeletion = async () => {
     let activeTrackUpdated = false;
     for (const update of updatesNeeded) {
         console.log(`Updating track at index ${update.index}`);
+        await TrackPlayer.pause()
         await TrackPlayer.remove(update.index);
         await TrackPlayer.add(update.newTrack, update.index);
         if (update.index === activeTrackIndex) {

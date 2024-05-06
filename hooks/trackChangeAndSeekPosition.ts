@@ -12,6 +12,7 @@ export const trackChangeAndSeekPosition = () => {
             const activeTrack = await TrackPlayer.getActiveTrack();
             const lastTrack = (await TrackPlayer.getQueue())?.at(-1)
 
+            console.log(activeTrack?.url)
             const localAudio = !(activeTrack?.url.includes('http', 0))
 
             const episodeId = activeTrack?.description?.split('|')[1];
@@ -34,9 +35,15 @@ export const trackChangeAndSeekPosition = () => {
                         newTrackPosition -= 5
                     }
 
-                    console.log('Found history for episode. Changing time...', position)
-                    await TrackPlayer.seekTo(newTrackPosition);
-                    await TrackPlayer.play()
+                    const { position: currentPosition } = await TrackPlayer.getProgress()
+
+                    console.log(currentPosition, newTrackPosition)
+
+                    if (currentPosition !== newTrackPosition) {
+                        console.log('Found history for episode. Changing time...', position)
+                        await TrackPlayer.seekTo(newTrackPosition);
+                        await TrackPlayer.play()
+                    }
                 } else {
                     await TrackPlayer.play()
                 }

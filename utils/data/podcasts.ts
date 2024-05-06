@@ -5,7 +5,7 @@ export const Podcasts: Record<string, Podcast> = {
         id: "a3bc8692-476f-4d2d-98df-3fc498321517",
         name: "The Lives of the Prophets",
         image: require('@/assets/images/podcasts/a3bc8692-476f-4d2d-98df-3fc498321517/cover.webp'),
-        remoteImage: 'https://drive.usercontent.google.com/uc?id=1O3c70KmqV9znxyU-pZuSB84E9rvMu9Mf&export=download',
+        remoteImage: 'https://zaynab.s3.eu-west-2.amazonaws.com/The+Lives+of+the+Prophets/background.webp',
         background: require('@/assets/images/podcasts/a3bc8692-476f-4d2d-98df-3fc498321517/background.webp'),
         description: "Explore the captivating series 'The Lives of the Prophets,' the first English-language lectures based on extensive research into original Arabic texts, particularly Ibn Kathir's 'Al-Bidayah wa-nihayah (The Beginning and the End).' Grounded in the Quran, Hadith, and insights from the Noble Companions, this series offers an authentic and inspiring journey through the lives of the prophets. Perfect for anyone seeking to deepen their understanding of these pivotal figures with scholarly precision and engaging storytelling.",
         subTitle: "Explore prophetic histories with authenticity and depth.",

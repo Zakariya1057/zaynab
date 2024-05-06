@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {H4, Image, Paragraph, YStack, View, Button, ScrollView} from 'tamagui';
 import TrackPlayer, {
-    State, useActiveTrack,
+    State, TrackType, useActiveTrack,
     usePlaybackState,
     useProgress,
 } from 'react-native-track-player';
@@ -17,6 +17,7 @@ import {showToast} from "@/utils/toast/show-toast";
 import {playNextTrack} from "@/utils/track/play-next-track";
 import {playPrevTrack} from "@/utils/track/play-prev-track";
 import useDownloadEpisode from "@/hooks/useDownloadEpisode";
+import {getFileExtension} from "@/utils/url/get-file-extension";
 
 export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, episode: Episode }) {
     const track = useActiveTrack()
@@ -62,12 +63,12 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
                 return
             }
 
-            const [_, episodeId] = track?.description?.split('|') ?? [];
+            const description = track?.description
 
             const firstEpisode = queue.at(0);
             const lastEpisode = queue.at(-1);
-            const isCurrentFirst = episodeId === firstEpisode?.id;
-            const isCurrentLast = episodeId === lastEpisode?.id;
+            const isCurrentFirst = description === firstEpisode?.description;
+            const isCurrentLast = description === lastEpisode?.description;
 
             setIsFirstEpisode(isCurrentFirst)
             setIsLastEpisode(isCurrentLast)
@@ -86,14 +87,16 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
 
         setAudioFailedToLoad(true)
 
-        await TrackPlayer.load({
-            id: episode.id,
-            url: episode.stream,
-            title: `${episode.number}. ${episode.description}`,
-            description: `${podcast.id}|${episode.id}`,
-            artwork: episode.remoteImage ?? podcast.remoteImage,
-            artist: podcast.name
-        });
+        await TrackPlayer.retry()
+        // await TrackPlayer.load({
+        //     id: episode.id,
+        //     url: episode.stream,
+        //     title: `${episode.number}. ${episode.description}`,
+        //     description: `${podcast.id}|${episode.id}`,
+        //     artwork: episode.remoteImage ?? podcast.remoteImage,
+        //     artist: podcast.name,
+        //     type: getFileExtension(episode.stream) === 'mp3' ? TrackType.Default : TrackType.HLS
+        // });
     }
 
     return (

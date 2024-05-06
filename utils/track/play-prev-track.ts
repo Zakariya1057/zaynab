@@ -14,6 +14,7 @@ export const playPrevTrack = async (audioFailedToLoad: boolean) => {
     const history = await getTrackHistoryAtIndex(newPosition);
     await TrackPlayer.skipToPrevious();
 
+    await TrackPlayer.pause()
     if (history) {
         // await TrackPlayer.seekTo(history.position);
     }

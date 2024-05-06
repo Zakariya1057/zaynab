@@ -40,7 +40,7 @@ export function DemoCard({title, position, duration, podcastId, episodeId}: {
 
     return (
         <TouchableOpacity onPress={openEpisode}>
-            <Card size="$3" bordered width={220} br={'$5'} overflow={'hidden'}>
+            <Card size="$3" bordered width={200} br={'$5'} overflow={'hidden'}>
                 <XStack>
                     <Image
                         resizeMode="cover"

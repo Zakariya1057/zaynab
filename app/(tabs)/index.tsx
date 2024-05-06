@@ -51,7 +51,6 @@ export default function App() {
         }
     };
 
-
     return (
         <Stack f={1} backgroundColor={'$background'}>
             <SectionList

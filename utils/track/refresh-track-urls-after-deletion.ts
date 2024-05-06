@@ -1,7 +1,7 @@
-import TrackPlayer, { Track } from 'react-native-track-player';
-import { getDownloadById } from "@/utils/database/download/get-download-by-id";
-import { getPodcastById } from "@/utils/data/getPodcastById";
-import { getEpisodeById } from "@/utils/data/getEpisodeById";
+import TrackPlayer, {Track, TrackType} from 'react-native-track-player';
+import {getDownloadById} from "@/utils/database/download/get-download-by-id";
+import {getPodcastById} from "@/utils/data/getPodcastById";
+import {getEpisodeById} from "@/utils/data/getEpisodeById";
 import {showToast} from "@/utils/toast/show-toast";
 
 // Function to handle track updates when a download has been deleted
@@ -40,7 +40,8 @@ export const refreshTrackUrlsAfterDeletion = async () => {
                     console.log(`Updating URL for track ${index}: ${episode.stream}`);
                     const newTrack: Track = {
                         ...track,
-                        url: episode.stream // Updating URL
+                        url: episode.stream,
+                        type: TrackType.HLS
                     };
 
                     updatesNeeded.push({ index, newTrack });
@@ -53,10 +54,10 @@ export const refreshTrackUrlsAfterDeletion = async () => {
     let activeTrackUpdated = false;
     for (const update of updatesNeeded) {
         console.log(`Updating track at index ${update.index}`);
-        await TrackPlayer.pause()
         await TrackPlayer.remove(update.index);
         await TrackPlayer.add(update.newTrack, update.index);
         if (update.index === activeTrackIndex) {
+            await TrackPlayer.pause()
             activeTrackUpdated = true;
         }
     }

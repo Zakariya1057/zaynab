@@ -20,6 +20,8 @@ export const updateExistingTracks = async (existingTracks: Track[], episode: Epi
             });
         }
 
+        await TrackPlayer.pause()
+
         console.log('Set From Existing Tracks');
         return true;
     }

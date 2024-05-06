@@ -33,7 +33,8 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
                 return;
             }
 
-            await setupNewQueue(podcast, episode, downloadsById, recordedEpisode, completed);
+            await setupNewQueue(podcast, episode, downloadsById);
+
         }
 
         setup();

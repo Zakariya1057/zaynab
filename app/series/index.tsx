@@ -17,6 +17,8 @@ import {fetchLastListenedEpisodeByPodcastId} from "@/utils/database/episode/fetc
 import {checkAndShowDownloadMessage} from "@/utils/notify/check-and-show-download-message";
 import {DownloadStatus} from "@/interfaces/download-status";
 import {getDownloadsByPodcastId} from "@/utils/database/download/get-downloads-by-podcast-id";
+import {setPodcastTracks} from "@/utils/track/set-podcast-tracks";
+import {prefetchPodcastTracks} from "@/utils/track/prefetch-podcast-tracks";
 
 export default function () {
     const {id, play: playAudio} = useLocalSearchParams<{ id: string, play?: string }>()
@@ -31,38 +33,7 @@ export default function () {
 
     const play = async () => {
         await setupPlayer();
-        const {state} = await TrackPlayer.getPlaybackState();
-        const playingPodcast = await playingCurrentPodcast(podcast.id);
-
-        if (playingPodcast) {
-            if (state !== State.Playing) {
-                await TrackPlayer.play();
-            } else {
-                await TrackPlayer.pause();
-            }
-            return;
-        }
-
-        await TrackPlayer.pause();
-
-        const tracks = await getTracksWithDownloads(podcast);
-        const lastEpisode = await fetchLastListenedEpisodeByPodcastId(podcast.id);
-
-        console.log(lastEpisode)
-        const shuffleOn = await fetchShuffleStatus();
-        if (shuffleOn) {
-            shuffleArray(tracks);
-        }
-
-        await TrackPlayer.setQueue(tracks);
-
-        if (lastEpisode) {
-            const queue = await TrackPlayer.getQueue()
-            const index = queue.findIndex((track) => track.description === lastEpisode.description)
-            await TrackPlayer.skip(index)
-        }
-
-        // await TrackPlayer.play();
+        await setPodcastTracks(id)
     }
 
     const updateDownloadIcon = async () => {

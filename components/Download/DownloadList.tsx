@@ -9,7 +9,7 @@ import {Button, Separator, Text, useTheme, XStack, YStack} from "tamagui";
 import {AnimatedCircularProgress} from "react-native-circular-progress";
 import {getPodcastById} from "@/utils/data/getPodcastById";
 import {getEpisodeById} from "@/utils/data/getEpisodeById";
-import {router} from "expo-router";
+import {Stack, router, useFocusEffect} from "expo-router";
 import {Ionicons, Octicons} from "@expo/vector-icons";
 import {DownloadStatus} from "@/interfaces/download-status";
 import {deleteDownload} from "@/utils/download/delete-download";
@@ -17,10 +17,15 @@ import {cancelDownload} from "@/utils/download/cancel-download";
 import {useDownloads} from "@/contexts/download-context";
 import useDownloadManager from "@/hooks/useDownloadManager";
 import {getEpisodeNumberFromTitle} from "@/utils/episode/get-episode-number-from-title";
+import {ArrowLeft} from "@tamagui/lucide-icons";
+import {deleteDownloads} from "@/utils/download/delete-downloads";
 
 interface DownloadItemProps {
     download: DownloadModel
     status: DownloadStatus
+    highlight: boolean
+    setHighlightedId: (id: string, download: DownloadModel) => void
+    highlightedItemsFound: boolean
 }
 
 const DownloadItemModal = ({modalVisible, setModalVisible, handlePauseDownload, handleDeleteDownload}) => {
@@ -61,21 +66,20 @@ const DownloadItemModal = ({modalVisible, setModalVisible, handlePauseDownload, 
     );
 };
 
-const DownloadItem: React.FC<DownloadItemProps> = ({download, status}) => {
+const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight, setHighlightedId, highlightedItemsFound}) => {
     const {podcastId, episodeId, totalBytesWritten, totalBytesExpectedToWrite, downloaded, error} = download
 
-    const { getDownloadResumable, removeDownload } = useDownloads();
+    const {getDownloadResumable, removeDownload} = useDownloads();
 
-    const { downloadAudio, startNextDownload } = useDownloadManager();
+    const {downloadAudio, startNextDownload} = useDownloadManager();
 
-    if (!podcastId || !episodeId){
+    if (!podcastId || !episodeId) {
         return null
     }
 
     const podcast = getPodcastById(podcastId)
     const episode = getEpisodeById(podcast, episodeId)
 
-    const openEpisode = () => router.push({pathname: "/notification.click/", params: {podcastId, episodeId}});
 
     const theme = useTheme()
     const color = theme.color.get()
@@ -106,11 +110,26 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status}) => {
         await startNextDownload()
     }
 
+    const onPress = () => {
+        if (highlightedItemsFound) {
+            handleLongPress()
+        } else {
+           router.push({pathname: "/notification.click/", params: {podcastId, episodeId}});
+        }
+    }
+
+    const handleLongPress = () => {
+        setHighlightedId(download.id, download);  // Toggle the highlighted state
+    };
+
     const percentage = (totalBytesWritten / totalBytesExpectedToWrite);
-    const percentageCompleted = download.downloaded ? 100 : ( Number.isNaN(percentage) ? 0 : Math.round((percentage) * 100) )
+    const percentageCompleted = download.downloaded ? 100 : (Number.isNaN(percentage) ? 0 : Math.round((percentage) * 100))
+
+    const backgroundColor = highlight ? 'rgba(189, 0, 0, 0.5)' : 'transparent';
 
     return (
-        <TouchableOpacity onPress={openEpisode}>
+        <TouchableOpacity onPress={onPress} delayLongPress={100} onLongPress={handleLongPress}
+                          style={{backgroundColor: backgroundColor}} activeOpacity={0.93}>
             <XStack
                 borderBottomWidth={1}
                 paddingLeft="$4"
@@ -146,19 +165,7 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status}) => {
 
                 {status === DownloadStatus.DownloadFailed && (
                     <TouchableOpacity onPress={() => downloadEpisode(download)} style={{padding: 10}}>
-                        <Ionicons name="reload" size={25} color={color} />
-                    </TouchableOpacity>
-                )}
-
-                {(status === DownloadStatus.CompletedDownload || (status === DownloadStatus.DownloadFailed) ) && (
-                    <TouchableOpacity onPress={() => deleteDownload(download, startNextDownload)} style={{ padding: 10, marginLeft: status === DownloadStatus.DownloadFailed ? 10 : 0}}>
-                        <Ionicons name="trash-outline" size={28} color={color} />
-                    </TouchableOpacity>
-                )}
-
-                {(status === DownloadStatus.InProgress || status === DownloadStatus.WaitingToDownload) && (
-                    <TouchableOpacity onPress={() => cancelDownload(download, onDelete)} style={{padding: 10, paddingRight: 13}}>
-                        <Octicons name="x" size={28} color={color} />
+                        <Ionicons name="reload" size={25} color={color}/>
                     </TouchableOpacity>
                 )}
 
@@ -184,28 +191,21 @@ const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) =>
 
     const [refreshing, setRefreshing] = useState(false);
     const [sections, setSections] = useState<{ title: DownloadStatus, data: DownloadModel[] }[]>([]);
+    const [highlighted, setHighlighted] = useState<Record<string, DownloadModel|null>>({})
 
     useEffect(() => {
         const waitingToDownload = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten === 0);
         const inProgressPaused = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten > 0 && d.totalBytesWritten < d.totalBytesExpectedToWrite);
         const failedToDownload = downloads.filter(d => d.error);
-        const completedDownloads = downloads
-            .filter(d => d.downloaded)
-            .sort((a, b) => {
-                if (a.podcastId < b.podcastId) return -1;
-                if (a.podcastId > b.podcastId) return 1;
-
-                return getEpisodeNumberFromTitle(a.title) - getEpisodeNumberFromTitle(b.title)
-            });
+        const completedDownloads = downloads.filter(d => d.downloaded)
 
         setSections([
-            { title: DownloadStatus.InProgress, data: inProgressPaused },
-            { title: DownloadStatus.DownloadFailed, data: failedToDownload },
-            { title: DownloadStatus.WaitingToDownload, data: waitingToDownload },
-            { title: DownloadStatus.CompletedDownload, data: completedDownloads },
+            {title: DownloadStatus.InProgress, data: inProgressPaused},
+            {title: DownloadStatus.DownloadFailed, data: failedToDownload},
+            {title: DownloadStatus.WaitingToDownload, data: waitingToDownload},
+            {title: DownloadStatus.CompletedDownload, data: completedDownloads},
         ].filter(section => section.data.length > 0));
     }, [downloads]);
-
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -215,28 +215,69 @@ const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) =>
         setRefreshing(false);
     };
 
+    const updateHighlighted = (id: string, download: DownloadModel|null) => {
+        setHighlighted((prev) => {
+            return {...prev, [id]: download}
+        })
+    }
+
+    const { startNextDownload } = useDownloadManager();
+
+    const deleteHighlighted = () => {
+        const validDownloads = Object.values(highlighted).filter((download): download is DownloadModel => download !== null);
+        deleteDownloads(validDownloads, startNextDownload);
+    }
+
+    const cancelHighlighted = () => {
+        setHighlighted({})
+    }
+
+    const highlightedItemsFound = Object.values(highlighted).length > 0
+
+    const headerRight = () =>  highlightedItemsFound ?
+        <TouchableOpacity onPress={deleteHighlighted}>
+            <Ionicons name="trash-outline" size={28} color={'white'} style={{ paddingRight: 15 }}/>
+        </TouchableOpacity> : null
+
+    const headerLeft = () =>  highlightedItemsFound ?
+        <TouchableOpacity onPress={cancelHighlighted}>
+            <ArrowLeft size={28} color="white" style={{ paddingLeft: 55 }} />
+        </TouchableOpacity> : null
+
+    const headerTitle = highlightedItemsFound ? '' : 'Downloads'
+
     return (
-        <SectionList
-            sections={sections}
-            keyExtractor={(item, index) => item.id + index}
-            renderItem={({item, section: { title }}) => <DownloadItem download={item} status={title}/>}
-            renderSectionHeader={({section: {title}}) => (
-                <YStack width="100%">
-                    <XStack justifyContent="space-between" alignItems="center" backgroundColor={'$background'}
-                            py={'$3'}>
-                        <Text fontSize={20} fontWeight="bold" pl={'$4'}>{title}</Text>
-                    </XStack>
-                </YStack>
-            )}
-            refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    colors={['purple']} // Optional: you can set the colors of the indicator (Android)
-                    tintColor={purple} // Optional: set the color of the indicator (iOS)
-                />
-            }
-        />
+        <>
+            <Stack.Screen options={{
+                headerTitle,
+                headerRight,
+                headerLeft,
+            }}/>
+            <SectionList
+                sections={sections}
+                keyExtractor={(item, index) => item.id + index}
+                renderItem={({item, section: {title}}) => <DownloadItem download={item} status={title}
+                                                                        highlight={highlighted[item.id]}
+                                                                        setHighlightedId={updateHighlighted} highlightedItemsFound={highlightedItemsFound}/>}
+                renderSectionHeader={({section: {title}}) => (
+                    <YStack width="100%">
+                        <XStack justifyContent="space-between" alignItems="center" backgroundColor={'$background'}
+                                py={'$3'}>
+                            <Text fontSize={20} fontWeight="bold" pl={'$4'}>{title}</Text>
+                        </XStack>
+                    </YStack>
+                )}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        colors={['purple']} // Optional: you can set the colors of the indicator (Android)
+                        tintColor={purple} // Optional: set the color of the indicator (iOS)
+                    />
+                }
+            />
+        </>
+
     );
 };
 
@@ -245,10 +286,11 @@ const enhance = withObservables(['downloads'], () => ({
     downloads: database.collections.get<DownloadModel>('downloads')
         .query(
             Q.sortBy('downloadUpdatedAt', Q.desc),
+            Q.take(100)
         )
         .observeWithColumns(['totalBytesWritten', 'totalBytesExpectedToWrite', 'downloaded', 'error'])
-
 }));
+
 
 // Wrap the component with the database and observables
 export default withDatabase(enhance(DownloadsList));

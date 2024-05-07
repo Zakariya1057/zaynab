@@ -7,8 +7,7 @@ export const trackChangeAndSeekPosition = () => {
 
     useEffect(() => {
         const trackChangeHandler = async () => {
-            await TrackPlayer.pause()
-
+            // await TrackPlayer.pause()
             const newPosition = await TrackPlayer.getActiveTrackIndex();
             const activeTrack = await TrackPlayer.getActiveTrack();
             const lastTrack = (await TrackPlayer.getQueue())?.at(-1)

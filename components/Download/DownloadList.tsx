@@ -11,14 +11,11 @@ import {getPodcastById} from "@/utils/data/getPodcastById";
 import {getEpisodeById} from "@/utils/data/getEpisodeById";
 import {router} from "expo-router";
 import {Ionicons, Octicons} from "@expo/vector-icons";
-import useDownloadEpisode from "@/hooks/useDownloadEpisode";
 import {DownloadStatus} from "@/interfaces/download-status";
 import {deleteDownload} from "@/utils/download/delete-download";
 import {cancelDownload} from "@/utils/download/cancel-download";
 import {useDownloads} from "@/contexts/download-context";
-import {useQueue} from "@/contexts/queue-context";
 import useDownloadManager from "@/hooks/useDownloadManager";
-import {refreshTrackUrlsAfterDeletion} from "@/utils/track/refresh-track-urls-after-deletion";
 import {getEpisodeNumberFromTitle} from "@/utils/episode/get-episode-number-from-title";
 
 interface DownloadItemProps {
@@ -67,8 +64,7 @@ const DownloadItemModal = ({modalVisible, setModalVisible, handlePauseDownload, 
 const DownloadItem: React.FC<DownloadItemProps> = ({download, status}) => {
     const {podcastId, episodeId, totalBytesWritten, totalBytesExpectedToWrite, downloaded, error} = download
 
-    const { getDownloadResumable, removeDownload, addToDeleted } = useDownloads();
-    const { removeFromQueue } = useQueue()
+    const { getDownloadResumable, removeDownload } = useDownloads();
 
     const { downloadAudio, startNextDownload } = useDownloadManager();
 
@@ -107,9 +103,6 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status}) => {
         await resumable?.cancelAsync()
 
         removeDownload(episodeId)
-        addToDeleted(episodeId)
-        removeFromQueue(episodeId)
-
         await startNextDownload()
     }
 

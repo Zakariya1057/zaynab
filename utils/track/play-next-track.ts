@@ -1,5 +1,4 @@
 import TrackPlayer from "react-native-track-player";
-import {getTrackHistoryAtIndex} from "@/utils/track/get-track-history-at-index";
 import {replaceFailedTrack} from "@/utils/track/replace-failed-track";
 
 export const playNextTrack = async (audioFailedToLoad: boolean) => {
@@ -10,13 +9,7 @@ export const playNextTrack = async (audioFailedToLoad: boolean) => {
         return
     }
 
-    const newPosition = await getTrackHistoryAtIndex(currentPosition + 1);
-
     await TrackPlayer.skipToNext();
 
     await TrackPlayer.pause()
-
-    if (newPosition) {
-        // await TrackPlayer.seekTo(newPosition.position);
-    }
 }

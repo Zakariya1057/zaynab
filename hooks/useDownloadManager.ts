@@ -19,7 +19,7 @@ import {updateTrackUrlOnDownloadComplete} from "@/utils/track/update-track-url-o
 import {getFileExtension} from "@/utils/url/get-file-extension";
 
 const useDownloadManager = () => {
-    const {addDownload, removeDownload, isDownloading, setDownloadResumable, isDeleted} = useDownloads();
+    const {addDownload, removeDownload, isDownloading, setDownloadResumable } = useDownloads();
 
     const downloadAudios = async (episodes: Partial<DownloadModel>[], upsert: boolean = true): Promise<void> => {
         if (episodes.length === 0) {

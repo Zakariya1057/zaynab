@@ -1,26 +1,12 @@
-import {Episode} from "@/interfaces/episode";
-import TrackPlayer, {Progress, Track} from "react-native-track-player";
-import {EpisodeModel} from "@/utils/database/models/episode-model";
+import TrackPlayer, {Track} from "react-native-track-player";
 
-export const updateExistingTracks = async (existingTracks: Track[], episode: Episode, recordedEpisode: EpisodeModel | null, downloadsById: Record<string, string>, completed: boolean): Promise<boolean> => {
-    const existingTrackIndex = existingTracks.findIndex((t) => t.id === episode.id);
+export const updateExistingTracks = async (existingTracks: Track[], episodeId: string): Promise<boolean> => {
+    const existingTrackIndex = existingTracks.findIndex((t) => t.id === episodeId);
 
     if (existingTrackIndex > -1) {
         console.log('Setting From Existing Tracks');
 
         await TrackPlayer.skip(existingTrackIndex);
-
-        const downloadedEpisode = downloadsById[episode.id];
-        const newTrack = existingTracks[existingTrackIndex];
-
-        if (newTrack && downloadedEpisode && newTrack.url !== downloadedEpisode) {
-            await TrackPlayer.load({
-                ...newTrack,
-                url: downloadedEpisode
-            });
-        }
-
-        await TrackPlayer.pause()
 
         console.log('Set From Existing Tracks');
         return true;

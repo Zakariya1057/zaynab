@@ -2,9 +2,6 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { DownloadResumable } from "expo-file-system";
 
 interface DownloadContextType {
-    addToDeleted: (episodeId: string) => void;
-    isDeleted: (episodeId: string) => boolean;
-
     addDownload: (episodeId: string) => void;
     removeDownload: (episodeId: string) => void;
     isDownloading: (episodeId: string) => boolean;
@@ -47,14 +44,6 @@ export const DownloadProvider: React.FC<Props> = ({ children }) => {
         return downloadResumables.get(episodeId) ?? null;
     };
 
-    const addToDeleted = (episodeId: string) => {
-        setDeleted(prev => new Set(prev.add(episodeId)));
-    }
-
-    const isDeleted = (episodeId: string) => {
-        return deleted.has(episodeId);
-    }
-
     return (
         <DownloadContext.Provider value={{
             addDownload,
@@ -62,8 +51,6 @@ export const DownloadProvider: React.FC<Props> = ({ children }) => {
             isDownloading,
             setDownloadResumable,
             getDownloadResumable,
-            addToDeleted,
-            isDeleted,
         }}>
             {children}
         </DownloadContext.Provider>

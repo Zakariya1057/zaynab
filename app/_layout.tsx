@@ -11,9 +11,9 @@ import Toast from 'react-native-toast-message';
 import '@/utils/database/setup'
 import {recordAudioPosition} from '@/utils/audio/record-audio-position'
 import {DownloadProvider} from "@/contexts/download-context";
-import {QueueProvider} from "@/contexts/queue-context";
 import {trackChangeAndSeekPosition} from "@/hooks/trackChangeAndSeekPosition";
 import {setupPlayer} from "@/utils/track/setup-player";
+import {initializeCache} from "@/utils/cache/episode-cache";
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -34,17 +34,17 @@ export default function RootLayout() {
         InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
     })
 
-    trackChangeAndSeekPosition()
-    recordAudioPosition()
-
     useEffect(() => {
         async function initApp() {
             await setupPlayer()
+            await initializeCache()
         }
 
         initApp();
     }, []);
 
+    trackChangeAndSeekPosition()
+    recordAudioPosition()
 
     useEffect(() => {
         if (interLoaded || interError) {
@@ -67,25 +67,23 @@ function RootLayoutNav() {
         <TamaguiProvider config={config} defaultTheme={colorScheme as any}>
             <ThemeProvider value={DarkTheme}>
                 <GestureHandlerRootView style={{flex: 1}}>
-                    <QueueProvider>
-                        <DownloadProvider>
-                            <Stack screenOptions={{
-                                title: '',
-                                animation: 'slide_from_right',
-                                headerLeft: () =>
-                                    <TouchableOpacity onPress={() => router.back()}>
-                                        <ArrowLeft size={30} color={'$color'}/>
-                                    </TouchableOpacity>
-                            }}
-                            >
-                                <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
-                                <Stack.Screen name="series" options={{headerShown: false}}/>
-                                <Stack.Screen name="episode"/>
-                            </Stack>
-                            <Toast/>
+                    <DownloadProvider>
+                        <Stack screenOptions={{
+                            title: '',
+                            animation: 'slide_from_right',
+                            headerLeft: () =>
+                                <TouchableOpacity onPress={() => router.back()}>
+                                    <ArrowLeft size={30} color={'$color'}/>
+                                </TouchableOpacity>
+                        }}
+                        >
+                            <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+                            <Stack.Screen name="series" options={{headerShown: false}}/>
+                            <Stack.Screen name="episode"/>
+                        </Stack>
+                        <Toast/>
 
-                        </DownloadProvider>
-                    </QueueProvider>
+                    </DownloadProvider>
                 </GestureHandlerRootView>
             </ThemeProvider>
         </TamaguiProvider>

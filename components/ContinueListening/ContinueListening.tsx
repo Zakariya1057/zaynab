@@ -8,16 +8,7 @@ import {database} from "@/utils/database/setup";
 import {Button, Card, H6, Image, Separator, Text, useTheme, XStack, YStack} from "tamagui";
 import {AnimatedCircularProgress} from "react-native-circular-progress";
 import {getPodcastById} from "@/utils/data/getPodcastById";
-import {getEpisodeById} from "@/utils/data/getEpisodeById";
 import {router} from "expo-router";
-import {Ionicons, Octicons} from "@expo/vector-icons";
-import useDownloadEpisode from "@/hooks/useDownloadEpisode";
-import {DownloadStatus} from "@/interfaces/download-status";
-import {deleteDownload} from "@/utils/download/delete-download";
-import {cancelDownload} from "@/utils/download/cancel-download";
-import {useDownloads} from "@/contexts/download-context";
-import {useQueue} from "@/contexts/queue-context";
-import useDownloadManager from "@/hooks/useDownloadManager";
 import {EpisodeModel} from "@/utils/database/models/episode-model";
 import {getPercentage} from "@/utils/percentage/get-percentage";
 

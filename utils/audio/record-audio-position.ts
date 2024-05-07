@@ -3,6 +3,7 @@ import TrackPlayer, {useActiveTrack, useProgress, State, Event} from "react-nati
 import { upsertEpisode } from "@/utils/database/episode/upsert-episode";
 import {getEpisodeNumberFromTitle} from "@/utils/episode/get-episode-number-from-title";
 import {field} from "@nozbe/watermelondb/decorators";
+import {updateEpisode} from "@/utils/cache/episode-cache";
 
 export const recordAudioPosition = () => {
     useEffect(() => {
@@ -40,6 +41,8 @@ export const recordAudioPosition = () => {
                             number: episodeNumber,
                             remoteImage: track.artwork
                         });
+
+                        updateEpisode(track.description ?? '', { position, duration })
 
                         // console.log('Progress updated for:', track.title, position, duration);
                     } catch (error) {

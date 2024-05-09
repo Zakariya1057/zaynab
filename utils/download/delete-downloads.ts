@@ -7,9 +7,9 @@ import { refreshTrackUrlsAfterDeletion } from "@/utils/track/refresh-track-urls-
 /**
  * Prompts the user for confirmation and deletes selected downloads if confirmed.
  * @param {DownloadModel[]} downloads - Array of downloads to be deleted.
- * @param {Function} startNextDownload - Callback function to initiate the next download.
+ * @param onConfirm
  */
-export const deleteDownloads = (downloads: DownloadModel[], startNextDownload: () => void) => {
+export const deleteDownloads = (downloads: DownloadModel[], onConfirm: () => {}) => {
     // Calculate the number of downloads to delete.
     const count = downloads.length;
 
@@ -32,7 +32,8 @@ export const deleteDownloads = (downloads: DownloadModel[], startNextDownload: (
                         await deleteDownloadRecord(download);  // Removes the record from the database.
                         await refreshTrackUrlsAfterDeletion();  // Refreshes track URLs to reflect the deletions.
                     }
-                    startNextDownload();  // Initiates the next download after deletions are complete.
+
+                    onConfirm();  // Initiates the next download after deletions are complete.
                 }
             }
         ],

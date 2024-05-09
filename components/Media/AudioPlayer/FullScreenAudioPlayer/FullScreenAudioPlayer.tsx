@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {H4, Image, Paragraph, YStack, View, Button, ScrollView} from 'tamagui';
+import {H4, Image, Paragraph, YStack, ScrollView} from 'tamagui';
 import TrackPlayer, {
-    State, TrackType, useActiveTrack,
+    State, useActiveTrack,
     usePlaybackState,
     useProgress,
 } from 'react-native-track-player';
@@ -17,7 +17,7 @@ import {showToast} from "@/utils/toast/show-toast";
 import {playNextTrack} from "@/utils/track/play-next-track";
 import {playPrevTrack} from "@/utils/track/play-prev-track";
 import useDownloadEpisode from "@/hooks/useDownloadEpisode";
-import {getFileExtension} from "@/utils/url/get-file-extension";
+import {TrackTitle} from "@/components/Media/MediaPlayerControls/TrackTitle";
 
 export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, episode: Episode }) {
     const track = useActiveTrack()
@@ -88,24 +88,16 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
         setAudioFailedToLoad(true)
 
         await TrackPlayer.retry()
-        // await TrackPlayer.load({
-        //     id: episode.id,
-        //     url: episode.stream,
-        //     title: `${episode.number}. ${episode.description}`,
-        //     description: `${podcast.id}|${episode.id}`,
-        //     artwork: episode.remoteImage ?? podcast.remoteImage,
-        //     artist: podcast.name,
-        //     type: getFileExtension(episode.stream) === 'mp3' ? TrackType.Default : TrackType.HLS
-        // });
     }
 
     return (
         <ScrollView
             refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                />
+                audioFailedToLoad ?
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    /> : undefined
             }
             style={{flex: 1}}
             contentContainerStyle={{flexGrow: 1}}
@@ -122,10 +114,8 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
 
                 <MediaImage image={episode.image ?? podcast.image}/>
 
-                <YStack mt="$2" space="$1">
-                    <H4 textAlign="center" color={'$color'} numberOfLines={1}>
-                        {track?.title}
-                    </H4>
+                <YStack mt="$2" space="$1" height={60}>
+                    <TrackTitle title={track?.title ?? ''} />
                     <Paragraph textAlign="center" color={'$color'} numberOfLines={1}>
                         {track?.artist}
                     </Paragraph>

@@ -1,79 +1,83 @@
+import React, {useState, useEffect, useRef} from 'react';
 import {
-    Text,
-    YStack,
-    XStack,
-    Image,
     Stack,
-    H5,
-    Card,
-    H6, useTheme, Input
+    Input,
+    Text,
+    YStack
 } from 'tamagui';
-import {PlayCircle} from "@tamagui/lucide-icons";
-import {router} from "expo-router";
-import {FlatList, ImageSourcePropType, RefreshControl, TouchableOpacity, SectionList} from "react-native";
+import { FlatList } from "react-native";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
-import React, {useCallback, useRef, useState} from "react";
-import {Podcasts} from "@/utils/data/podcasts";
-import {Podcast} from "@/interfaces/podcast";
-import {useEpisodes} from "@/hooks/useEpisodes";
+import { Podcasts } from "@/utils/data/podcasts";
+import { PodcastElement } from "@/components/Podcast/PodcastElement";
+import LottieView from "lottie-react-native";
 
 export default function App() {
-    const sections = [
-        {
-            title: "Popular Podcasts",
-            data: Object.values(Podcasts) // Assuming Podcasts is an array
-        }
-    ];
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredPodcasts, setFilteredPodcasts] = useState(Object.values(Podcasts));
+
+    const animation = useRef(null);
+
+    // Handle input change to filter podcasts
+    useEffect(() => {
+        const lowerCaseQuery = searchQuery.toLowerCase();
+        const filtered = Object.values(Podcasts).filter(podcast =>
+            podcast.name.toLowerCase().includes(lowerCaseQuery)
+        );
+        setFilteredPodcasts(filtered);
+    }, [searchQuery]); // This will re-run the filter whenever searchQuery changes
 
     const renderItem = ({ item }) => {
-        return <PodcastElement {...item} />;
+        return <PodcastElement podcast={item} showPlayIcon={false} />;
     };
 
     return (
-        <Stack f={1} backgroundColor={'$background'}>
-            <Input width={'100%'} placeholder={'Search'}/>
+        <Stack f={1}>
+            <Stack f={1} p={'$3'}>
+                <Input
+                    width={'100%'}
+                    placeholder={'Search podcasts'}
+                    backgroundColor={'$white'}
+                    borderWidth={2}
+                    borderColor={'$gray4'}
+                    borderRadius={10}
+                    mb={'$5'}
+                    mt={'$2'}
+                    fontSize={'$5'}
+                    onChangeText={text => setSearchQuery(text)}
+                    clearButtonMode={'always'}
+                />
 
-            <SectionList
-                sections={sections}
-                keyExtractor={(item, index) => item.id || index.toString()}
-                renderItem={renderItem}
-                contentContainerStyle={{ paddingHorizontal: 10, rowGap: 10 }}
-                showsVerticalScrollIndicator={false}
-            />
+                {filteredPodcasts.length > 0 ? (
+                    <FlatList
+                        data={filteredPodcasts}
+                        keyExtractor={(item, index) => item.id || index.toString()}
+                        renderItem={renderItem}
+                        contentContainerStyle={{ paddingBottom: 10 }}
+                        showsVerticalScrollIndicator={false}
+                    />
+                ) : (
+                    <YStack ai='center' jc='center' f={1}>
+                        <Text
+                            fontSize="$5"
+                            color="$gray"
+                            mt="$4"
+                            ta="center"
+                            lineHeight={'$3'}
+                        >
+                            Sorry, no podcasts found. { '\n' }
+                            Try searching for something else.
+                        </Text>
+
+                        <LottieView
+                            autoPlay
+                            ref={animation}
+                            style={{ aspectRatio: 1, height: 200 }}
+                            source={require('@/assets/animation/no-data-found.json')}
+                        />
+                    </YStack>
+                )}
+            </Stack>
             <CompactAudioPlayer />
         </Stack>
-    )
-}
-
-export const PodcastElement = (podcast: Podcast) => {
-    const {name, subTitle, image} = podcast
-
-    return (
-        <TouchableOpacity onPress={
-            () => router.push({pathname: "/series/", params: {id: podcast.id}})
-        } >
-            <XStack
-                gap="$3"
-                alignItems="center"
-                borderRadius="$3"
-            >
-                <Image
-                    src={image}
-                    width={80}
-                    aspectRatio={1}
-                    borderRadius={'$3'}
-                    overflow={'hidden'}
-                    resizeMode="cover"
-                />
-                <YStack f={1} justifyContent="center" space="$2">
-                    <H5 lineHeight="$4" numberOfLines={2}>{name}</H5>
-                    <Text fontSize={'$4'} numberOfLines={2}>{subTitle}</Text>
-                </YStack>
-                <TouchableOpacity
-                    onPress={() => router.push({pathname: "/series/", params: {id: podcast.id, play: true}})}>
-                    <PlayCircle size="$4" strokeWidth={1.3} color={'$color.purple'}/>
-                </TouchableOpacity>
-            </XStack>
-        </TouchableOpacity>
-    )
+    );
 }

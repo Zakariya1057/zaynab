@@ -5,20 +5,14 @@ import Navigation from "../../components/Navigation/Navigation";
 import Series from "../../components/Series/Series";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
 import {getPodcastById} from "@/utils/data/getPodcastById";
-import TrackPlayer, {State, useActiveTrack} from "react-native-track-player";
+import {useActiveTrack} from "react-native-track-player";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {setupPlayer} from "@/utils/track/setup-player";
-import {playingCurrentPodcast} from "@/utils/track/playing-current-podcast";
-import {getTracksWithDownloads} from "@/utils/track/get-tracks-with-downloads";
 import {useDownloadPodcastEpisodes} from "@/hooks/useDownloadPodcastEpisodes";
-import {fetchShuffleStatus} from "@/utils/shuffle/fetch-shuffle-status";
-import {shuffleArray} from "@/utils/shuffle/shuffle-array";
-import {fetchLastListenedEpisodeByPodcastId} from "@/utils/database/episode/fetch-last-listened-episode-by-podcast-id";
 import {checkAndShowDownloadMessage} from "@/utils/notify/check-and-show-download-message";
 import {DownloadStatus} from "@/interfaces/download-status";
 import {getDownloadsByPodcastId} from "@/utils/database/download/get-downloads-by-podcast-id";
 import {setPodcastTracks} from "@/utils/track/set-podcast-tracks";
-import {prefetchPodcastTracks} from "@/utils/track/prefetch-podcast-tracks";
 
 export default function () {
     const {id, play: playAudio} = useLocalSearchParams<{ id: string, play?: string }>()

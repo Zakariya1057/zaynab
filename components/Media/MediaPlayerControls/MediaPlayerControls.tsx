@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Spinner, useTheme, View, YStack, Text} from 'tamagui';
-import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
+import {Entypo, Feather, Ionicons, MaterialIcons} from '@expo/vector-icons';
 import {Pressable, TouchableOpacity} from "react-native";
 import {Download, FastForward, Rewind} from '@tamagui/lucide-icons'
 import {withObservables} from "@nozbe/watermelondb/react";
@@ -8,15 +8,8 @@ import {database} from "@/utils/database/setup";
 import {DownloadModel} from "@/utils/database/models/download-model";
 import {catchError, map, of} from "rxjs";
 import {Q} from "@nozbe/watermelondb";
-import LottieView from "lottie-react-native";
-import {useDownloads} from "@/contexts/download-context";
-import episode from "@/app/episode";
-import {useActiveTrack} from "react-native-track-player";
-import {fetchShuffleStatus} from "@/utils/shuffle/fetch-shuffle-status";
-import {storeShuffleStatus} from "@/utils/shuffle/store-shuffle-status";
-import {shuffleTracks} from "@/utils/shuffle/shuffle-tracks";
-import {sortTracks} from "@/utils/shuffle/sort-tracks";
 import useShuffle from "@/hooks/useShuffle";
+import {usePlaybackSpeed} from "@/hooks/usePlaybackSpeed";
 
 interface Props {
     isPlaying: boolean;
@@ -33,29 +26,6 @@ interface Props {
     isFirst?: boolean; // Indicates if the current track is the first one
     isLast?: boolean;  // Indicates if the current track is the last one
 }
-
-const ConditionalLottie = ({ isDownloading }) => {
-    const animationRef = useRef(null);
-
-    useEffect(() => {
-        if (isDownloading) {
-            animationRef.current?.play();
-        } else {
-            animationRef.current?.reset();
-        }
-    }, [isDownloading]);
-
-    if (!isDownloading) return null;
-
-    return (
-        <LottieView
-            ref={animationRef}
-            style={{ width: 100, height: 100 }}
-            source={require('@/assets/animation/download.json')}
-            loop
-        />
-    );
-};
 
 const MediaPlayerControls: React.FC<Props> = ({
                                                   isPlaying,
@@ -78,29 +48,31 @@ const MediaPlayerControls: React.FC<Props> = ({
 
     const strokeWidth = 1.7
 
-    const downloadProgress = downloadModel ? (downloadModel.totalBytesWritten / downloadModel.totalBytesExpectedToWrite * 100) : 0
+    // const downloadProgress = downloadModel ? (downloadModel.totalBytesWritten / downloadModel.totalBytesExpectedToWrite * 100) : 0
 
     const downloaded = downloadModel?.downloaded
 
     const currentlyDownloading = downloadModel?.downloadUpdatedAt &&
-        (Date.now() - (downloadModel.downloadUpdatedAt*1000) <= 3000)
+        (Date.now() - (downloadModel.downloadUpdatedAt * 1000) <= 3000)
 
-    let downloadIcon;
-    if (downloaded) {
-        downloadIcon = <Ionicons name="cloud-done" size={size+6} color={color} strokeWidth={strokeWidth}/>;
-    } else if (currentlyDownloading) {
-        downloadIcon = <Ionicons name="cloud-download-outline" size={size+4} color={color} strokeWidth={strokeWidth} />
-    } else {
-        downloadIcon = <Download size={size} color={color} strokeWidth={strokeWidth}/>;
-    }
+    // let downloadIcon;
+    // if (downloaded) {
+    //     downloadIcon = <Ionicons name="cloud-done" size={size+6} color={color} strokeWidth={strokeWidth}/>;
+    // } else if (currentlyDownloading) {
+    //     downloadIcon = <Ionicons name="cloud-download-outline" size={size+4} color={color} strokeWidth={strokeWidth} />
+    // } else {
+    //     downloadIcon = <Download size={size} color={color} strokeWidth={strokeWidth}/>;
+    // }
 
 
-   const { shuffleOn, toggleShuffle } = useShuffle()
+    const {speed, cycleSpeed} = usePlaybackSpeed();
+
+    const {shuffleOn, toggleShuffle} = useShuffle()
 
     return (
         <YStack flexDirection="row" alignItems="center" justifyContent="space-between">
             {variant === 'small' ? (
-                <TouchableOpacity onPress={togglePlayPause} style={{ padding: 5}}>
+                <TouchableOpacity onPress={togglePlayPause} style={{padding: 5}}>
                     {
                         !loading ? (
                                 <Ionicons name={isPlaying ? 'pause' : 'play'} size={size} color={purple}/>
@@ -112,9 +84,9 @@ const MediaPlayerControls: React.FC<Props> = ({
 
                 </TouchableOpacity>
             ) : (
-                <>
+                <YStack f={1} flexDirection="row" alignItems="center" justifyContent="space-between">
                     <TouchableOpacity onPress={toggleShuffle}>
-                        <Ionicons name="shuffle" size={size + 5} color={shuffleOn ? purple : color} strokeWidth={strokeWidth}/>
+                        <Ionicons name="shuffle-outline" size={size + 5} color={!shuffleOn ? color : purple}/>
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={playPrev} disabled={isFirst}>
@@ -128,8 +100,12 @@ const MediaPlayerControls: React.FC<Props> = ({
 
                         <View
                             borderRadius={100}
+                            height={80}
+                            aspectRatio={1}
                             backgroundColor={purple}
                             padding={variant === 'large' ? 20 : 5}
+                            justifyContent={'center'}
+                            alignItems={'center'}
                         >
                             {
                                 buffering || loading ?
@@ -147,20 +123,27 @@ const MediaPlayerControls: React.FC<Props> = ({
                         <FastForward size={size} color={isLast ? 'grey' : color} strokeWidth={strokeWidth}/>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={download}>
+                    <TouchableOpacity onPress={cycleSpeed}>
                         <YStack alignItems="center">
-                            {downloadIcon}
-                            { (currentlyDownloading && !downloaded && downloadProgress) ? <Text mt={'$2'}>{Math.floor(downloadProgress)}%</Text> : undefined }
+                            <MaterialIcons name="speed" size={size + 4} color={color}/>
+                            <Text mt={'$1'}>{`${speed}x`}</Text>
                         </YStack>
                     </TouchableOpacity>
-                </>
+
+                    {/*<TouchableOpacity onPress={download}>*/}
+                    {/*    <YStack alignItems="center">*/}
+                    {/*        {downloadIcon}*/}
+                    {/*        { (currentlyDownloading && !downloaded && downloadProgress) ? <Text mt={'$2'}>{Math.floor(downloadProgress)}%</Text> : undefined }*/}
+                    {/*    </YStack>*/}
+                    {/*</TouchableOpacity>*/}
+                </YStack>
             )}
         </YStack>
     );
 };
 
 // Continue using the enhanced function as it was
-const enhance = withObservables(['episodeId'], ({ episodeId }) => ({
+const enhance = withObservables(['episodeId'], ({episodeId}) => ({
     downloadModel: episodeId ? database.get<DownloadModel>('downloads').query(
         Q.where('episodeId', episodeId)
     ).observeWithColumns(['totalBytesWritten', 'downloaded']).pipe(

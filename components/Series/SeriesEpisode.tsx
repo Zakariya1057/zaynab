@@ -1,38 +1,8 @@
-import React, {useEffect, useRef} from 'react';
 import {YStack, Text, Separator, XStack, useTheme} from 'tamagui';
-import LottieView from 'lottie-react-native';
-import {State, usePlaybackState} from "react-native-track-player";
 import {AnimatedCircularProgress} from 'react-native-circular-progress';
 import {Ionicons} from "@expo/vector-icons";
 
-const ConditionalLottie = ({isPlaying}) => {
-    const animationRef = useRef(null);
-
-    useEffect(() => {
-        if (isPlaying) {
-            animationRef.current?.play();
-        } else {
-            animationRef.current?.reset();
-        }
-    }, [isPlaying]);
-
-    if (!isPlaying) return null;
-
-    return (
-        <LottieView
-            ref={animationRef}
-            style={{width: 70, height: 50}}
-            source={require('@/assets/animation/sound.json')}
-            loop
-        />
-    );
-};
-
 export default function SeriesEpisode({title, description, openEpisode, active, playing, percentage, downloaded}: SeriesEpisodeProps) {
-    const animation = useRef(null);
-
-    const {state} = usePlaybackState()
-
     const theme = useTheme();
     const purple = theme.purple.get()
     const color = theme.color.get()
@@ -60,16 +30,12 @@ export default function SeriesEpisode({title, description, openEpisode, active, 
                     <Text fontSize={15} color={active ? '$color.purple2' : '$charcoal'}>{description}</Text>
                 </YStack>
 
-                <YStack justifyContent={'center'}>
-                    <ConditionalLottie isPlaying={playing && state !== State.Paused}/>
-                </YStack>
-
                 {
                     percentage ?
                         <YStack justifyContent={'center'} ml={'$5'}>
                             <AnimatedCircularProgress
                                 size={50}
-                                width={5}
+                                width={3}
                                 fill={Math.round(percentage * 100)}
                                 tintColor={purple}
                                 backgroundColor={'rgba(111,67,241,0.47)'}

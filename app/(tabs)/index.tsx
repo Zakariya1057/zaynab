@@ -2,20 +2,16 @@ import {
     Text,
     YStack,
     XStack,
-    Image,
     Stack,
-    H5,
     useTheme
 } from 'tamagui';
-import {PlayCircle} from "@tamagui/lucide-icons";
-import {router} from "expo-router";
-import {RefreshControl, TouchableOpacity, SectionList} from "react-native";
+import {RefreshControl, SectionList} from "react-native";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
 import React, {useCallback, useState} from "react";
 import {Podcasts} from "@/utils/data/podcasts";
-import {Podcast} from "@/interfaces/podcast";
 import {useEpisodes} from "@/hooks/useEpisodes";
 import ContinueListening from "@/components/ContinueListening/ContinueListening";
+import {PodcastElement} from "@/components/Podcast/PodcastElement";
 
 export default function App() {
     const {episodes, retry} = useEpisodes()
@@ -47,65 +43,30 @@ export default function App() {
             return <ContinueListening />
         } else {
             // Render a single item for other sections
-            return <PodcastElement {...item} />;
+            return <PodcastElement podcast={item} />;
         }
     };
 
     return (
-        <Stack f={1} backgroundColor={'$background'}>
+        <Stack f={1}>
             <SectionList
                 sections={sections}
                 keyExtractor={(item, index) => item.id || index.toString()}
                 renderItem={renderItem}
                 renderSectionHeader={({ section: { title } }) => (
                     <YStack width="100%">
-                        <XStack justifyContent="space-between" alignItems="center" backgroundColor={'$background'} py={'$3'}>
-                            <Text fontSize={20} fontWeight="bold">{title}</Text>
+                        <XStack justifyContent="space-between" alignItems="center" py={'$3'}>
+                            <Text fontSize={'$7'} fontWeight="bold">{title}</Text>
                         </XStack>
                     </YStack>
                 )}
                 contentContainerStyle={{ paddingHorizontal: 10, rowGap: 10 }}
                 showsVerticalScrollIndicator={false}
-                backgroundColor={'$backgroundStrong'}
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={purple}/>
                 }
             />
             <CompactAudioPlayer edges={[]} />
         </Stack>
-    )
-}
-
-
-export const PodcastElement = (podcast: Podcast) => {
-    const {name, subTitle, image} = podcast
-
-    return (
-        <TouchableOpacity onPress={
-            () => router.push({pathname: "/series/", params: {id: podcast.id}})
-        } >
-            <XStack
-                gap="$3"
-                alignItems="center"
-                borderRadius="$3"
-            >
-                <Image
-                    src={image}
-                    width={80}
-                    aspectRatio={1}
-                    borderRadius={'$3'}
-                    overflow={'hidden'}
-                    resizeMode="cover"
-                />
-                <YStack f={1} justifyContent="center" space="$2">
-                    <H5 lineHeight="$4" numberOfLines={2}>{name}</H5>
-                    <Text fontSize={'$4'} numberOfLines={2}>{subTitle}</Text>
-                </YStack>
-                <TouchableOpacity
-                    onPress={() => router.push({pathname: "/series/", params: {id: podcast.id, play: true}})}>
-                    <PlayCircle size="$4" strokeWidth={1.3} color={'$color.purple'}/>
-                </TouchableOpacity>
-            </XStack>
-        </TouchableOpacity>
     )
 }

@@ -7,14 +7,14 @@ export const Podcasts: Record<string, Podcast> = {
         image: require('@/assets/images/podcasts/a3bc8692-476f-4d2d-98df-3fc498321517/cover.webp'),
         remoteImage: 'https://zaynab.s3.eu-west-2.amazonaws.com/The+Lives+of+the+Prophets/background.webp',
         background: require('@/assets/images/podcasts/a3bc8692-476f-4d2d-98df-3fc498321517/background.webp'),
-        description: "Explore the captivating series 'The Lives of the Prophets,' the first English-language lectures based on extensive research into original Arabic texts, particularly Ibn Kathir's 'Al-Bidayah wa-nihayah (The Beginning and the End).' Grounded in the Quran, Hadith, and insights from the Noble Companions, this series offers an authentic and inspiring journey through the lives of the prophets. Perfect for anyone seeking to deepen their understanding of these pivotal figures with scholarly precision and engaging storytelling.",
+        description: "Discover 'The Lives of the Prophets,' an English series grounded in the Quran and Hadith and based on Ibn Kathir's works. This scholarly series provides a captivating look at the prophets' lives, ideal for deepening your understanding.",
         subTitle: "Explore prophetic histories with authenticity and depth.",
         episodes: {
             "6605c3ca-cdc4-4904-a82a-178ffb8466f5": {
                 id: "6605c3ca-cdc4-4904-a82a-178ffb8466f5",
                 number: 1,
-                stream: "https://d21y2nonaorlw9.cloudfront.net/The+Lives+of+the+Prophets/audio/0cf44fa4-292c-43a9-9112-e82843af9cf7/playlist.m3u8",
-                download: "https://d21y2nonaorlw9.cloudfront.net/The+Lives+of+the+Prophets/audio/0cf44fa4-292c-43a9-9112-e82843af9cf7.mp3",
+                stream: "https://d21y2nonaorlw9.cloudfront.net/The+Lives+of+the+Prophets/audio/6605c3ca-cdc4-4904-a82a-178ffb8466f5/playlist.m3u8",
+                download: "https://d21y2nonaorlw9.cloudfront.net/The+Lives+of+the+Prophets/audio/6605c3ca-cdc4-4904-a82a-178ffb8466f5.mp3",
                 description: "Introduction – Story Of Creation"
             },
             "15c09fa2-3f12-4492-8b98-1f9b6890b511": {

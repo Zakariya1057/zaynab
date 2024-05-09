@@ -7,7 +7,6 @@ const headingFont = createInterFont();
 const bodyFont = createInterFont();
 
 const appConfig = createTamagui({
-    // settings: { fastSchemeChange: true },
     themes,
     defaultTheme: "dark",
     shouldAddPrefersColorThemes: false,
@@ -17,8 +16,8 @@ const appConfig = createTamagui({
         color: {
             ...tokens.color,
             sms: "#f43f5e",
-            purple: '#5e2cf3',
-            purple2: '#6f43f1',
+            purple: '#572cdb',
+            purple2: '#7649ff',
         },
     },
     shorthands,

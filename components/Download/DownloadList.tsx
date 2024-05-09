@@ -9,14 +9,10 @@ import {Button, Separator, Text, useTheme, XStack, YStack} from "tamagui";
 import {AnimatedCircularProgress} from "react-native-circular-progress";
 import {getPodcastById} from "@/utils/data/getPodcastById";
 import {getEpisodeById} from "@/utils/data/getEpisodeById";
-import {Stack, router, useFocusEffect} from "expo-router";
-import {Ionicons, Octicons} from "@expo/vector-icons";
+import {Stack, router} from "expo-router";
+import {Ionicons} from "@expo/vector-icons";
 import {DownloadStatus} from "@/interfaces/download-status";
-import {deleteDownload} from "@/utils/download/delete-download";
-import {cancelDownload} from "@/utils/download/cancel-download";
-import {useDownloads} from "@/contexts/download-context";
 import useDownloadManager from "@/hooks/useDownloadManager";
-import {getEpisodeNumberFromTitle} from "@/utils/episode/get-episode-number-from-title";
 import {ArrowLeft} from "@tamagui/lucide-icons";
 import {deleteDownloads} from "@/utils/download/delete-downloads";
 
@@ -69,9 +65,7 @@ const DownloadItemModal = ({modalVisible, setModalVisible, handlePauseDownload, 
 const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight, setHighlightedId, highlightedItemsFound}) => {
     const {podcastId, episodeId, totalBytesWritten, totalBytesExpectedToWrite, downloaded, error} = download
 
-    const {getDownloadResumable, removeDownload} = useDownloads();
-
-    const {downloadAudio, startNextDownload} = useDownloadManager();
+    const {downloadAudio} = useDownloadManager();
 
     if (!podcastId || !episodeId) {
         return null
@@ -102,14 +96,6 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight,
         await downloadAudio(download)
     }
 
-    const onDelete = async () => {
-        const resumable = getDownloadResumable(episodeId)
-        await resumable?.cancelAsync()
-
-        removeDownload(episodeId)
-        await startNextDownload()
-    }
-
     const onPress = () => {
         if (highlightedItemsFound) {
             handleLongPress()
@@ -119,7 +105,7 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight,
     }
 
     const handleLongPress = () => {
-        setHighlightedId(download.id, download);  // Toggle the highlighted state
+        setHighlightedId(download.id, highlight ? null : download);  // Toggle the highlighted state
     };
 
     const percentage = (totalBytesWritten / totalBytesExpectedToWrite);
@@ -128,8 +114,13 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight,
     const backgroundColor = highlight ? 'rgba(189, 0, 0, 0.5)' : 'transparent';
 
     return (
-        <TouchableOpacity onPress={onPress} delayLongPress={100} onLongPress={handleLongPress}
-                          style={{backgroundColor: backgroundColor}} activeOpacity={0.93}>
+        <TouchableOpacity
+            onPress={onPress}
+            delayLongPress={200}
+            onLongPress={handleLongPress}
+            style={{backgroundColor: backgroundColor}}
+            activeOpacity={0.93}
+        >
             <XStack
                 borderBottomWidth={1}
                 paddingLeft="$4"
@@ -146,6 +137,7 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight,
                         tintColor={'rgb(189,0,0)'}
                         backgroundColor={'rgba(154,0,0,0.47)'}
                         rotation={0}
+                        animationDuration={percentageCompleted === 100 ? 0 : 1000}
                     >
                         {(fill) => (
                             <Text>{percentageCompleted}%</Text>
@@ -205,7 +197,7 @@ const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) =>
             {title: DownloadStatus.WaitingToDownload, data: waitingToDownload},
             {title: DownloadStatus.CompletedDownload, data: completedDownloads},
         ].filter(section => section.data.length > 0));
-    }, [downloads]);
+    }, [downloads]); // Dependency array includes only downloads
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -225,14 +217,17 @@ const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) =>
 
     const deleteHighlighted = () => {
         const validDownloads = Object.values(highlighted).filter((download): download is DownloadModel => download !== null);
-        deleteDownloads(validDownloads, startNextDownload);
+        deleteDownloads(validDownloads, async () => {
+            cancelHighlighted()
+            await startNextDownload()
+        });
     }
 
     const cancelHighlighted = () => {
         setHighlighted({})
     }
 
-    const highlightedItemsFound = Object.values(highlighted).length > 0
+    const highlightedItemsFound = Object.values(highlighted).some(download => download !== null);
 
     const headerRight = () =>  highlightedItemsFound ?
         <TouchableOpacity onPress={deleteHighlighted}>
@@ -263,7 +258,7 @@ const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) =>
                     <YStack width="100%">
                         <XStack justifyContent="space-between" alignItems="center" backgroundColor={'$background'}
                                 py={'$3'}>
-                            <Text fontSize={20} fontWeight="bold" pl={'$4'}>{title}</Text>
+                            <Text fontSize={'$7'} fontWeight="bold" pl={'$4'}>{title}</Text>
                         </XStack>
                     </YStack>
                 )}

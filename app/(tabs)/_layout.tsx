@@ -2,7 +2,7 @@ import {Tabs} from 'expo-router'
 import {
     Home,
     Search,
-    Download, Bookmark,
+    Download, Bookmark, Settings
 } from "@tamagui/lucide-icons";
 import {useRestartDownloadsOnBoot} from "@/hooks/useRestartDownloadOnBoot";
 
@@ -30,19 +30,17 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="search"
+                name="bookmarks"
                 options={{
-                    href: null,
-                    title: 'Search',
-                    tabBarIcon: ({ color }) => <Search color={color} />,
+                    title: 'Bookmarks',
+                    tabBarIcon: ({ color }) => <Bookmark color={color} />,
                 }}
             />
             <Tabs.Screen
-                name="bookmarks"
+                name="search"
                 options={{
-                    href: null,
-                    title: 'Bookmark',
-                    tabBarIcon: ({ color }) => <Bookmark color={color} />,
+                    title: 'Search',
+                    tabBarIcon: ({ color }) => <Search color={color} />,
                 }}
             />
             <Tabs.Screen
@@ -52,6 +50,14 @@ export default function TabLayout() {
                     tabBarIcon: ({ color }) => <Download color={color} />,
                 }}
             />
+            <Tabs.Screen
+                name="settings"
+                options={{
+                    title: 'Settings',
+                    tabBarIcon: ({ color }) => <Settings color={color} />,
+                }}
+            />
+
         </Tabs>
     )
 }

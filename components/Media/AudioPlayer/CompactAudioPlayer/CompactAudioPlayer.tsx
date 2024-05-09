@@ -46,7 +46,7 @@ export default function EpisodePlayer({ edges = [] }: { edges?: Edge[] }) {
     const player = (
         <TouchableOpacity onPress={openEpisode} activeOpacity={0.9}>
             <YStack backgroundColor={background} alignItems="center">
-                <YStack height={4} width="100%" borderRadius={10} backgroundColor="black">
+                <YStack height={4} width="100%" borderRadius={10} backgroundColor="rgba(0, 0, 0, 0.3)">
                     <YStack height={'100%'} backgroundColor="$color.purple" borderTopRightRadius={10} borderBottomRightRadius={10} width={`${(position / duration) * 100}%`} />
                 </YStack>
 

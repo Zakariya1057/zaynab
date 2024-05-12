@@ -50,7 +50,6 @@ export default function () {
     });
 
     useEffect(() => {
-        checkAndShowDownloadMessage()
         updateDownloadIcon()
 
         if (playAudio) {

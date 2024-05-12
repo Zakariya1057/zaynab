@@ -1,5 +1,4 @@
 import {getEpisodes} from "@/utils/database/episode/get-episodes";
-import {getAllEpisodes} from "@/utils/data/getAllEpisodes";
 
 export interface ProgressData {
     position: number;

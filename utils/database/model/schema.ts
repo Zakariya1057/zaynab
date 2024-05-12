@@ -1,5 +1,4 @@
 import { appSchema, tableSchema } from '@nozbe/watermelondb'
-import {field} from "@nozbe/watermelondb/decorators";
 
 export const schema = appSchema({
     version: 1,
@@ -41,6 +40,13 @@ export const schema = appSchema({
                 { name: 'downloadStartedAt', type: 'number' },
                 { name: 'downloadUpdatedAt', type: 'number' },
                 { name: 'downloadCompletedAt', type: 'number' },
+            ]
+        }),
+        tableSchema({
+            name: 'settings',
+            columns: [
+                { name: 'key', type: 'string', isIndexed: true },
+                { name: 'value', type: 'boolean' }
             ]
         }),
     ]

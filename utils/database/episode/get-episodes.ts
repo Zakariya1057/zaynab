@@ -2,7 +2,7 @@ import { Q } from '@nozbe/watermelondb';
 import {EpisodeModel} from "@/utils/database/models/episode-model";
 import {database} from "@/utils/database/setup";
 
-export const getEpisodes = async (podcastId: string|undefined): Promise<EpisodeModel[]> => {
+export const getEpisodes = async (podcastId?: string|undefined): Promise<EpisodeModel[]> => {
     try {
         const episodesCollection = database.get('episodes');
 

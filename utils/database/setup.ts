@@ -6,6 +6,7 @@ import { schema } from './model/schema'
 import migrations from './model/migrations'
 import {EpisodeModel} from "@/utils/database/models/episode-model";
 import {DownloadModel} from "@/utils/database/models/download-model";
+import {SettingsModel} from "@/utils/database/models/setting-model";
 // import Post from './model/Post' // ⬅️ You'll import your Models here
 
 // First, create the adapter to the underlying database:
@@ -29,6 +30,7 @@ export const database = new Database({
     adapter,
     modelClasses: [
         EpisodeModel,
-        DownloadModel
+        DownloadModel,
+        SettingsModel
     ],
 })

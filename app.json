@@ -7,9 +7,7 @@
     "icon": "./assets/logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "dark",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -23,35 +21,43 @@
         "backgroundColor": "#9039cf"
       },
       "supportsTablet": true,
-      "bundleIdentifier": "zakariyamohummed.zaynab.com"
+      "bundleIdentifier": "zakariyamohummed.zaynab.com",
+      "infoPlist": {
+        "UIBackgroundModes": ["audio", "fetch"],
+        "NSUserNotificationUsageDescription": "This app uses notifications to remind you to finish your episode."
+      }
     },
     "android": {
-      "splash": {
-        "image": "./assets/android-splash.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#9039cf"
-      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#9039cf"
       },
-      "package": "zakariyamohummed.zaynab.com"
+      "package": "zakariyamohummed.zaynab.com",
+      "permissions": [
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED",
+        "WAKE_LOCK",
+        "FOREGROUND_SERVICE",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ],
+      "splash": {
+        "image": "./assets/android-splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#9039cf"
+      }
     },
     "plugins": [
       "expo-router",
       "expo-build-properties",
-      [
-        "@morrowdigital/watermelondb-expo-plugin"
-      ],
+      ["@morrowdigital/watermelondb-expo-plugin"],
       [
         "expo-build-properties",
         {
           "android": {
             "kotlinVersion": "1.6.10",
             "packagingOptions": {
-              "pickFirst": [
-                "**/libc++_shared.so"
-              ]
+              "pickFirst": ["**/libc++_shared.so"]
             }
           }
         }

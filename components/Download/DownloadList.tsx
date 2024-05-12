@@ -254,6 +254,7 @@ const DownloadsList = ({downloads}) => {
                         </XStack>
                     </YStack>
                 )}
+                showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}

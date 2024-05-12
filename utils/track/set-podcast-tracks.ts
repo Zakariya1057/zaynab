@@ -5,8 +5,9 @@ import {fetchLastListenedEpisodeByPodcastId} from "@/utils/database/episode/fetc
 import {fetchShuffleStatus} from "@/utils/shuffle/fetch-shuffle-status";
 import {shuffleArray} from "@/utils/shuffle/shuffle-array";
 import {getPodcastById} from "@/utils/data/getPodcastById";
+import {EpisodeModel} from "@/utils/database/models/episode-model";
 
-export const setPodcastTracks = async (podcastId: string) => {
+export const setPodcastTracks = async (podcastId: string, savedLastEpisode: EpisodeModel|undefined) => {
     const podcast = getPodcastById(podcastId);
 
     const {state} = await TrackPlayer.getPlaybackState();
@@ -22,7 +23,7 @@ export const setPodcastTracks = async (podcastId: string) => {
     }
 
     const tracks = await getTracksWithDownloads(podcast);
-    const lastEpisode = await fetchLastListenedEpisodeByPodcastId(podcast.id);
+    const lastEpisode = savedLastEpisode ? savedLastEpisode :  fetchLastListenedEpisodeByPodcastId(podcast.id);
 
     const shuffleOn = await fetchShuffleStatus();
     if (shuffleOn) {

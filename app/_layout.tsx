@@ -14,18 +14,16 @@ import {DownloadProvider} from "@/contexts/download-context";
 import {trackChangeAndSeekPosition} from "@/hooks/trackChangeAndSeekPosition";
 import {setupPlayer} from "@/utils/track/setup-player";
 import {initializeCache} from "@/utils/cache/episode-cache";
-import {Button, View} from 'react-native';
+import {View} from 'react-native';
 import {PopoverDemo} from "@/components/PopoverDemon";
+import {AudioPlaybackProvider} from "@/hooks/useAudioPlayback";
+import {prefetchLastPodcastTracks} from "@/utils/track/prefetch-last-podcast-tracks";
+import {setAutoPlay} from "@/utils/track/auto-play";
 
 export {
     // Catch any errors thrown by the Layout component.
     ErrorBoundary,
 } from 'expo-router'
-
-export const unstable_settings = {
-    // Ensure that reloading on `/modal` keeps a back button present.
-    initialRouteName: '(tabs)',
-}
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
@@ -36,16 +34,20 @@ export default function RootLayout() {
         InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
     })
 
+    const { setupListener } = trackChangeAndSeekPosition()
+
     useEffect(() => {
         async function initApp() {
             await setupPlayer()
             await initializeCache()
+            setupListener()
+
+            await prefetchLastPodcastTracks()
         }
 
         initApp();
     }, []);
 
-    trackChangeAndSeekPosition()
     recordAudioPosition()
 
     useEffect(() => {
@@ -70,28 +72,22 @@ function RootLayoutNav() {
             <ThemeProvider value={DarkTheme}>
                 <GestureHandlerRootView style={{flex: 1}}>
                     <DownloadProvider>
-                        <Stack screenOptions={{
-                            title: '',
-                            animation: 'slide_from_right',
-                            headerLeft: () =>
-                                <TouchableOpacity onPress={() => router.back()}>
-                                    <ArrowLeft size={30} color={'$color'}/>
-                                </TouchableOpacity>
-                        }}
-                        >
-                            <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
-                            <Stack.Screen name="series" options={{headerShown: false}}/>
-                            <Stack.Screen name="notification.click" options={{
-                                headerRight: () => (
-                                    <View style={{marginRight: 10}}>
-                                        <PopoverDemo/>
-                                    </View>
-                                )
+                        <AudioPlaybackProvider>
+                            <Stack screenOptions={{
+                                title: '',
+                                animation: 'slide_from_right',
+                                headerLeft: () =>
+                                    <TouchableOpacity onPress={() => router.back()}>
+                                        <ArrowLeft size={30} color={'$color'} strokeWidth={2}/>
+                                    </TouchableOpacity>
                             }}
-                            />
-                        </Stack>
-                        <Toast/>
-
+                            >
+                                <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+                                <Stack.Screen name="series" options={{headerShown: false}}/>
+                                <Stack.Screen name="notification.click" />
+                            </Stack>
+                            <Toast/>
+                        </AudioPlaybackProvider>
                     </DownloadProvider>
                 </GestureHandlerRootView>
             </ThemeProvider>

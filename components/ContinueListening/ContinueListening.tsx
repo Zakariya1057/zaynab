@@ -84,9 +84,10 @@ const ContinueListening: React.FC<{ episodes: EpisodeModel[] }> = ({episodes}) =
                     podcastId={item.podcastId}
                 />
             )}
+
             keyExtractor={item => item.episodeId}
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{gap: 20}}
+            contentContainerStyle={{gap: 20, paddingLeft: 10}}
         />
     )
 };

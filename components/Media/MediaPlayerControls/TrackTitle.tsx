@@ -14,8 +14,6 @@ export const TrackTitle = ({ title }: { title: string }) => {
     };
 
     const onTextLayout = (event: NativeSyntheticEvent<TextLayoutEventData>) => {
-        console.log('Lines', event.nativeEvent.lines)
-
         if (event.nativeEvent.lines.length === 0) {
             return
         }
@@ -28,7 +26,6 @@ export const TrackTitle = ({ title }: { title: string }) => {
 
     const onContainerLayout = (event: LayoutChangeEvent) => {
         const {width} = event.nativeEvent.layout;
-        console.log('Layout', event.nativeEvent.layout)
         setContainerWidth(width);
         checkIfMarqueeNeeded(textWidth, width);
     };

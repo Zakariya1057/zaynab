@@ -10,6 +10,8 @@ import {useEpisodes} from "@/hooks/useEpisodes";
 import {useTheme} from "tamagui";
 import {useDownloads} from "@/hooks/useDownloads";
 import {State, usePlaybackState} from "react-native-track-player";
+import {database} from "@/utils/database/setup";
+import {Q} from "@nozbe/watermelondb";
 
 interface Props {
     podcast: Podcast,
@@ -18,27 +20,27 @@ interface Props {
 }
 
 export default ({podcast, play, playingEpisodeId}: Props) => {
-    const {episodes, retry, loading} = useEpisodes();
+    const {episodes, retry, loading} = useEpisodes(podcast.id);
     const { downloads } = useDownloads(podcast.id);
 
     const { state } = usePlaybackState();
 
     const [refreshing, setRefreshing] = useState(false);
 
-    const setEpisodeHistory = useCallback(() => {
-        if (episodes.length > 0) {
-            for (const episode of episodes) {
-                if (podcast.episodes[episode.episodeId]) {
-                    podcast.episodes[episode.episodeId].duration = episode.duration;
-                    podcast.episodes[episode.episodeId].position = episode.position;
-                    podcast.episodes[episode.episodeId].downloaded = false;
-                }
-            }
+    const podcastEpisodes = Object.values(podcast.episodes)
 
-            for (const download of downloads) {
-                if (podcast.episodes[download.episodeId]) {
-                    podcast.episodes[download.episodeId].downloaded = download.downloaded;
-                }
+    const setEpisodeHistory = useCallback(() => {
+        for (const episode of episodes) {
+            if (podcast.episodes[episode.episodeId]) {
+                podcast.episodes[episode.episodeId].duration = episode.duration;
+                podcast.episodes[episode.episodeId].position = episode.position;
+                podcast.episodes[episode.episodeId].downloaded = false;
+            }
+        }
+
+        for (const download of downloads) {
+            if (podcast.episodes[download.episodeId]) {
+                podcast.episodes[download.episodeId].downloaded = download.downloaded;
             }
         }
     }, [episodes, podcast.episodes, downloads]);
@@ -99,7 +101,7 @@ export default ({podcast, play, playingEpisodeId}: Props) => {
                 />
             }
             ListHeaderComponent={ListHeader}
-            data={Object.values(podcast.episodes)}
+            data={podcastEpisodes}
             renderItem={renderEpisodeItem}
             keyExtractor={item => item.id}
         />

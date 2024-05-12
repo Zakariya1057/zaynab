@@ -17,7 +17,7 @@ export const handleTrackLoading = async (track: Track | undefined, downloadsById
             });
 
             await TrackPlayer.pause()
-            trackChangeAndSeekPosition()
+            // trackChangeAndSeekPosition()
             // await TrackPlayer.seekTo(recordedEpisode?.position ?? 0);
         }
         return true;

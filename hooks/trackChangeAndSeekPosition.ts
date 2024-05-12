@@ -1,59 +1,74 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import TrackPlayer, { Event } from 'react-native-track-player';
-import {getEpisode} from "@/utils/cache/episode-cache";
+import { getEpisode } from "@/utils/cache/episode-cache";
+import {getAutoPlay} from "@/utils/track/auto-play";
 
 export const trackChangeAndSeekPosition = () => {
     const [currentTrackIndex, setCurrentTrackIndex] = useState<number | null>(null);
 
-    useEffect(() => {
-        const trackChangeHandler = async () => {
-            // await TrackPlayer.pause()
-            const newPosition = await TrackPlayer.getActiveTrackIndex();
-            const activeTrack = await TrackPlayer.getActiveTrack();
-            const lastTrack = (await TrackPlayer.getQueue())?.at(-1)
+    const trackChangeHandler = async () => {
+        const newPosition = await TrackPlayer.getActiveTrackIndex();
+        const activeTrack = await TrackPlayer.getActiveTrack();
+        const lastTrack = (await TrackPlayer.getQueue())?.at(-1);
+        const localAudio = !(activeTrack?.url.startsWith('http'));
 
-            const localAudio = !(activeTrack?.url.includes('http', 0))
+        const shouldAutoPlay = getAutoPlay()
 
-            if (localAudio || !newPosition || newPosition !== currentTrackIndex) {
-                setCurrentTrackIndex(newPosition ?? 0);
+        console.log('Should Play:', shouldAutoPlay)
 
-                const { duration, position } = getEpisode(activeTrack?.description ?? '') ?? {}
+        // Only perform actions if it's a new track or if it's a local file.
+        if (localAudio || newPosition !== currentTrackIndex) {
+            setCurrentTrackIndex(newPosition ?? 0);
 
-                let newTrackPosition = position ?? 0
+            // Retrieve saved episode details from cache.
+            const episode = getEpisode(activeTrack?.description ?? '');
+            if (episode) {
+                const {duration, position} = episode;
+                let newTrackPosition = position ?? 0;
 
-                if (position && duration) {
-                    if ((duration - position) < 5) {
-                        if (lastTrack?.description === activeTrack?.description) {
-                            await TrackPlayer.seekTo(newTrackPosition);
-                            await TrackPlayer.pause()
-                            return
-                        }
-
-                        newTrackPosition -= 5
-                    }
-
-                    const { position: currentPosition } = await TrackPlayer.getProgress()
-
-                    if (currentPosition !== newTrackPosition) {
-                        console.log('Found history for episode. Changing time...', position)
+                // Determine if near the end of the track and adjust.
+                if (position && duration && (duration - position) < 5) {
+                    newTrackPosition = Math.max(0, duration - 5);
+                    if (lastTrack?.description === activeTrack?.description) {
                         await TrackPlayer.seekTo(newTrackPosition);
-                        await TrackPlayer.play()
+                        if (!shouldAutoPlay) {
+                            await TrackPlayer.pause();
+                        }
+                        return;
                     }
-                } else {
-                    await TrackPlayer.play()
+                }
+
+                // Seek to the last known position if it's different from current and decide to play.
+                const {position: currentPosition} = await TrackPlayer.getProgress();
+                if (currentPosition !== newTrackPosition) {
+                    console.log('Found history for episode. Changing time...', newTrackPosition);
+                    await TrackPlayer.seekTo(newTrackPosition);
                 }
             }
-        };
 
+            if (shouldAutoPlay) {
+                await TrackPlayer.play();
+            } else {
+                await TrackPlayer.pause();
+            }
+        }
+    };
+
+    const setupListener = () => {
+        // Setup listeners for track changes and queue ending.
         const subscriptions = [
             TrackPlayer.addEventListener(Event.PlaybackActiveTrackChanged, trackChangeHandler),
             TrackPlayer.addEventListener(Event.PlaybackQueueEnded, trackChangeHandler)
-        ]
+        ];
 
         return () => {
-            subscriptions.forEach((subscription) => subscription.remove())
+            subscriptions.forEach(subscription => subscription.remove());
         };
-    }, [currentTrackIndex]);
+    }
 
-    return null; // You can return any necessary data or component here
+    // Public API: allow external components to control auto-play setting.
+    return {
+        setupListener,
+        trackChangeHandler,
+    };
 };

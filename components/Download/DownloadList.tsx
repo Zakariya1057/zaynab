@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {Modal, RefreshControl, SectionList, TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
 import {withDatabase} from '@nozbe/watermelondb/DatabaseProvider';
 import {withObservables} from '@nozbe/watermelondb/react';
@@ -9,12 +9,14 @@ import {Button, Separator, Text, useTheme, XStack, YStack} from "tamagui";
 import {AnimatedCircularProgress} from "react-native-circular-progress";
 import {getPodcastById} from "@/utils/data/getPodcastById";
 import {getEpisodeById} from "@/utils/data/getEpisodeById";
-import {Stack, router} from "expo-router";
+import {router, Stack} from "expo-router";
 import {Ionicons} from "@expo/vector-icons";
 import {DownloadStatus} from "@/interfaces/download-status";
 import useDownloadManager from "@/hooks/useDownloadManager";
 import {ArrowLeft} from "@tamagui/lucide-icons";
 import {deleteDownloads} from "@/utils/download/delete-downloads";
+import TrackPlayer, {State} from "react-native-track-player";
+import {setAutoPlay} from "@/utils/track/auto-play";
 
 interface DownloadItemProps {
     download: DownloadModel
@@ -77,20 +79,6 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight,
 
     const theme = useTheme()
     const color = theme.color.get()
-
-    const [modalVisible, setModalVisible] = useState(false);
-
-    const handlePauseDownload = () => {
-        console.log('Pausing the download');
-        // Add logic to pause the download
-        setModalVisible(false);
-    };
-
-    const handleDeleteDownload = () => {
-        console.log('Deleting the download');
-        // Add logic to delete the download
-        setModalVisible(false);
-    };
 
     const downloadEpisode = async (download: DownloadModel) => {
         await downloadAudio(download)
@@ -165,69 +153,67 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight,
 
             <Separator alignSelf="stretch" vertical={false}/>
 
-            <DownloadItemModal
-                modalVisible={modalVisible}
-                setModalVisible={setModalVisible}
-                handlePauseDownload={handlePauseDownload}
-                handleDeleteDownload={handleDeleteDownload}
-            />
-
         </TouchableOpacity>
     );
 }
 
 // Main component to display the list of downloads
-const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) => {
+const DownloadsList = ({downloads}) => {
     const theme = useTheme();
-    const purple = theme.purple.get()
+    const purple = theme.purple.get();
 
     const [refreshing, setRefreshing] = useState(false);
-    const [sections, setSections] = useState<{ title: DownloadStatus, data: DownloadModel[] }[]>([]);
-    const [highlighted, setHighlighted] = useState<Record<string, DownloadModel|null>>({})
+    const [highlighted, setHighlighted] = useState({});
 
-    useEffect(() => {
+    const sections = useMemo(() => {
         const waitingToDownload = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten === 0);
-        const inProgressPaused = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten > 0 && d.totalBytesWritten < d.totalBytesExpectedToWrite);
+        const inProgressPaused = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten > 0 && d.totalBytesExpectedToWrite > d.totalBytesWritten);
         const failedToDownload = downloads.filter(d => d.error);
-        const completedDownloads = downloads.filter(d => d.downloaded)
+        const completedDownloads = downloads.filter(d => d.downloaded);
 
-        setSections([
+        return [
             {title: DownloadStatus.InProgress, data: inProgressPaused},
             {title: DownloadStatus.DownloadFailed, data: failedToDownload},
             {title: DownloadStatus.WaitingToDownload, data: waitingToDownload},
             {title: DownloadStatus.CompletedDownload, data: completedDownloads},
-        ].filter(section => section.data.length > 0));
-    }, [downloads]); // Dependency array includes only downloads
+        ].filter(section => section.data.length > 0);
+    }, [downloads]);
 
-    const onRefresh = async () => {
+    const onRefresh = useCallback(async () => {
         setRefreshing(true);
         console.log('Refresh action triggered');
-        // You might want to trigger a refetch or some update logic
-        // Here you would normally go and fetch new data or re-fetch existing data
-        setRefreshing(false);
-    };
+        // Simulation of a fetch request
+        setTimeout(() => setRefreshing(false), 2000);
+    }, []);
 
-    const updateHighlighted = (id: string, download: DownloadModel|null) => {
-        setHighlighted((prev) => {
-            return {...prev, [id]: download}
-        })
+    const updateHighlighted = (id: string, download: DownloadModel) => {
+        setHighlighted(prev => ({...prev, [id]: download ? download : undefined}));
     }
+
+    const highlightedItemsFound = Object.values(highlighted).some(download => download !== null);
 
     const { startNextDownload } = useDownloadManager();
 
-    const deleteHighlighted = () => {
+    const deleteHighlighted = async () => {
+        const { state } = await TrackPlayer.getPlaybackState()
         const validDownloads = Object.values(highlighted).filter((download): download is DownloadModel => download !== null);
+
+        if (state === State.Playing) {
+            setAutoPlay(true)
+        } else {
+            setAutoPlay(false)
+        }
+
         deleteDownloads(validDownloads, async () => {
             cancelHighlighted()
             await startNextDownload()
+            setAutoPlay(true)
         });
     }
 
     const cancelHighlighted = () => {
         setHighlighted({})
     }
-
-    const highlightedItemsFound = Object.values(highlighted).some(download => download !== null);
 
     const headerRight = () =>  highlightedItemsFound ?
         <TouchableOpacity onPress={deleteHighlighted}>
@@ -251,14 +237,20 @@ const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) =>
             <SectionList
                 sections={sections}
                 keyExtractor={(item, index) => item.id + index}
-                renderItem={({item, section: {title}}) => <DownloadItem download={item} status={title}
-                                                                        highlight={highlighted[item.id]}
-                                                                        setHighlightedId={updateHighlighted} highlightedItemsFound={highlightedItemsFound}/>}
+                renderItem={({item, section: {title}}) => (
+                    <DownloadItem
+                        download={item}
+                        status={title}
+                        highlight={!!highlighted[item.id]}
+                        setHighlightedId={updateHighlighted}
+                        highlightedItemsFound={highlightedItemsFound}
+                    />
+                )}
                 renderSectionHeader={({section: {title}}) => (
                     <YStack width="100%">
                         <XStack justifyContent="space-between" alignItems="center" backgroundColor={'$background'}
                                 py={'$3'}>
-                            <Text fontSize={'$7'} fontWeight="bold" pl={'$4'}>{title}</Text>
+                            <Text fontSize={'$6'} fontWeight="bold" pl={'$4'}>{title}</Text>
                         </XStack>
                     </YStack>
                 )}
@@ -266,8 +258,8 @@ const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) =>
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        colors={['purple']} // Optional: you can set the colors of the indicator (Android)
-                        tintColor={purple} // Optional: set the color of the indicator (iOS)
+                        colors={[purple]}
+                        tintColor={purple}
                     />
                 }
             />
@@ -276,16 +268,6 @@ const DownloadsList: React.FC<{ downloads: DownloadModel[] }> = ({downloads}) =>
     );
 };
 
-// This function specifies which observables the component subscribes to and watches column changes
-const enhance = withObservables(['downloads'], () => ({
-    downloads: database.collections.get<DownloadModel>('downloads')
-        .query(
-            Q.sortBy('downloadUpdatedAt', Q.desc),
-            Q.take(100)
-        )
-        .observeWithColumns(['totalBytesWritten', 'totalBytesExpectedToWrite', 'downloaded', 'error'])
-}));
-
-
-// Wrap the component with the database and observables
-export default withDatabase(enhance(DownloadsList));
+export default withDatabase(withObservables(['downloads'], () => ({
+    downloads: database.collections.get('downloads').query(Q.sortBy('downloadUpdatedAt', Q.desc), Q.take(100))
+}))(DownloadsList));

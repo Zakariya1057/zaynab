@@ -3,7 +3,7 @@ import {
     YStack,
     XStack,
     Stack,
-    useTheme
+    useTheme, View
 } from 'tamagui';
 import {RefreshControl, SectionList} from "react-native";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
@@ -43,7 +43,9 @@ export default function App() {
             return <ContinueListening />
         } else {
             // Render a single item for other sections
-            return <PodcastElement podcast={item} />;
+            return <View pl={'$3'}>
+                <PodcastElement podcast={item} />
+            </View>;
         }
     };
 
@@ -55,12 +57,13 @@ export default function App() {
                 renderItem={renderItem}
                 renderSectionHeader={({ section: { title } }) => (
                     <YStack width="100%">
-                        <XStack justifyContent="space-between" alignItems="center" py={'$3'}>
-                            <Text fontSize={'$7'} fontWeight="bold">{title}</Text>
+                        <XStack justifyContent="space-between" alignItems="center" backgroundColor={'$background'}
+                                py={'$3'} pl={'$3'}>
+                            <Text fontSize={'$6'} fontWeight="bold">{title}</Text>
                         </XStack>
                     </YStack>
                 )}
-                contentContainerStyle={{ paddingHorizontal: 10, rowGap: 10 }}
+                contentContainerStyle={{ rowGap: 10 }}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={purple}/>

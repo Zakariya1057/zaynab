@@ -29,7 +29,10 @@ export default function PodcastEpisode() {
     }
 
     return podcastId && episodeId ? (
-        <Episode podcastId={podcastId} episodeId={episodeId} />
+        <>
+            <Episode podcastId={podcastId} episodeId={episodeId} />
+        </>
+
     ) : (
         <Spinner />
     );

@@ -8,8 +8,7 @@ import {getEpisodeDownloadsById} from "@/utils/download/get-episodes-with-downlo
 import {updateExistingTracks} from "@/utils/track/update-existing-tracks";
 import {setupNewQueue} from "@/utils/track/setup-new-queue";
 import {useTheme} from "tamagui";
-import {Download} from "@tamagui/lucide-icons";
-import { Stack } from 'expo-router'
+import {setAutoPlay} from "@/utils/track/auto-play";
 
 export default function ({podcastId, episodeId}: { podcastId: string, episodeId: string }) {
     const podcast = getPodcastById(podcastId)
@@ -21,9 +20,12 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
         async function setup() {
             await setupPlayer();
 
+            setAutoPlay(true)
+
             const activeTrack = await TrackPlayer.getActiveTrack()
 
             if (activeTrack && activeTrack.description === description) {
+                await TrackPlayer.play()
                 return
             }
 
@@ -51,7 +53,6 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
 
     return (
         <>
-            <Stack.Screen options={{ headerShown: true, headerRight: () => <Download size={35} color={'white'} strokeWidth={1.7}/>  }}/>
             <FullScreenAudioPlayer podcast={podcast} episode={episode}/>
         </>
     )

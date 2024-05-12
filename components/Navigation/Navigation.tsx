@@ -16,11 +16,11 @@ interface Props {
 const DownloadIcon = ({ status }) => {
     switch (status) {
         case DownloadStatus.CompletedDownload:
-            return  <Ionicons name="cloud-done" size={30} color="white" />;
+            return  <Ionicons name="cloud-done" size={30} color="white" strokeWidth={2}/>;
         case DownloadStatus.InProgress:
-            return  <Download size={30} color={'white'} />
+            return  <Download size={30} color={'white'} strokeWidth={2}/>
         case DownloadStatus.WaitingToDownload:
-            return <Download size={30} color={'white'} />
+            return <Download size={30} color={'white'} strokeWidth={2}/>
         default:
             return null; // Default case to handle unexpected status
     }
@@ -31,13 +31,13 @@ export default function NavigationBar({ goBack, download, downloadStatus }: Prop
         <View style={styles.container}>
             <SafeAreaView style={styles.container}>
                 <TouchableOpacity onPress={goBack}>
-                    <ArrowLeft size={30} color="white" />
+                    <ArrowLeft size={30} color="white" strokeWidth={2}/>
                 </TouchableOpacity>
 
                 <View style={{ flex: 1 }} />
 
                 <TouchableOpacity onPress={download}>
-                    <DownloadIcon status={downloadStatus} />
+                    <DownloadIcon status={downloadStatus}/>
                 </TouchableOpacity>
             </SafeAreaView>
         </View>

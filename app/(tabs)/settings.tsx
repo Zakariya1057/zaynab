@@ -28,7 +28,7 @@ const SettingsInfo = ({label, value}) => (
 );
 
 const SettingsButton = ({title, onPress}) => (
-    <Button onPress={onPress} fontSize={'$5'}>{title}</Button>
+    <Button onPress={onPress} fontSize={'$4'}>{title}</Button>
 );
 
 const SettingsPage = () => {
@@ -89,7 +89,7 @@ const SettingsPage = () => {
 
                 <SettingsSection title="Storage">
                     <SettingsInfo label="Total Downloads Size" value={totalDownloadsSize}/>
-                    <Button onPress={clearDownloads} fontSize={'$5'}>Delete Downloads</Button>
+                    <Button onPress={clearDownloads} fontSize={'$4'}>Delete Downloads</Button>
                 </SettingsSection>
 
                 <SettingsSection title="Notifications">

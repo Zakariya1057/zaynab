@@ -7,7 +7,7 @@ import {
 import {useRestartDownloadsOnBoot} from "@/hooks/useRestartDownloadOnBoot";
 
 export default function TabLayout() {
-    useRestartDownloadsOnBoot();
+    // useRestartDownloadsOnBoot();
 
     return (
         <Tabs
@@ -32,6 +32,7 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="bookmarks"
                 options={{
+                    href: null,
                     title: 'Bookmarks',
                     tabBarIcon: ({ color }) => <Bookmark color={color} />,
                 }}

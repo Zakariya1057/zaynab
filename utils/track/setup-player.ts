@@ -12,7 +12,6 @@ export const setupPlayer = async (): Promise<void> => {
         await TrackPlayer.setupPlayer();
         await TrackPlayer.reset()
         await TrackPlayer.updateOptions({
-                // Media controls capabilities
                 capabilities: [
                     Capability.Play,
                     Capability.Pause,
@@ -20,19 +19,18 @@ export const setupPlayer = async (): Promise<void> => {
                     Capability.SkipToPrevious,
                     Capability.Stop,
                 ],
+
+                android: {
+                    alwaysPauseOnInterruption: true,
+                    appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
+                },
+
                 progressUpdateEventInterval: 1,
 
                 // Capabilities that will show up when the notification.click is in the compact form on Android
                 compactCapabilities: [Capability.Play, Capability.Pause],
             }
         )
-
-        await TrackPlayer.updateOptions({
-            android: {
-                alwaysPauseOnInterruption: true,
-                appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
-            }
-        })
 
         const rate = await getSpeedFromStorage() ?? 1
         await TrackPlayer.setRate(rate)

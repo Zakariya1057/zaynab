@@ -1,13 +1,7 @@
-import React, {useEffect, useRef, useState} from 'react';
 import {Spinner, useTheme, View, YStack, Text} from 'tamagui';
-import {Entypo, Feather, Ionicons, MaterialIcons} from '@expo/vector-icons';
-import {Pressable, TouchableOpacity} from "react-native";
-import {Download, FastForward, Rewind} from '@tamagui/lucide-icons'
-import {withObservables} from "@nozbe/watermelondb/react";
-import {database} from "@/utils/database/setup";
-import {DownloadModel} from "@/utils/database/models/download-model";
-import {catchError, map, of} from "rxjs";
-import {Q} from "@nozbe/watermelondb";
+import {Ionicons, MaterialIcons} from '@expo/vector-icons';
+import {TouchableOpacity} from "react-native";
+import {FastForward, Rewind} from '@tamagui/lucide-icons'
 import useShuffle from "@/hooks/useShuffle";
 import {usePlaybackSpeed} from "@/hooks/usePlaybackSpeed";
 
@@ -16,10 +10,6 @@ interface Props {
     togglePlayPause: () => void;
     playNext?: () => void;
     playPrev?: () => void;
-    download?: () => void;
-
-    downloadModel?: DownloadModel | null;
-
     loading?: boolean;
     buffering?: boolean;
     variant: 'small' | 'medium' | 'large';
@@ -32,8 +22,6 @@ const MediaPlayerControls: React.FC<Props> = ({
                                                   togglePlayPause,
                                                   playNext,
                                                   playPrev,
-                                                  download,
-                                                  downloadModel,
                                                   isFirst,
                                                   isLast,
                                                   variant,
@@ -47,23 +35,6 @@ const MediaPlayerControls: React.FC<Props> = ({
     const purple = theme.purple.get()
 
     const strokeWidth = 1.7
-
-    // const downloadProgress = downloadModel ? (downloadModel.totalBytesWritten / downloadModel.totalBytesExpectedToWrite * 100) : 0
-
-    const downloaded = downloadModel?.downloaded
-
-    const currentlyDownloading = downloadModel?.downloadUpdatedAt &&
-        (Date.now() - (downloadModel.downloadUpdatedAt * 1000) <= 3000)
-
-    // let downloadIcon;
-    // if (downloaded) {
-    //     downloadIcon = <Ionicons name="cloud-done" size={size+6} color={color} strokeWidth={strokeWidth}/>;
-    // } else if (currentlyDownloading) {
-    //     downloadIcon = <Ionicons name="cloud-download-outline" size={size+4} color={color} strokeWidth={strokeWidth} />
-    // } else {
-    //     downloadIcon = <Download size={size} color={color} strokeWidth={strokeWidth}/>;
-    // }
-
 
     const {speed, cycleSpeed} = usePlaybackSpeed();
 
@@ -129,27 +100,10 @@ const MediaPlayerControls: React.FC<Props> = ({
                             <Text mt={'$1'}>{`${speed}x`}</Text>
                         </YStack>
                     </TouchableOpacity>
-
-                    {/*<TouchableOpacity onPress={download}>*/}
-                    {/*    <YStack alignItems="center">*/}
-                    {/*        {downloadIcon}*/}
-                    {/*        { (currentlyDownloading && !downloaded && downloadProgress) ? <Text mt={'$2'}>{Math.floor(downloadProgress)}%</Text> : undefined }*/}
-                    {/*    </YStack>*/}
-                    {/*</TouchableOpacity>*/}
                 </YStack>
             )}
         </YStack>
     );
 };
 
-// Continue using the enhanced function as it was
-const enhance = withObservables(['episodeId'], ({episodeId}) => ({
-    downloadModel: episodeId ? database.get<DownloadModel>('downloads').query(
-        Q.where('episodeId', episodeId)
-    ).observeWithColumns(['totalBytesWritten', 'downloaded']).pipe(
-        map(downloads => downloads.length > 0 ? downloads[0] : null),
-        catchError(() => of(null))
-    ) : of(null) // Return null immediately if episodeId is undefined
-}));
-
-export default enhance(MediaPlayerControls);
+export default MediaPlayerControls

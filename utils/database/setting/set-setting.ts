@@ -21,13 +21,11 @@ export const setSetting = async (key: SettingKey, value: boolean): Promise<void>
             await setting.update(settingRecord => {
                 settingRecord.value = value;
             });
-            console.log('Setting updated:', key, value);
         } else {
             await settingsCollection.create(settingRecord => {
                 settingRecord.key = key;
                 settingRecord.value = value;
             });
-            console.log('Setting created:', key, value);
         }
     }).catch(error => {
         console.error('Error setting value:', error);

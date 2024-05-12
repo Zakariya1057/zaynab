@@ -21,6 +21,7 @@ import {registerNotificationListener} from "@/utils/notification/register-notifi
 import {registerForPushNotifications} from "@/utils/notification/register-for-push-notification";
 import {setNotificationHandler} from "@/utils/notification/set-notification-handler";
 import {setupNotifications} from "@/utils/notification/setup-notifications";
+import {updateActivity} from "@/utils/schedule/update-activity";
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -48,6 +49,8 @@ export default function RootLayout() {
 
             await prefetchLastPodcastTracks()
             await initializeSettingsCache()
+
+            await updateActivity()
         }
 
         initApp();

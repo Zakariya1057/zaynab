@@ -43,7 +43,7 @@ export function DemoCard({title, position, duration, podcastId, episodeId}: {
                 </XStack>
                 <Card.Header>
                     <XStack gap={'$2'}>
-                        <H6 f={1} lineHeight={'$4'} numberOfLines={2}>{title}</H6>
+                        <Text f={1} lineHeight={'$4'} numberOfLines={2} fontWeight={'500'} fontSize={'$5'}>{title}</Text>
                         <XStack alignItems={'center'} justifyContent={'flex-end'}>
                             <AnimatedCircularProgress
                                 size={43}

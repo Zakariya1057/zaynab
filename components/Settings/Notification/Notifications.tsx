@@ -13,6 +13,7 @@ export default function NotificationSettings() {
                 label="Finish Episode Reminder"
                 value={reminder}
                 onValueChange={setReminder}
+                description="Enable to receive a reminder in one week to finish your last episode or explore new talks."
             />
         </SettingsSection>
     )

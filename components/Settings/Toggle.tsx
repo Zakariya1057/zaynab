@@ -14,8 +14,8 @@ interface SettingToggleProps {
 const SettingToggle: React.FC<SettingToggleProps> = ({ label, onValueChange, value, description }) => {
     return (
         <XStack>
-            <YStack f={1} gap={'$2'}>
-                <Text fontSize="$5">{label}</Text>
+            <YStack f={1} gap={'$1'}>
+                <Text fontSize="$5" fontWeight={'500'}>{label}</Text>
                 {description && (
                     <Text fontSize="$4" color="rgba(255, 255, 255, 0.9)">
                         {description}

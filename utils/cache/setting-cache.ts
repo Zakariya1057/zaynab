@@ -17,8 +17,6 @@ export const initializeSettingsCache = async (): Promise<void> => {
         const {key, value} = setting;
         cache[key] = value;
     })
-
-    console.log(cache)
 };
 
 // Function to get a setting from the cache

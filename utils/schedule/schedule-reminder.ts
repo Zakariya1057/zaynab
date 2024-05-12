@@ -1,25 +1,24 @@
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Episode} from "@/interfaces/episode";
 
-export const scheduleReminder = async (episode: Episode, podcastId: string) => {
-    const { id: episodeId } = episode
+export const scheduleReminder = async () => {
+    await Notifications.cancelAllScheduledNotificationsAsync();
 
-    const lastListened = await AsyncStorage.getItem(`episode_start:${episodeId}`);
-    if (lastListened) {
-        const lastListenedDate = new Date(lastListened);
-        const weekLater = new Date(lastListenedDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const lastActive = await AsyncStorage.getItem('last_active_date');
+    if (lastActive) {
+        const lastActiveDate = new Date(lastActive);
+        const weekLater = new Date(lastActiveDate.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-        const notificationId = await Notifications.scheduleNotificationAsync({
+        await Notifications.scheduleNotificationAsync({
             content: {
-                title: "Come back and finish your episode!",
-                body: "Your episode is waiting for you. Tap to resume listening.",
-                data: { podcastId, episodeId }
+                title: "Continue Your Journey with Zaynab",
+                body: "Reconnect with your faith! Dive back into enlightening talks and be inspired by the beauty of Islam.",
+                data: { screen: 'Home' }, // This could be adjusted depending on where you want users to land
             },
-            trigger: { second: 10 },
+            trigger: {
+                date: weekLater,
+            },
         });
-
-        // Store the notificationId with the episodeId
-        await AsyncStorage.setItem(`notificationId:${episodeId}`, notificationId);
+        console.log(`Notification rescheduled for: ${weekLater}`);
     }
 }

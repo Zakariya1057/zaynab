@@ -1,6 +1,5 @@
 import SettingsSection from "@/components/Settings/Section";
 import SettingsToggle from "@/components/Settings/Toggle";
-import React, {useState} from "react";
 import useSetting from "@/hooks/useSetting";
 import {SettingKey} from "@/interfaces/setting-key";
 

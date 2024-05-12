@@ -19,6 +19,5 @@ export const scheduleReminder = async () => {
                 date: weekLater,
             },
         });
-        console.log(`Notification rescheduled for: ${weekLater}`);
     }
 }

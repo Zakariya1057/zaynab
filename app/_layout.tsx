@@ -1,12 +1,12 @@
 import {DarkTheme, ThemeProvider} from '@react-navigation/native'
-import {router, SplashScreen, Stack, usePathname} from 'expo-router'
-import {Platform, TouchableOpacity, useColorScheme} from 'react-native'
-import {TamaguiProvider, Text} from 'tamagui'
+import {router, SplashScreen, Stack} from 'expo-router'
+import {TouchableOpacity, useColorScheme} from 'react-native'
+import {TamaguiProvider} from 'tamagui'
 import config from '../tamagui.config'
 import {useFonts} from 'expo-font'
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect} from 'react'
 import {GestureHandlerRootView} from "react-native-gesture-handler";
-import {ArrowLeft, Download} from "@tamagui/lucide-icons";
+import {ArrowLeft} from "@tamagui/lucide-icons";
 import Toast from 'react-native-toast-message';
 import '@/utils/database/setup'
 import {recordAudioPosition} from '@/utils/audio/record-audio-position'
@@ -16,12 +16,11 @@ import {setupPlayer} from "@/utils/track/setup-player";
 import {initializeCache} from "@/utils/cache/episode-cache";
 import {AudioPlaybackProvider} from "@/hooks/useAudioPlayback";
 import {prefetchLastPodcastTracks} from "@/utils/track/prefetch-last-podcast-tracks";
-import {initializeSettingsCache} from "@/utils/cache/setting-cache";
-import {registerNotificationListener} from "@/utils/notification/register-notification-listener";
-import {registerForPushNotifications} from "@/utils/notification/register-for-push-notification";
-import {setNotificationHandler} from "@/utils/notification/set-notification-handler";
+import {getSetting, initializeSettingsCache} from "@/utils/cache/setting-cache";
 import {setupNotifications} from "@/utils/notification/setup-notifications";
 import {updateActivity} from "@/utils/schedule/update-activity";
+import {SettingKey} from "@/interfaces/setting-key";
+import {useRestartDownloadsOnBoot} from "@/hooks/useRestartDownloadOnBoot";
 
 export {
     // Catch any errors thrown by the Layout component.

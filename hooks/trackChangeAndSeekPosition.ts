@@ -14,8 +14,6 @@ export const trackChangeAndSeekPosition = () => {
 
         const shouldAutoPlay = getAutoPlay()
 
-        console.log('Should Play:', shouldAutoPlay)
-
         // Only perform actions if it's a new track or if it's a local file.
         if (localAudio || newPosition !== currentTrackIndex) {
             setCurrentTrackIndex(newPosition ?? 0);

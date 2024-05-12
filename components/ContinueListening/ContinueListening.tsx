@@ -47,7 +47,7 @@ export function DemoCard({title, position, duration, podcastId, episodeId}: {
                         <XStack alignItems={'center'} justifyContent={'flex-end'}>
                             <AnimatedCircularProgress
                                 size={43}
-                                width={4}
+                                width={3}
                                 fill={(percentage * 100)}
                                 tintColor={purple}
                                 backgroundColor={'rgba(111,67,241,0.47)'}

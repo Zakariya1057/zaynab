@@ -4,10 +4,14 @@ import {
     Search,
     Download, Bookmark, Settings
 } from "@tamagui/lucide-icons";
+import {getSetting} from "@/utils/cache/setting-cache";
+import {SettingKey} from "@/interfaces/setting-key";
 import {useRestartDownloadsOnBoot} from "@/hooks/useRestartDownloadOnBoot";
 
 export default function TabLayout() {
-    // useRestartDownloadsOnBoot();
+    if (getSetting(SettingKey.ResumeDownloadsOnBoot)) {
+        useRestartDownloadsOnBoot();
+    }
 
     return (
         <Tabs

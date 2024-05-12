@@ -21,7 +21,7 @@ const DownloadSettings: React.FC = () => {
                 label="Resume downloads on app startup"
                 value={resumeDownloadsOnBoot}
                 onValueChange={setResumeDownloadsOnBoot}
-                description="Automatically resume pending downloads when the app starts to ensure all episodes are up to date."
+                description="Automatically resume incomplete downloads when the app starts."
             />
             <SettingsToggle
                 label="Auto-delete unplayed episodes"

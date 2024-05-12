@@ -9,7 +9,7 @@ import { refreshTrackUrlsAfterDeletion } from "@/utils/track/refresh-track-urls-
  * @param {DownloadModel[]} downloads - Array of downloads to be deleted.
  * @param onConfirm
  */
-export const deleteDownloads = (downloads: DownloadModel[], onConfirm: () => {}) => {
+export const deleteDownloads = (downloads: DownloadModel[], onConfirm?: () => {}) => {
     // Calculate the number of downloads to delete.
     const count = downloads.length;
 
@@ -33,7 +33,7 @@ export const deleteDownloads = (downloads: DownloadModel[], onConfirm: () => {})
                         await refreshTrackUrlsAfterDeletion();  // Refreshes track URLs to reflect the deletions.
                     }
 
-                    onConfirm();  // Initiates the next download after deletions are complete.
+                    onConfirm && onConfirm();  // Initiates the next download after deletions are complete.
                 }
             }
         ],

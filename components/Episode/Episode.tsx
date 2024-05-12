@@ -17,8 +17,6 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
 
     const description = [podcastId, episodeId].join('|')
 
-    scheduleReminder(episode, podcastId)
-
     useEffect(() => {
         async function setup() {
             await setupPlayer();

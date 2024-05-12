@@ -9,7 +9,6 @@ import {useActiveTrack} from "react-native-track-player";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {setupPlayer} from "@/utils/track/setup-player";
 import {useDownloadPodcastEpisodes} from "@/hooks/useDownloadPodcastEpisodes";
-import {checkAndShowDownloadMessage} from "@/utils/notify/check-and-show-download-message";
 import {DownloadStatus} from "@/interfaces/download-status";
 import {getDownloadsByPodcastId} from "@/utils/database/download/get-downloads-by-podcast-id";
 import {setPodcastTracks} from "@/utils/track/set-podcast-tracks";

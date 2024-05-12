@@ -7,7 +7,7 @@ import {shuffleArray} from "@/utils/shuffle/shuffle-array";
 import {getPodcastById} from "@/utils/data/getPodcastById";
 import {EpisodeModel} from "@/utils/database/models/episode-model";
 
-export const setPodcastTracks = async (podcastId: string, savedLastEpisode: EpisodeModel|undefined) => {
+export const setPodcastTracks = async (podcastId: string, savedLastEpisode?: EpisodeModel|undefined) => {
     const podcast = getPodcastById(podcastId);
 
     const {state} = await TrackPlayer.getPlaybackState();

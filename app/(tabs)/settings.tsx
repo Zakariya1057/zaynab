@@ -10,7 +10,7 @@ import Feedback from "@/components/Settings/Feedback/Feedback";
 const SettingsPage = () => {
     return (
         <>
-            <ScrollView flex={1}>
+            <ScrollView flex={1} showsVerticalScrollIndicator={false}>
                 <Downloads />
 
                 <Storage />

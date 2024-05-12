@@ -13,9 +13,8 @@ import {router, Stack} from "expo-router";
 import {Ionicons} from "@expo/vector-icons";
 import {DownloadStatus} from "@/interfaces/download-status";
 import useDownloadManager from "@/hooks/useDownloadManager";
-import {ArrowLeft} from "@tamagui/lucide-icons";
+import {ArrowLeft, Download} from "@tamagui/lucide-icons";
 import {deleteDownloads} from "@/utils/download/delete-downloads";
-import TrackPlayer, {State} from "react-native-track-player";
 import {setAutoPlay} from "@/utils/track/auto-play";
 
 interface DownloadItemProps {
@@ -134,7 +133,7 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight,
                 </YStack>
 
                 <YStack f={1} mx={'$3'}>
-                    <Text fontSize={17} fontWeight="bold" mb="$1.5" color={'$charcoal'} numberOfLines={1}>
+                    <Text fontSize={16} fontWeight="bold" mb="$1.5" color={'$charcoal'} numberOfLines={1}>
                         {episode.number}. {episode.description}
                     </Text>
                     <Text fontSize={15} color={'$charcoal'}>
@@ -142,6 +141,12 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight,
                         {/*{percentage} - {totalBytesWritten} / {totalBytesExpectedToWrite}*/}
                     </Text>
                 </YStack>
+
+                {status === DownloadStatus.InProgress && (
+                    <TouchableOpacity onPress={() => downloadEpisode(download)} style={{padding: 10}}>
+                        <Download size={25} color={'white'} strokeWidth={2}/>
+                    </TouchableOpacity>
+                )}
 
                 {status === DownloadStatus.DownloadFailed && (
                     <TouchableOpacity onPress={() => downloadEpisode(download)} style={{padding: 10}}>
@@ -195,14 +200,7 @@ const DownloadsList = ({downloads}) => {
     const { startNextDownload } = useDownloadManager();
 
     const deleteHighlighted = async () => {
-        const { state } = await TrackPlayer.getPlaybackState()
         const validDownloads = Object.values(highlighted).filter((download): download is DownloadModel => download !== null);
-
-        if (state === State.Playing) {
-            setAutoPlay(true)
-        } else {
-            setAutoPlay(false)
-        }
 
         deleteDownloads(validDownloads, async () => {
             cancelHighlighted()
@@ -270,5 +268,5 @@ const DownloadsList = ({downloads}) => {
 };
 
 export default withDatabase(withObservables(['downloads'], () => ({
-    downloads: database.collections.get('downloads').query(Q.sortBy('downloadUpdatedAt', Q.desc), Q.take(100))
+    downloads: database.collections.get('downloads').query(Q.sortBy('downloadUpdatedAt', Q.desc))
 }))(DownloadsList));

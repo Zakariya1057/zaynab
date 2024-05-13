@@ -10,7 +10,7 @@ export const upsertEpisode = async (episodeData: Partial<EpisodeModel>) => {
             Q.where('episodeId', episodeData.episodeId)
         ).fetch();
 
-        const time = getCurrentUnixTime();
+        const time = getCurrentUnixTime()
 
         if (existingEpisodes.length > 0) {
             // Episode exists, update it

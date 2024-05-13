@@ -20,6 +20,4 @@ export const setupLocalNotifications = async (): Promise<void> => {
     if (Platform.OS === 'android') {
         await registerAndroidPushNotifications();
     }
-
-    console.log('Local notifications setup complete.');
 };

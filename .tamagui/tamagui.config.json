@@ -48442,14 +48442,14 @@
           "isVar": true,
           "key": "$purple",
           "name": "color-194",
-          "val": "#572cdb",
+          "val": "#4e42b5",
           "variable": ""
         },
         "purple2": {
           "isVar": true,
           "key": "$purple2",
           "name": "color-195",
-          "val": "#7649ff",
+          "val": "#6a55cc",
           "variable": ""
         }
       },
@@ -50735,14 +50735,14 @@
         "isVar": true,
         "key": "$purple",
         "name": "color-194",
-        "val": "#572cdb",
+        "val": "#4e42b5",
         "variable": ""
       },
       "$color.purple2": {
         "isVar": true,
         "key": "$purple2",
         "name": "color-195",
-        "val": "#7649ff",
+        "val": "#6a55cc",
         "variable": ""
       },
       "$radius.0": {

@@ -33,7 +33,7 @@ export const TrackTitle = ({ title }: { title: string }) => {
     return (
         <YStack onLayout={onContainerLayout} f={1} ai='center' jc='center' width="100%">
             {isMarqueeNeeded ? (
-                <Marquee spacing={50} speed={0.7}>
+                <Marquee spacing={50} speed={0.6}>
                     <H4 textAlign="center" color={'$color'} numberOfLines={1} on onTextLayout={onTextLayout}>
                         {title}
                     </H4>

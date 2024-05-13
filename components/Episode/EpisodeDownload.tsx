@@ -26,11 +26,11 @@ const EpisodeDownload: React.FC<Props> = ({
 
     let downloadIcon;
     if (downloaded) {
-        downloadIcon = <Ionicons name="cloud-done" size={30 + 6} color={'white'} strokeWidth={2}/>;
+        downloadIcon = <Ionicons name="cloud-done" size={27 + 6} color={'white'} strokeWidth={2}/>;
     } else if (currentlyDownloading) {
-        downloadIcon = <Ionicons name="cloud-download-outline" size={30 + 4} color={'white'} strokeWidth={2}/>
+        downloadIcon = <Ionicons name="cloud-download-outline" size={27 + 4} color={'white'} strokeWidth={2}/>
     } else {
-        downloadIcon = <Download size={30} color={'white'} strokeWidth={2}/>;
+        downloadIcon = <Download size={27} color={'white'} strokeWidth={2}/>;
     }
 
     const downloadProgress = downloadModel ? (downloadModel.totalBytesWritten / downloadModel.totalBytesExpectedToWrite * 100) : 0

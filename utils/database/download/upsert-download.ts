@@ -10,7 +10,7 @@ export const upsertDownload = async (downloadData: Partial<DownloadModel>, updat
             Q.where('episodeId', downloadData.episodeId) // Assuming you link downloads to episodes via episodeId
         ).fetch();
 
-        const time = getCurrentUnixTime();
+        const time = getCurrentUnixTime()
 
         if (existingDownloads.length > 0) {
             // Download exists, update it

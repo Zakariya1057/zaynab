@@ -6,13 +6,12 @@ export const fetchLastListenedEpisode = async (): Promise<EpisodeModel | null> =
     try {
         const episodesCollection = database.get('episodes');
         const episodes = await episodesCollection.query(
-            Q.sortBy('episodeUpdatedAt', Q.desc)  // Assuming 'lastListenedAt' is the field that tracks the last listen time
+            Q.sortBy('episodeUpdatedAt', Q.desc)
         ).fetch();
 
         if (episodes.length > 0) {
             return episodes[0] as EpisodeModel;
         } else {
-            console.log('No Last Episode Found');
             return null;
         }
     } catch (error) {

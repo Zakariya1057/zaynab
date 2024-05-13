@@ -11,6 +11,8 @@ export const refreshTrackUrlsAfterDeletion = async () => {
     const activeTrack = await TrackPlayer.getActiveTrack();
     const activeTrackIndex = await TrackPlayer.getActiveTrackIndex();
 
+    console.log(activeTrack)
+
     if (!activeTrack?.description) {
         console.log('Active track does not have a description. Exiting...');
         return;

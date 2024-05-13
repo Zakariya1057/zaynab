@@ -9,7 +9,7 @@ export const deleteLocalFile = async (download: DownloadModel, displayToast: boo
             if (fileInfo.exists) {
                 await FileSystem.deleteAsync(download.uri);
                 console.log(`File at ${download.uri} has been successfully deleted.`);
-                displayToast && showToast('success', 'File Deleted', `The file for episode was successfully deleted.`);
+                // displayToast && showToast('success', 'File Deleted', `The file for episode was successfully deleted.`);
             }
         }
     } catch (error) {

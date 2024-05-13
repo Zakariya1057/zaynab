@@ -3,13 +3,14 @@ import { DownloadModel } from "@/utils/database/models/download-model";
 import { deleteLocalFile } from "@/utils/file/delete-local-file";
 import { deleteDownloadRecord } from "@/utils/download/delete-download-record";
 import { refreshTrackUrlsAfterDeletion } from "@/utils/track/refresh-track-urls-after-deletion";
+import {deleteDownloadsAndRefreshTracks} from "@/utils/download/delete-downloads-and-refresh-tracks";
 
 /**
  * Prompts the user for confirmation and deletes selected downloads if confirmed.
  * @param {DownloadModel[]} downloads - Array of downloads to be deleted.
  * @param onConfirm
  */
-export const deleteDownloads = (downloads: DownloadModel[], onConfirm?: () => {}) => {
+export const confirmDeleteDownloads = (downloads: DownloadModel[], onConfirm?: () => {}) => {
     // Calculate the number of downloads to delete.
     const count = downloads.length;
 
@@ -27,12 +28,7 @@ export const deleteDownloads = (downloads: DownloadModel[], onConfirm?: () => {}
                 text: "Delete",  // Option to confirm the deletion.
                 onPress: async () => {  // Asynchronous handler for the confirmation action.
                     // Loop over each download and perform deletion operations.
-                    for (const download of downloads) {
-                        await deleteLocalFile(download);  // Deletes the local file associated with the download.
-                        await deleteDownloadRecord(download);  // Removes the record from the database.
-                        await refreshTrackUrlsAfterDeletion();  // Refreshes track URLs to reflect the deletions.
-                    }
-
+                    await deleteDownloadsAndRefreshTracks(downloads)
                     onConfirm && onConfirm();  // Initiates the next download after deletions are complete.
                 }
             }

@@ -16,11 +16,8 @@ import {setupPlayer} from "@/utils/track/setup-player";
 import {initializeCache} from "@/utils/cache/episode-cache";
 import {AudioPlaybackProvider} from "@/hooks/useAudioPlayback";
 import {prefetchLastPodcastTracks} from "@/utils/track/prefetch-last-podcast-tracks";
-import {getSetting, initializeSettingsCache} from "@/utils/cache/setting-cache";
+import {initializeSettingsCache} from "@/utils/cache/setting-cache";
 import {setupNotifications} from "@/utils/notification/setup-notifications";
-import {updateActivity} from "@/utils/schedule/update-activity";
-import {SettingKey} from "@/interfaces/setting-key";
-import {useRestartDownloadsOnBoot} from "@/hooks/useRestartDownloadOnBoot";
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -38,18 +35,11 @@ export default function RootLayout() {
 
     const { setupListener } = trackChangeAndSeekPosition()
 
-    setupNotifications()
-
     useEffect(() => {
         async function initApp() {
             await setupPlayer()
             await initializeCache()
             setupListener()
-
-            await prefetchLastPodcastTracks()
-            await initializeSettingsCache()
-
-            await updateActivity()
         }
 
         initApp();

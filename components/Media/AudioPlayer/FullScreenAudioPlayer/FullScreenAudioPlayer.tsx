@@ -90,6 +90,9 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
         await TrackPlayer.retry()
     }
 
+    useEffect(() => {
+        console.log(state)
+    }, [state]);
     return (
         <ScrollView
             refreshControl={
@@ -136,12 +139,12 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
                     playNext={() => playNextTrack(audioFailedToLoad)}
                     playPrev={() => playPrevTrack(audioFailedToLoad)}
                     buffering={audioLoaded && buffering}
-                    isPlaying={state === State.Playing}
+                    isPlaying={(state === State.Playing)}
                     isFirst={isFirstEpisode}
                     isLast={isLastEpisode}
                     download={() => downloadEpisode()}
                     episodeId={track?.description?.split('|')[1]}
-                    loading={duration !== 0 && (state === State.Loading || state === State.Buffering)}
+                    loading={duration !== 0 && (state === State.Loading)}
                 />
 
                 {/*<AboutEpisodeSheet*/}

@@ -14,7 +14,7 @@ import {Ionicons} from "@expo/vector-icons";
 import {DownloadStatus} from "@/interfaces/download-status";
 import useDownloadManager from "@/hooks/useDownloadManager";
 import {ArrowLeft, Download} from "@tamagui/lucide-icons";
-import {deleteDownloads} from "@/utils/download/delete-downloads";
+import {confirmDeleteDownloads} from "@/utils/download/confirm-delete-downloads";
 import {setAutoPlay} from "@/utils/track/auto-play";
 
 interface DownloadItemProps {
@@ -142,7 +142,7 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight,
                     </Text>
                 </YStack>
 
-                {status === DownloadStatus.InProgress && (
+                {status === DownloadStatus.InProgress || status === DownloadStatus.WaitingToDownload && (
                     <TouchableOpacity onPress={() => downloadEpisode(download)} style={{padding: 10}}>
                         <Download size={25} color={'white'} strokeWidth={2}/>
                     </TouchableOpacity>
@@ -170,7 +170,7 @@ const DownloadsList = ({downloads}) => {
     const [refreshing, setRefreshing] = useState(false);
     const [highlighted, setHighlighted] = useState({});
 
-    const sections = useMemo(() => {
+    const sections = () => {
         const waitingToDownload = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten === 0);
         const inProgressPaused = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten > 0 && d.totalBytesExpectedToWrite > d.totalBytesWritten);
         const failedToDownload = downloads.filter(d => d.error);
@@ -182,7 +182,7 @@ const DownloadsList = ({downloads}) => {
             {title: DownloadStatus.WaitingToDownload, data: waitingToDownload},
             {title: DownloadStatus.CompletedDownload, data: completedDownloads},
         ].filter(section => section.data.length > 0);
-    }, [downloads]);
+    }
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
@@ -202,7 +202,7 @@ const DownloadsList = ({downloads}) => {
     const deleteHighlighted = async () => {
         const validDownloads = Object.values(highlighted).filter((download): download is DownloadModel => download !== null);
 
-        deleteDownloads(validDownloads, async () => {
+        confirmDeleteDownloads(validDownloads, async () => {
             cancelHighlighted()
             await startNextDownload()
             setAutoPlay(true)
@@ -233,7 +233,7 @@ const DownloadsList = ({downloads}) => {
                 headerLeft,
             }}/>
             <SectionList
-                sections={sections}
+                sections={sections()}
                 keyExtractor={(item, index) => item.id + index}
                 renderItem={({item, section: {title}}) => (
                     <DownloadItem

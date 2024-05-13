@@ -4,20 +4,19 @@ import {setSetting as setDbSetting } from "@/utils/database/setting/set-setting"
 import {getSetting, updateSetting} from "@/utils/cache/setting-cache";
 
 // Define a generic type for the hook that ensures the values are appropriate for the settings being handled.
-function useSetting(key: SettingKey, defaultValue: boolean): [boolean, (newValue: boolean) => void] {
-    const [value, setValue] = useState<boolean>(defaultValue);
+function useSetting(key: SettingKey): [boolean, (newValue: boolean) => void] {
+    const [value, setValue] = useState<boolean>(getSetting(key));
 
     useEffect(() => {
         async function fetchSetting() {
             const cachedValue = getSetting(key)
-            setValue(cachedValue ?? false);
+            setValue(cachedValue);
         }
 
         fetchSetting();
     }, [key]);
 
     const handleValueChange = async (newValue: boolean) => {
-        console.log('Handling Value Changes')
         setValue(newValue);
         updateSetting(key, newValue)
         setDbSetting(key, newValue);

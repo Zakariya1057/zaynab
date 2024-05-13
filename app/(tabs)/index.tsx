@@ -43,7 +43,7 @@ export default function App() {
             return <ContinueListening />
         } else {
             // Render a single item for other sections
-            return <View pl={'$3'}>
+            return <View px={'$3'}>
                 <PodcastElement podcast={item} />
             </View>;
         }

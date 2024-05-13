@@ -9,7 +9,7 @@ import {updateExistingTracks} from "@/utils/track/update-existing-tracks";
 import {setupNewQueue} from "@/utils/track/setup-new-queue";
 import {useTheme} from "tamagui";
 import {setAutoPlay} from "@/utils/track/auto-play";
-import {scheduleReminder} from "@/utils/schedule/schedule-reminder";
+import {scheduleReminder} from "@/utils/reminder/schedule-reminder";
 
 export default function ({podcastId, episodeId}: { podcastId: string, episodeId: string }) {
     const podcast = getPodcastById(podcastId)
@@ -26,7 +26,6 @@ export default function ({podcastId, episodeId}: { podcastId: string, episodeId:
             const activeTrack = await TrackPlayer.getActiveTrack()
 
             if (activeTrack && activeTrack.description === description) {
-                await TrackPlayer.play()
                 return
             }
 

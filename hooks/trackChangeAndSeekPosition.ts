@@ -39,7 +39,7 @@ export const trackChangeAndSeekPosition = () => {
                 // Seek to the last known position if it's different from current and decide to play.
                 const {position: currentPosition} = await TrackPlayer.getProgress();
                 if (currentPosition !== newTrackPosition) {
-                    console.log('Found history for episode. Changing time...', newTrackPosition);
+                    // console.log('Found history for episode. Changing time...', newTrackPosition);
                     await TrackPlayer.seekTo(newTrackPosition);
                 }
             }

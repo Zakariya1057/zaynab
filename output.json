@@ -1,0 +1,172 @@
+{
+    "6ee27d57-b2d0-49c0-9c74-0864dc2b6fb7": {
+        "id": "6ee27d57-b2d0-49c0-9c74-0864dc2b6fb7",
+        "name": "The End Of Times – The Hereafter (8 Part Series)",
+        "image": "require('@/assets/images/podcasts/6ee27d57-b2d0-49c0-9c74-0864dc2b6fb7/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/6ee27d57-b2d0-49c0-9c74-0864dc2b6fb7/image.png')",
+        "description": "Description for The End Of Times – The Hereafter (8 Part Series)",
+        "subTitle": "Subtitle for The End Of Times – The Hereafter (8 Part Series)",
+        "episodes": {}
+    },
+    "bd1575d9-37de-4b4d-ae5a-4bd5f60e00b8": {
+        "id": "bd1575d9-37de-4b4d-ae5a-4bd5f60e00b8",
+        "name": "The End Of Times – The Hereafter (22 Part Series)",
+        "image": "require('@/assets/images/podcasts/bd1575d9-37de-4b4d-ae5a-4bd5f60e00b8/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/bd1575d9-37de-4b4d-ae5a-4bd5f60e00b8/image.png')",
+        "description": "Description for The End Of Times – The Hereafter (22 Part Series)",
+        "subTitle": "Subtitle for The End Of Times – The Hereafter (22 Part Series)",
+        "episodes": {}
+    },
+    "8fc07e5d-d5e7-4f5e-b35c-503e60592786": {
+        "id": "8fc07e5d-d5e7-4f5e-b35c-503e60592786",
+        "name": "Lives of the Prophets (From Adam to Issa (Jesus) Peace be upom them)",
+        "image": "require('@/assets/images/podcasts/8fc07e5d-d5e7-4f5e-b35c-503e60592786/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/8fc07e5d-d5e7-4f5e-b35c-503e60592786/image.png')",
+        "description": "Description for Lives of the Prophets (From Adam to Issa (Jesus) Peace be upom them)",
+        "subTitle": "Subtitle for Lives of the Prophets (From Adam to Issa (Jesus) Peace be upom them)",
+        "episodes": {}
+    },
+    "3a766ed2-64f4-4a90-a708-a8a6eb92cb82": {
+        "id": "3a766ed2-64f4-4a90-a708-a8a6eb92cb82",
+        "name": "Prophet Muhammed (SAWS (Peace be upon him)) Makkan Period – Part 1/3",
+        "image": "require('@/assets/images/podcasts/3a766ed2-64f4-4a90-a708-a8a6eb92cb82/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/3a766ed2-64f4-4a90-a708-a8a6eb92cb82/image.png')",
+        "description": "Description for Prophet Muhammed (SAWS (Peace be upon him)) Makkan Period – Part 1/3",
+        "subTitle": "Subtitle for Prophet Muhammed (SAWS (Peace be upon him)) Makkan Period – Part 1/3",
+        "episodes": {}
+    },
+    "f3cb9108-d0f8-43f1-a9da-f0c9c3d7e2fd": {
+        "id": "f3cb9108-d0f8-43f1-a9da-f0c9c3d7e2fd",
+        "name": "Prophet Muhammed (SAWS (Peace be upon him)) Medina Period 1 – Part 2/3",
+        "image": "require('@/assets/images/podcasts/f3cb9108-d0f8-43f1-a9da-f0c9c3d7e2fd/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/f3cb9108-d0f8-43f1-a9da-f0c9c3d7e2fd/image.png')",
+        "description": "Description for Prophet Muhammed (SAWS (Peace be upon him)) Medina Period 1 – Part 2/3",
+        "subTitle": "Subtitle for Prophet Muhammed (SAWS (Peace be upon him)) Medina Period 1 – Part 2/3",
+        "episodes": {}
+    },
+    "93c7685a-f5e8-4fa4-8f2a-ef248d077ca2": {
+        "id": "93c7685a-f5e8-4fa4-8f2a-ef248d077ca2",
+        "name": "Prophet Muhammed (SAWS (Peace be upon him)) Medina Period 2 – Part 3/3",
+        "image": "require('@/assets/images/podcasts/93c7685a-f5e8-4fa4-8f2a-ef248d077ca2/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/93c7685a-f5e8-4fa4-8f2a-ef248d077ca2/image.png')",
+        "description": "Description for Prophet Muhammed (SAWS (Peace be upon him)) Medina Period 2 – Part 3/3",
+        "subTitle": "Subtitle for Prophet Muhammed (SAWS (Peace be upon him)) Medina Period 2 – Part 3/3",
+        "episodes": {}
+    },
+    "8618cff6-8f44-42d1-b020-095d937d0b1a": {
+        "id": "8618cff6-8f44-42d1-b020-095d937d0b1a",
+        "name": "Stories From Hadiths",
+        "image": "require('@/assets/images/podcasts/8618cff6-8f44-42d1-b020-095d937d0b1a/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/8618cff6-8f44-42d1-b020-095d937d0b1a/image.png')",
+        "description": "Description for Stories From Hadiths",
+        "subTitle": "Subtitle for Stories From Hadiths",
+        "episodes": {}
+    },
+    "8c60c50c-d224-4d25-b0bc-6b1ee793a947": {
+        "id": "8c60c50c-d224-4d25-b0bc-6b1ee793a947",
+        "name": "Allah is Preparing us for Victory (2006)",
+        "image": "require('@/assets/images/podcasts/8c60c50c-d224-4d25-b0bc-6b1ee793a947/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/8c60c50c-d224-4d25-b0bc-6b1ee793a947/image.png')",
+        "description": "Description for Allah is Preparing us for Victory (2006)",
+        "subTitle": "Subtitle for Allah is Preparing us for Victory (2006)",
+        "episodes": {}
+    },
+    "1a176ec6-11cd-4569-8c94-25442f713b71": {
+        "id": "1a176ec6-11cd-4569-8c94-25442f713b71",
+        "name": "Popular Lectures",
+        "image": "require('@/assets/images/podcasts/1a176ec6-11cd-4569-8c94-25442f713b71/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/1a176ec6-11cd-4569-8c94-25442f713b71/image.png')",
+        "description": "Description for Popular Lectures",
+        "subTitle": "Subtitle for Popular Lectures",
+        "episodes": {}
+    },
+    "b3e9c4a1-9af8-4b63-8bfc-8e84a7d8c321": {
+        "id": "b3e9c4a1-9af8-4b63-8bfc-8e84a7d8c321",
+        "name": "Lessons From The Companions",
+        "image": "require('@/assets/images/podcasts/b3e9c4a1-9af8-4b63-8bfc-8e84a7d8c321/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/b3e9c4a1-9af8-4b63-8bfc-8e84a7d8c321/image.png')",
+        "description": "Description for Lessons From The Companions",
+        "subTitle": "Subtitle for Lessons From The Companions",
+        "episodes": {}
+    },
+    "b740ead3-2fd5-4fa1-885b-d0e5cc3c15d6": {
+        "id": "b740ead3-2fd5-4fa1-885b-d0e5cc3c15d6",
+        "name": "Companions Of The Ditch",
+        "image": "require('@/assets/images/podcasts/b740ead3-2fd5-4fa1-885b-d0e5cc3c15d6/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/b740ead3-2fd5-4fa1-885b-d0e5cc3c15d6/image.png')",
+        "description": "Description for Companions Of The Ditch",
+        "subTitle": "Subtitle for Companions Of The Ditch",
+        "episodes": {}
+    },
+    "b91b8146-cc3d-4202-81c2-7bd2bbd585a2": {
+        "id": "b91b8146-cc3d-4202-81c2-7bd2bbd585a2",
+        "name": "Lessons from the life of Prophet Musa (Moses) (alayhis-salam)",
+        "image": "require('@/assets/images/podcasts/b91b8146-cc3d-4202-81c2-7bd2bbd585a2/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/b91b8146-cc3d-4202-81c2-7bd2bbd585a2/image.png')",
+        "description": "Description for Lessons from the life of Prophet Musa (Moses) (alayhis-salam)",
+        "subTitle": "Subtitle for Lessons from the life of Prophet Musa (Moses) (alayhis-salam)",
+        "episodes": {}
+    },
+    "2a22d622-cbd9-4634-89c0-6783b0d3d6f1": {
+        "id": "2a22d622-cbd9-4634-89c0-6783b0d3d6f1",
+        "name": "Dream Interpretations",
+        "image": "require('@/assets/images/podcasts/2a22d622-cbd9-4634-89c0-6783b0d3d6f1/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/2a22d622-cbd9-4634-89c0-6783b0d3d6f1/image.png')",
+        "description": "Description for Dream Interpretations",
+        "subTitle": "Subtitle for Dream Interpretations",
+        "episodes": {}
+    },
+    "97ac2a95-c680-4d2b-9462-02499386867e": {
+        "id": "97ac2a95-c680-4d2b-9462-02499386867e",
+        "name": "Abu Bakr al Siddiq (RA): His Life and Times",
+        "image": "require('@/assets/images/podcasts/97ac2a95-c680-4d2b-9462-02499386867e/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/97ac2a95-c680-4d2b-9462-02499386867e/image.png')",
+        "description": "Description for Abu Bakr al Siddiq (RA): His Life and Times",
+        "subTitle": "Subtitle for Abu Bakr al Siddiq (RA): His Life and Times",
+        "episodes": {}
+    },
+    "a23738d0-4ee2-4190-8f02-28928d335855": {
+        "id": "a23738d0-4ee2-4190-8f02-28928d335855",
+        "name": "Ummar Ibn Alkhataab (RA) – His Life and Times",
+        "image": "require('@/assets/images/podcasts/a23738d0-4ee2-4190-8f02-28928d335855/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/a23738d0-4ee2-4190-8f02-28928d335855/image.png')",
+        "description": "Description for Ummar Ibn Alkhataab (RA) – His Life and Times",
+        "subTitle": "Subtitle for Ummar Ibn Alkhataab (RA) – His Life and Times",
+        "episodes": {}
+    },
+    "23134cf9-2d38-49a8-a872-f98030e77134": {
+        "id": "23134cf9-2d38-49a8-a872-f98030e77134",
+        "name": "Other Lectures",
+        "image": "require('@/assets/images/podcasts/23134cf9-2d38-49a8-a872-f98030e77134/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/23134cf9-2d38-49a8-a872-f98030e77134/image.png')",
+        "description": "Description for Other Lectures",
+        "subTitle": "Subtitle for Other Lectures",
+        "episodes": {}
+    },
+    "a054ae8c-9cea-4c9c-8f45-a826ceb1e6d9": {
+        "id": "a054ae8c-9cea-4c9c-8f45-a826ceb1e6d9",
+        "name": "Interviews",
+        "image": "require('@/assets/images/podcasts/a054ae8c-9cea-4c9c-8f45-a826ceb1e6d9/image.png')",
+        "remoteImage": "",
+        "background": "require('@/assets/images/podcasts/a054ae8c-9cea-4c9c-8f45-a826ceb1e6d9/image.png')",
+        "description": "Description for Interviews",
+        "subTitle": "Subtitle for Interviews",
+        "episodes": {}
+    }
+}

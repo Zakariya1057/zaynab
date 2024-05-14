@@ -177,7 +177,11 @@ const DownloadsList = ({downloads}) => {
 
     const sections = () => {
         const waitingToDownload = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten === 0);
-        const inProgressPaused = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten > 0 && d.totalBytesExpectedToWrite > d.totalBytesWritten);
+        const inProgressPaused = downloads
+            .filter(d => !d.error && !d.downloaded && d.totalBytesWritten > 0 && d.totalBytesExpectedToWrite > d.totalBytesWritten)
+            .splice()
+            .sort((a,b) => a.downloadStartedAt - b.downloadStartedAt);
+
         const failedToDownload = downloads.filter(d => d.error);
         const completedDownloads = downloads.filter(d => d.downloaded);
 

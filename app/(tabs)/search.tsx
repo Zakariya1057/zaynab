@@ -21,10 +21,27 @@ export default function App() {
     useEffect(() => {
         const lowerCaseQuery = searchQuery.toLowerCase();
         const filtered = Object.values(Podcasts).filter(podcast =>
-            podcast.name.toLowerCase().includes(lowerCaseQuery)
+            podcast.name.toLowerCase().includes(lowerCaseQuery) ||
+            podcast.description.toLowerCase().includes(lowerCaseQuery) ||
+            podcast.subTitle.toLowerCase().includes(lowerCaseQuery) ||
+            Object.values(podcast.episodes).find(episode => episode.description.toLowerCase().includes(lowerCaseQuery))
         );
-        setFilteredPodcasts(filtered);
-    }, [searchQuery]); // This will re-run the filter whenever searchQuery changes
+
+        const sorted = filtered.sort((a, b) => {
+            const aNameMatches = a.name.toLowerCase().includes(lowerCaseQuery);
+            const bNameMatches = b.name.toLowerCase().includes(lowerCaseQuery);
+
+            if (aNameMatches && !bNameMatches) {
+                return -1;
+            }
+            if (!aNameMatches && bNameMatches) {
+                return 1;
+            }
+            return 0;
+        });
+
+        setFilteredPodcasts(sorted);
+    }, [searchQuery]);
 
     const renderItem = ({ item }) => {
         return <PodcastElement podcast={item} showPlayIcon={false} />;

@@ -30,12 +30,12 @@ export default function SeriesHeader({ image, title, description, continuePlayin
                 </YStack>
                 <YStack
                     position="absolute"
-                    alignSelf="center"
                     justifyContent="flex-end"
                     paddingHorizontal={'$4'} // Assuming $4 matches Theme.spacing.large in your theme
                     paddingBottom={'$4'}
                     space="$4" // Assuming you want to maintain a 20px gap similar to 'rowGap: 20'
                     bottom={0}
+                    width={'100%'}
                     top={0}
                 >
                     <H3

@@ -67,7 +67,7 @@ export default ({podcast, play, playingEpisodeId}: Props) => {
             description={podcast.description}
             image={podcast.image}
             play={play}
-            continuePlaying={downloads.length > 0}
+            continuePlaying={episodes.length > 0}
         />
     ), [podcast, play]);
 

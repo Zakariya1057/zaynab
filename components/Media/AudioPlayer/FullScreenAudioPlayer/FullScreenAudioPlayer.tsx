@@ -90,9 +90,6 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
         await TrackPlayer.retry()
     }
 
-    useEffect(() => {
-        console.log(state)
-    }, [state]);
     return (
         <ScrollView
             refreshControl={
@@ -117,9 +114,13 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
 
                 <MediaImage image={episode.image ?? podcast.image}/>
 
-                <YStack mt="$2" space="$1" height={60}>
+                <YStack mt="$2" minHeight={55}>
                     <TrackTitle title={track?.title ?? ''} />
-                    <Paragraph textAlign="center" color={'$color'} numberOfLines={1}>
+                    <Paragraph
+                        textAlign="center"
+                        color={'$color'}
+                        numberOfLines={1}
+                    >
                         {track?.artist}
                     </Paragraph>
                 </YStack>
@@ -139,7 +140,7 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
                     playNext={() => playNextTrack(audioFailedToLoad)}
                     playPrev={() => playPrevTrack(audioFailedToLoad)}
                     buffering={audioLoaded && buffering}
-                    isPlaying={(state === State.Playing)}
+                    isPlaying={state === State.Playing}
                     isFirst={isFirstEpisode}
                     isLast={isLastEpisode}
                     download={() => downloadEpisode()}
@@ -150,7 +151,6 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
                 {/*<AboutEpisodeSheet*/}
                 {/*    about={'The life of the Muslim Ummah is solely dependent on the ink of its scholars and the blood of its Martyrs." - Shaykh Abdullah Azzam (May the Mercy of Allah be with him) Indeed history is written in the colours, black - the ink of its scholars, red - the blood of the martyrs. Maktabah Sound Studio is proud to introduce "Heroes of Islam" a series of lectures exploring the lives of some of the greatest men in the history of Islam'}*/}
                 {/*/>*/}
-
             </YStack>
         </ScrollView>
     );

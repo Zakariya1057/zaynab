@@ -100,6 +100,11 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight,
 
     const backgroundColor = highlight ? 'rgba(189, 0, 0, 0.5)' : 'transparent';
 
+    // Calculate time since last update
+    const now = new Date();
+    const lastUpdated = new Date(download.downloadUpdatedAt * 1000);
+    const timeDifference = (now.getTime() - lastUpdated.getTime()) / 1000; // Time difference in seconds
+
     return (
         <TouchableOpacity
             onPress={onPress}
@@ -132,17 +137,17 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight,
                     </AnimatedCircularProgress>
                 </YStack>
 
-                <YStack f={1} mx={'$3'}>
+                <YStack f={1} mx={'$3'} gap={'$1'}>
                     <Text fontSize={16} fontWeight="bold" mb="$1.5" color={'$charcoal'} numberOfLines={1}>
                         {episode.number}. {episode.description}
                     </Text>
-                    <Text fontSize={15} color={'$charcoal'}>
+                    <Text fontSize={15} color={'$charcoal'} numberOfLines={1}>
                         {podcast.name}
                         {/*{percentage} - {totalBytesWritten} / {totalBytesExpectedToWrite}*/}
                     </Text>
                 </YStack>
 
-                {status === DownloadStatus.InProgress || status === DownloadStatus.WaitingToDownload && (
+                {((timeDifference > 10) && (status === DownloadStatus.InProgress || status === DownloadStatus.WaitingToDownload)) && (
                     <TouchableOpacity onPress={() => downloadEpisode(download)} style={{padding: 10}}>
                         <Download size={25} color={'white'} strokeWidth={2}/>
                     </TouchableOpacity>
@@ -268,5 +273,5 @@ const DownloadsList = ({downloads}) => {
 };
 
 export default withDatabase(withObservables(['downloads'], () => ({
-    downloads: database.collections.get('downloads').query(Q.sortBy('downloadUpdatedAt', Q.desc))
+    downloads: database.collections.get('downloads').query(Q.sortBy('downloadUpdatedAt', Q.desc)).observeWithColumns(['downloadUpdatedAt'])
 }))(DownloadsList));

@@ -11,7 +11,6 @@ import {SettingKey} from "@/interfaces/setting-key";
 import {useRestartDownloadsOnBoot} from "@/hooks/useRestartDownloadOnBoot";
 import useDownloadManager from "@/hooks/useDownloadManager";
 import {setupNotifications} from "@/utils/notification/setup-notifications";
-import {getCompletedEpisodes} from "@/utils/database/download/get-completed-episodes";
 import {prefetchLastPodcastTracks} from "@/utils/track/prefetch-last-podcast-tracks";
 
 export default function TabLayout() {

@@ -15,9 +15,6 @@ import {trackChangeAndSeekPosition} from "@/hooks/trackChangeAndSeekPosition";
 import {setupPlayer} from "@/utils/track/setup-player";
 import {initializeCache} from "@/utils/cache/episode-cache";
 import {AudioPlaybackProvider} from "@/hooks/useAudioPlayback";
-import {prefetchLastPodcastTracks} from "@/utils/track/prefetch-last-podcast-tracks";
-import {initializeSettingsCache} from "@/utils/cache/setting-cache";
-import {setupNotifications} from "@/utils/notification/setup-notifications";
 
 export {
     // Catch any errors thrown by the Layout component.

@@ -43,7 +43,7 @@ export default function App() {
             return <ContinueListening />
         } else {
             // Render a single item for other sections
-            return <View px={'$3'}>
+            return <View px={'$3'} mb={'$2'}>
                 <PodcastElement podcast={item} />
             </View>;
         }
@@ -58,7 +58,7 @@ export default function App() {
                 renderSectionHeader={({ section: { title } }) => (
                     <YStack width="100%">
                         <XStack justifyContent="space-between" alignItems="center" backgroundColor={'$background'}
-                                py={'$3'} pl={'$3'}>
+                                py={'$3'} pl={'$3'} mb={'$2'}>
                             <Text fontSize={'$6'} fontWeight="bold">{title}</Text>
                         </XStack>
                     </YStack>

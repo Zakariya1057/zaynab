@@ -1,5 +1,5 @@
 import {Spinner, useTheme, View, YStack, Text} from 'tamagui';
-import {Ionicons, MaterialIcons} from '@expo/vector-icons';
+import {FontAwesome, FontAwesome5, Ionicons, MaterialIcons} from '@expo/vector-icons';
 import {TouchableOpacity} from "react-native";
 import {FastForward, Rewind} from '@tamagui/lucide-icons'
 import useShuffle from "@/hooks/useShuffle";
@@ -43,10 +43,10 @@ const MediaPlayerControls: React.FC<Props> = ({
     return (
         <YStack flexDirection="row" alignItems="center" justifyContent="space-between">
             {variant === 'small' ? (
-                <TouchableOpacity onPress={togglePlayPause} style={{padding: 5}}>
+                <TouchableOpacity onPress={togglePlayPause} style={{padding: 5, width: 40}}>
                     {
                         !loading ? (
-                                <Ionicons name={isPlaying ? 'pause' : 'play'} size={size} color={purple}/>
+                                <FontAwesome5 name={isPlaying ? 'pause' : 'play'} size={size-10} color={purple} />
                             ) :
                             (
                                 <Spinner size="small" color={purple}/>
@@ -57,11 +57,11 @@ const MediaPlayerControls: React.FC<Props> = ({
             ) : (
                 <YStack f={1} flexDirection="row" alignItems="center" justifyContent="space-between">
                     <TouchableOpacity onPress={toggleShuffle}>
-                        <Ionicons name="shuffle-outline" size={size + 5} color={!shuffleOn ? color : purple}/>
+                        <FontAwesome5 name="random" size={size} color={!shuffleOn ? color : purple} />
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={playPrev} disabled={isFirst}>
-                        <Rewind size={size} color={isFirst ? 'grey' : color} strokeWidth={strokeWidth}/>
+                        <FontAwesome5 size={size} name="backward" color={isFirst ? 'grey' : color} strokeWidth={strokeWidth} />
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -83,7 +83,7 @@ const MediaPlayerControls: React.FC<Props> = ({
                                     (
                                         <Spinner size="large" color={'white'}/>
                                     ) : (
-                                        <Ionicons name={isPlaying ? 'pause' : 'play'} size={size + 3} color={'white'}/>
+                                        <FontAwesome5 name={isPlaying ? 'pause' : 'play'} size={size} color={'white'} />
                                     )
                             }
 
@@ -91,12 +91,12 @@ const MediaPlayerControls: React.FC<Props> = ({
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={playNext} disabled={isLast}>
-                        <FastForward size={size} color={isLast ? 'grey' : color} strokeWidth={strokeWidth}/>
+                        <FontAwesome5 name="forward" size={size} color={isLast ? 'grey' : color} strokeWidth={strokeWidth} />
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={cycleSpeed}>
                         <YStack alignItems="center">
-                            <MaterialIcons name="speed" size={size + 4} color={color}/>
+                            <FontAwesome5 name="tachometer-alt" size={size} color={color} />
                             <Text mt={'$1'}>{`${speed}x`}</Text>
                         </YStack>
                     </TouchableOpacity>

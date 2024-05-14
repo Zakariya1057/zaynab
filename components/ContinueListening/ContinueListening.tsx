@@ -31,7 +31,7 @@ export function DemoCard({title, position, duration, podcastId, episodeId}: {
 
     return (
         <TouchableOpacity onPress={openEpisode}>
-            <Card size="$3" bordered width={200} br={'$5'} overflow={'hidden'}>
+            <Card size="$3" bordered width={180} br={'$5'} overflow={'hidden'}>
                 <XStack>
                     <Image
                         resizeMode="cover"
@@ -43,7 +43,7 @@ export function DemoCard({title, position, duration, podcastId, episodeId}: {
                 </XStack>
                 <Card.Header>
                     <XStack gap={'$2'}>
-                        <Text f={1} lineHeight={'$4'} numberOfLines={2} fontWeight={'500'} fontSize={'$5'}>{title}</Text>
+                        <Text f={1} lineHeight={'$1'} numberOfLines={2} fontWeight={'500'} fontSize={'$4'}>{title}</Text>
                         <XStack alignItems={'center'} justifyContent={'flex-end'}>
                             <AnimatedCircularProgress
                                 size={43}

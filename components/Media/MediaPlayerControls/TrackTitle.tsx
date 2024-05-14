@@ -19,9 +19,9 @@ export const TrackTitle = ({ title }: { title: string }) => {
         }
 
         const {width} = event.nativeEvent.lines[0];
-        const percentage = (width/containerWidth)*100
+        const percentage = Math.round((width/containerWidth)*100)
 
-        setIsMarqueeNeeded(percentage > 98)
+        setIsMarqueeNeeded(percentage >= 97)
     };
 
     const onContainerLayout = (event: LayoutChangeEvent) => {
@@ -31,15 +31,22 @@ export const TrackTitle = ({ title }: { title: string }) => {
     };
 
     return (
-        <YStack onLayout={onContainerLayout} f={1} ai='center' jc='center' width="100%">
+        <YStack onLayout={onContainerLayout} f={1} width="100%">
             {isMarqueeNeeded ? (
                 <Marquee spacing={50} speed={0.6}>
-                    <H4 textAlign="center" color={'$color'} numberOfLines={1} on onTextLayout={onTextLayout}>
+                    <H4 textAlign="center" color={'$color'} numberOfLines={1} onTextLayout={onTextLayout}>
                         {title}
                     </H4>
                 </Marquee>
             ) : (
-                <H4 textAlign="center" color={'$color'} numberOfLines={1} onTextLayout={onTextLayout}>
+                <H4
+                    alignSelf={'center'}
+                    justifyContent={'center'}
+                    textAlign="center"
+                    color={'$color'}
+                    onTextLayout={onTextLayout}
+                    numberOfLines={1}
+                >
                     {title}
                 </H4>
             )}

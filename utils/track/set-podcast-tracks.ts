@@ -13,6 +13,8 @@ export const setPodcastTracks = async (podcastId: string, savedLastEpisode?: Epi
     const {state} = await TrackPlayer.getPlaybackState();
     const playingPodcast = await playingCurrentPodcast(podcast.id);
 
+    console.log('Playing Current Podcast', playingPodcast)
+
     if (playingPodcast) {
         if (state !== State.Playing) {
             await TrackPlayer.play();
@@ -23,7 +25,9 @@ export const setPodcastTracks = async (podcastId: string, savedLastEpisode?: Epi
     }
 
     const tracks = await getTracksWithDownloads(podcast);
-    const lastEpisode = savedLastEpisode ? savedLastEpisode :  fetchLastListenedEpisodeByPodcastId(podcast.id);
+    const lastEpisode = savedLastEpisode ?
+        savedLastEpisode :
+        await fetchLastListenedEpisodeByPodcastId(podcast.id);
 
     const shuffleOn = await fetchShuffleStatus();
     if (shuffleOn) {

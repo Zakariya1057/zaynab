@@ -32,7 +32,7 @@ export default function App() {
 
     return (
         <Stack f={1}>
-            <Stack f={1} p={'$3'}>
+            <Stack f={1} px={'$3'} pt={'$2'}>
                 <Input
                     width={'100%'}
                     placeholder={'Search podcasts'}
@@ -40,7 +40,7 @@ export default function App() {
                     borderWidth={2}
                     borderColor={'$gray4'}
                     borderRadius={10}
-                    mb={'$5'}
+                    mb={'$4'}
                     mt={'$2'}
                     fontSize={'$5'}
                     onChangeText={text => setSearchQuery(text)}
@@ -52,8 +52,8 @@ export default function App() {
                         data={filteredPodcasts}
                         keyExtractor={(item, index) => item.id || index.toString()}
                         renderItem={renderItem}
-                        contentContainerStyle={{ paddingBottom: 10 }}
                         showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ rowGap: 20 }}
                     />
                 ) : (
                     <YStack ai='center' jc='center' f={1}>

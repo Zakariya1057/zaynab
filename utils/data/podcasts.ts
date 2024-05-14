@@ -1,12 +1,135 @@
 import {Podcast} from "@/interfaces/podcast";
 
 export const Podcasts: Record<string, Podcast> = {
+    "2b355614-58b0-4a75-9961-386ab29059d0": {
+        id: "2b355614-58b0-4a75-9961-386ab29059d0",
+        name: "The Makkan Era: Prophet Muhammad (PBUH) - Part 1",
+        image: require('@/assets/images/podcasts/2b355614-58b0-4a75-9961-386ab29059d0/image.png'),
+        remoteImage: 'https://d21y2nonaorlw9.cloudfront.net/The+Lives+of+the+Prophets/image.png',
+        background: require('@/assets/images/podcasts/2b355614-58b0-4a75-9961-386ab29059d0/image.png'),
+        description: "Explore the transformative Makkan period of Prophet Muhammad (PBUH) in this three-part series. Delve into his early life, revelations, and the defining challenges of the era. Discover the key events that shaped the foundation of Islam.",
+        subTitle: "Unveiling the Makkan Era: Key Early Moments",
+        episodes: {
+            "fe77a861-c8cd-4cec-b72f-de0367763f6b": {
+                id: "fe77a861-c8cd-4cec-b72f-de0367763f6b",
+                number: 1,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD1Introduction.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD1Introduction.mp3",
+                description: "Makkan Period: Setting the Stage"
+            },
+            "408511e0-d197-484b-a7a4-237cb4350b28": {
+                id: "408511e0-d197-484b-a7a4-237cb4350b28",
+                number: 2,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD2BackgroundHistory.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD2BackgroundHistory.mp3",
+                description: "Arabia Before Islam: A Forgotten Era"
+            },
+            "4839e21f-9867-479a-b469-f1b6ef9aa7a9": {
+                id: "4839e21f-9867-479a-b469-f1b6ef9aa7a9",
+                number: 3,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD3TheReligiousSitautionOfPreIslamicArabia.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD3TheReligiousSitautionOfPreIslamicArabia.mp3",
+                description: "Spiritual Void: Pre-Islamic Arabia"
+            },
+            "8dbb880a-e9c2-4232-808d-b2fb5183e24e": {
+                id: "8dbb880a-e9c2-4232-808d-b2fb5183e24e",
+                number: 4,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD4EarlyLife.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD4EarlyLife.mp3",
+                description: "Early Days: Birth and Childhood"
+            },
+            "d354469c-ce51-4eb8-aba0-96587d07156f": {
+                id: "d354469c-ce51-4eb8-aba0-96587d07156f",
+                number: 5,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD5ImportantEvents.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD5ImportantEvents.mp3",
+                description: "Milestones: Key Early Events"
+            },
+            "9affdf93-0ead-42c2-be6a-9d6ec7eb9725": {
+                id: "9affdf93-0ead-42c2-be6a-9d6ec7eb9725",
+                number: 6,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD6InPursuitOfTheTruth.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD6InPursuitOfTheTruth.mp3",
+                description: "A Seeker’s Journey"
+            },
+            "88689236-5449-418e-885e-97f08a37c46b": {
+                id: "88689236-5449-418e-885e-97f08a37c46b",
+                number: 7,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD7TheGladTidings.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD7TheGladTidings.mp3",
+                description: "Prophecies and Hopes"
+            },
+            "9c397071-600b-4c9b-bbb6-078581383e2e": {
+                id: "9c397071-600b-4c9b-bbb6-078581383e2e",
+                number: 8,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD8TheRevelation.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD8TheRevelation.mp3",
+                description: "A Night Like No Other"
+            },
+            "326e1505-af56-4ac0-8914-57e985199160": {
+                id: "326e1505-af56-4ac0-8914-57e985199160",
+                number: 9,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD9TheReactionPart1.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD9TheReactionPart1.mp3",
+                description: "Shockwaves: Reaction Begins (Part 1)"
+            },
+            "f8d4c9fc-8554-4553-b7e5-bcbd7147c87a": {
+                id: "f8d4c9fc-8554-4553-b7e5-bcbd7147c87a",
+                number: 10,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD10TheReactionPart2.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD10TheReactionPart2.mp3",
+                description: "Resistance and Rejection (Part 2)"
+            },
+            "957bff86-892b-4bf3-84e4-d10f68653a62": {
+                id: "957bff86-892b-4bf3-84e4-d10f68653a62",
+                number: 11,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD11TheEarlyImmigrantsPartI.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD11TheEarlyImmigrantsPartI.mp3",
+                description: "Braving the Unknown (Part 1)"
+            },
+            "97e0e870-9abd-4f53-9abf-a43a3d6e005f": {
+                id: "97e0e870-9abd-4f53-9abf-a43a3d6e005f",
+                number: 12,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD12TheEarlyImmigrantsPartII.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD12TheEarlyImmigrantsPartII.mp3",
+                description: "Sacrifice and Struggle (Part 2)"
+            },
+            "52f960b3-bd46-4334-994e-2629eda60c1e": {
+                id: "52f960b3-bd46-4334-994e-2629eda60c1e",
+                number: 13,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD13MajorEvents.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD13MajorEvents.mp3",
+                description: "Turning Points in Makkah"
+            },
+            "449180d5-d4e5-46a8-ad10-47322da94671": {
+                id: "449180d5-d4e5-46a8-ad10-47322da94671",
+                number: 14,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD14TheLaterYearsOfMakkah.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD14TheLaterYearsOfMakkah.mp3",
+                description: "End of an Era in Makkah"
+            },
+            "50c0d1a4-b877-488c-87f6-00cc146513e8": {
+                id: "50c0d1a4-b877-488c-87f6-00cc146513e8",
+                number: 15,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD15InSearchOfABase.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD15InSearchOfABase.mp3",
+                description: "A New Dawn: Seeking a Base"
+            },
+            "832aee39-48c8-4db4-85d5-7005499daab2": {
+                id: "832aee39-48c8-4db4-85d5-7005499daab2",
+                number: 16,
+                stream: "https://archive.org/download/lifeofmuhammadmakkah/CD16TheRoadToMadinah.mp3",
+                download: "https://archive.org/download/lifeofmuhammadmakkah/CD16TheRoadToMadinah.mp3",
+                description: "Towards Madinah: Path to Hijrah"
+            }
+        }
+    },
     "a3bc8692-476f-4d2d-98df-3fc498321517": {
         id: "a3bc8692-476f-4d2d-98df-3fc498321517",
         name: "The Lives of the Prophets",
-        image: require('@/assets/images/podcasts/a3bc8692-476f-4d2d-98df-3fc498321517/cover.webp'),
-        remoteImage: 'https://zaynab.s3.eu-west-2.amazonaws.com/The+Lives+of+the+Prophets/background.webp',
-        background: require('@/assets/images/podcasts/a3bc8692-476f-4d2d-98df-3fc498321517/background.webp'),
+        image: require('@/assets/images/podcasts/a3bc8692-476f-4d2d-98df-3fc498321517/image.png'),
+        remoteImage: 'https://d21y2nonaorlw9.cloudfront.net/The+Lives+of+the+Prophets/image.png',
+        background: require('@/assets/images/podcasts/a3bc8692-476f-4d2d-98df-3fc498321517/image.png'),
         description: "Discover 'The Lives of the Prophets,' an English series grounded in the Quran and Hadith and based on Ibn Kathir's works. This scholarly series provides a captivating look at the prophets' lives, ideal for deepening your understanding.",
         subTitle: "Explore prophetic histories with authenticity and depth.",
         episodes: {
@@ -158,5 +281,5 @@ export const Podcasts: Record<string, Podcast> = {
                 description: "The Family Of Imran"
             }
         }
-    }
+    },
 }

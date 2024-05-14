@@ -18,6 +18,7 @@ export const setupPlayer = async (): Promise<void> => {
                     Capability.SkipToNext,
                     Capability.SkipToPrevious,
                     Capability.Stop,
+                    Capability.SeekTo,
                 ],
 
                 android: {
@@ -28,7 +29,14 @@ export const setupPlayer = async (): Promise<void> => {
                 progressUpdateEventInterval: 1,
 
                 // Capabilities that will show up when the notification.click is in the compact form on Android
-                compactCapabilities: [Capability.Play, Capability.Pause],
+                compactCapabilities: [
+                    Capability.Play,
+                    Capability.Pause,
+                    Capability.SkipToNext,
+                    Capability.SkipToPrevious,
+                    Capability.Stop,
+                    Capability.SeekTo,
+                ],
             }
         )
 

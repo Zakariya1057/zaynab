@@ -50,13 +50,13 @@ export default function EpisodePlayer({ edges = [] }: { edges?: Edge[] }) {
                     <YStack height={'100%'} backgroundColor="$color.purple" borderTopRightRadius={10} borderBottomRightRadius={10} width={`${(position / duration) * 100}%`} />
                 </YStack>
 
-                <XStack flexDirection="row" paddingHorizontal={16} paddingVertical={10} alignItems="center" height={65}>
+                <XStack flexDirection="row" paddingHorizontal={'$3'} alignItems="center" height={65}>
                     <Image src={episode.image ?? podcast.image} width={45} height={40} borderRadius={5} resizeMode="cover" />
-                    <YStack marginLeft={12} justifyContent="center" f={1} gap={'$1'}>
+                    <YStack marginLeft={12} justifyContent="space-between" f={1} gap={'$1.5'}>
                         <Text fontSize={15} fontWeight="600" numberOfLines={1}>
                             { track?.title }
                         </Text>
-                        <Text fontSize={14}>
+                        <Text fontSize={14} numberOfLines={1}>
                             { track?.artist }
                         </Text>
                     </YStack>

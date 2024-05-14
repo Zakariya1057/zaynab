@@ -2,35 +2,37 @@
   "expo": {
     "name": "Zaynab",
     "slug": "zaynab",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "dark",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/splash3.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#4e42b5"
     },
     "ios": {
       "icon": "./assets/logo.png",
-      "splash": {
-        "image": "./assets/android-splash.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#9039cf"
-      },
       "supportsTablet": true,
       "bundleIdentifier": "zakariyamohummed.zaynab.com",
       "infoPlist": {
-        "UIBackgroundModes": ["audio", "fetch"],
-        "NSUserNotificationUsageDescription": "This app uses notifications to remind you to finish your episode."
+        "UIBackgroundModes": [
+          "audio",
+          "fetch"
+        ],
+        "NSUserNotificationUsageDescription": "This app uses notifications to remind you to finish your episode.",
+        "ITSAppUsesNonExemptEncryption": false,
+        "ITSAppUsesEncryption": false
       }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo.png",
-        "backgroundColor": "#9039cf"
+        "backgroundColor": "#4e42b5"
       },
       "package": "zakariyamohummed.zaynab.com",
       "permissions": [
@@ -40,28 +42,28 @@
         "FOREGROUND_SERVICE",
         "INTERNET",
         "ACCESS_NETWORK_STATE"
-      ],
-      "splash": {
-        "image": "./assets/android-splash.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#9039cf"
-      }
+      ]
     },
     "plugins": [
       "expo-router",
       "expo-build-properties",
-      ["@morrowdigital/watermelondb-expo-plugin"],
+      [
+        "@morrowdigital/watermelondb-expo-plugin"
+      ],
       [
         "expo-build-properties",
         {
           "android": {
             "kotlinVersion": "1.6.10",
             "packagingOptions": {
-              "pickFirst": ["**/libc++_shared.so"]
+              "pickFirst": [
+                "**/libc++_shared.so"
+              ]
             }
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
@@ -71,7 +73,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "950794c4-275a-4f87-a0a3-c5df8c91c6a1"
+        "projectId": "96861c2e-295d-408f-93c5-184bafd96168"
       }
     }
   }

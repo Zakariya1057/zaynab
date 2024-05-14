@@ -1,13 +1,16 @@
 import React from 'react';
-import {Button, H2, Image, Text, useTheme, YStack} from 'tamagui';
+import {Button, H2, H3, Image, Text, useTheme, YStack} from 'tamagui';
 import EpisodeHeader from './EpisodeHeader';
-import {Play, Pause} from '@tamagui/lucide-icons';
-import {State, usePlaybackState} from "react-native-track-player"; // Ensure you have the correct icon import
+import {State, useActiveTrack, usePlaybackState} from "react-native-track-player";
+import {FontAwesome5} from "@expo/vector-icons"; // Ensure you have the correct icon import
 
 export default function SeriesHeader({ image, title, description, continuePlaying, play }: SeriesHeaderProps) {
+    const track = useActiveTrack()
     const { state } = usePlaybackState()
     const theme = useTheme();
     const purple = theme.purple.get()
+
+    const currentPodcastPlaying = track?.artist === title
 
     return (
         <>
@@ -35,16 +38,16 @@ export default function SeriesHeader({ image, title, description, continuePlayin
                     bottom={0}
                     top={0}
                 >
-                    <H2
+                    <H3
                         color="white"
                         textAlign="center"
                     >
                         {title}
-                    </H2>
+                    </H3>
 
                     <Button
                         icon={
-                            state === State.Playing ? (  <Pause color={purple} fill={purple} size={'$1'} /> ) : (  <Play color={purple} fill={purple} size={'$1'} /> )
+                            <FontAwesome5 name={currentPodcastPlaying && (state === State.Playing) ? 'pause' : 'play'} size={20} color={purple} />
                     } // Adjust the color according to your theme
                         onPress={play}
                         size="$4"
@@ -53,9 +56,11 @@ export default function SeriesHeader({ image, title, description, continuePlayin
                         alignSelf="center"
                         backgroundColor="rgba(0,0,0,0.60)"
                         borderColor={purple}
-                        borderWidth={'$0.5'}
+                        borderWidth={1.8}
                     >
-                        { state === State.Playing ? 'Pause' :  ( continuePlaying ? 'Resume' : 'Play' ) }
+                        {
+                            currentPodcastPlaying ? (  state === State.Playing ? 'Pause' :  ( continuePlaying ? 'Resume' : 'Play' ) ) : ( continuePlaying ? 'Resume' : 'Play')
+                        }
                     </Button>
 
                     <Text

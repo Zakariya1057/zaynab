@@ -7,4 +7,7 @@ module.exports = async function() {
     TrackPlayer.addEventListener(Event.RemoteNext, () => TrackPlayer.skipToNext());
     TrackPlayer.addEventListener(Event.RemoteStop, () => TrackPlayer.stop());
     TrackPlayer.addEventListener(Event.RemotePrevious, () => TrackPlayer.skipToPrevious());
+    TrackPlayer.addEventListener(Event.RemoteSeek, async (seekTo) => {
+        await TrackPlayer.seekTo(seekTo.position);
+    });
 }

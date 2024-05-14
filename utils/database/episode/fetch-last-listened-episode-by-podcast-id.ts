@@ -16,7 +16,7 @@ export const fetchLastListenedEpisodeByPodcastId = async (podcastId: string): Pr
         ).fetch();
 
         if (episodes.length > 0) {
-            return episodes[0] as EpisodeModel; // Assuming the first record is the most recently listened to
+            return episodes.at(-1) as EpisodeModel; // Assuming the first record is the most recently listened to
         } else {
             console.log('No listened episodes found for podcast ID:', podcastId);
             return null;

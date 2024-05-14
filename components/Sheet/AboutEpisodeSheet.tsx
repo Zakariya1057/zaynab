@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import {YStack, Text, useTheme, Paragraph, H3, H4} from 'tamagui';
+import {YStack, Text, useTheme, Paragraph, H3, H4, H5} from 'tamagui';
 import { Theme } from '../../constants';
 import BottomSheet from "@gorhom/bottom-sheet";
 
@@ -8,7 +8,7 @@ interface AboutEpisodeSheetProps {
 }
 
 export default function AboutEpisodeSheet({ about }: AboutEpisodeSheetProps) {
-    const snapPoints = useMemo(() => ['11%', '75%', '100%'], []);
+    const snapPoints = useMemo(() => ['10%', '75%', '100%'], []);
 
     const theme = useTheme()
 
@@ -30,9 +30,9 @@ export default function AboutEpisodeSheet({ about }: AboutEpisodeSheetProps) {
             backgroundStyle={{ backgroundColor: theme.background.get() }}
         >
             <YStack f={1} px={Theme.spacing.large}>
-                <H4 color={'$color'} my={10}>
+                <H5 color={'$color'} my={10}>
                     About Episode
-                </H4>
+                </H5>
                 <Paragraph color={'$color'} mb={10}>
                     {about}
                 </Paragraph>

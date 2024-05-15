@@ -227,8 +227,8 @@ export const Podcasts: Record<string, Podcast> = {
             "da489ff6-8c42-4be3-8022-fb237e640d46": {
                 id: "da489ff6-8c42-4be3-8022-fb237e640d46",
                 number: 22,
-                stream: "https://archive.org/22/items/nooor90/22_-_The_People_Of_Paradise.mp3",
-                download: "https://archive.org/22/items/nooor90/22_-_The_People_Of_Paradise.mp3",
+                stream: "https://d21y2nonaorlw9.cloudfront.net/End+Times+Deep+Dive/audio/22_-_The_People_Of_Paradise/playlist.m3u8",
+                download: "https://d21y2nonaorlw9.cloudfront.net/End+Times+Deep+Dive/audio/22_-_The_People_Of_Paradise.mp3",
                 description: "The Inhabitants of Paradise"
             }
         }
@@ -1198,15 +1198,15 @@ export const Podcasts: Record<string, Podcast> = {
             "df1ca59c-2105-4d4c-8e9c-003ab3a9bfed": {
                 id: "df1ca59c-2105-4d4c-8e9c-003ab3a9bfed",
                 number: 14,
-                stream: "https://ia801506.us.archive.org/6/items/noo0or12/14_-_The_Opening_Of_The_Persian_Empire.mp3",
-                download: "https://ia801506.us.archive.org/6/items/noo0or12/14_-_The_Opening_Of_The_Persian_Empire.mp3",
+                stream: "https://d21y2nonaorlw9.cloudfront.net/Ummar+Ibn+Alkhataab+(RA)+%E2%80%93+His+Life+and+Time/audio/14_-_The_Opening_Of_The_Persian_Empire/playlist.m3u8",
+                download: "https://d21y2nonaorlw9.cloudfront.net/Ummar+Ibn+Alkhataab+(RA)+%E2%80%93+His+Life+and+Time/audio/14_-_The_Opening_Of_The_Persian_Empire.mp3",
                 description: "The Opening Of The Persian Empire"
             },
             "f68e23e9-65fa-4626-814d-97418695bb67": {
                 id: "f68e23e9-65fa-4626-814d-97418695bb67",
                 number: 15,
-                stream: "https://ia601506.us.archive.org/6/items/noo0or12/15_-_The_Opening_Of_The_Persian_Empire.mp3",
-                download: "https://ia601506.us.archive.org/6/items/noo0or12/15_-_The_Opening_Of_The_Persian_Empire.mp3",
+                stream: "https://d21y2nonaorlw9.cloudfront.net/Ummar+Ibn+Alkhataab+(RA)+%E2%80%93+His+Life+and+Time/audio/15_-_The_Opening_Of_The_Persian_Empire/playlist.m3u8",
+                download: "https://d21y2nonaorlw9.cloudfront.net/Ummar+Ibn+Alkhataab+(RA)+%E2%80%93+His+Life+and+Time/audio/15_-_The_Opening_Of_The_Persian_Empire.mp3",
                 description: "The Opening Of The Persian Empire"
             },
             "7ab38051-a7af-4b2f-9e0e-013fc1a7b553": {

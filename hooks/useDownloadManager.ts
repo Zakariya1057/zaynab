@@ -10,20 +10,28 @@ import { getDownloadById } from "@/utils/database/download/get-download-by-id";
 import { insertDownload } from "@/utils/database/download/insert-download";
 import { DownloadModel } from "@/utils/database/models/download-model";
 import { useDownloads } from "@/contexts/download-context";
-import { debounce } from "@/utils/debounce/debounce";
 import { showToast } from "@/utils/toast/show-toast";
 import { getDownloadInProgress } from "@/utils/database/download/get-download-in-progress";
 import { updateTrackUrlOnDownloadComplete } from "@/utils/track/update-track-url-on-download-complete";
 import { getFileExtension } from "@/utils/url/get-file-extension";
 import { getSetting } from "@/utils/cache/setting-cache";
 import { SettingKey } from "@/interfaces/setting-key";
+import {
+    clearActiveDownload,
+    getActiveDownload,
+    setActiveDownload,
+    updateActiveDownload
+} from "@/utils/download/active-download";
+import {throttleDebounce} from "@/utils/debounce/throttle-debounce";
 
 const useDownloadManager = () => {
     const { addDownload, removeDownload, isDownloading, setDownloadResumable } = useDownloads();
 
-    const debouncedUpdateProgress = debounce(async (id: string, totalBytesWritten: number, totalBytesExpectedToWrite: number) => {
+    const throttledDebouncedUpdateProgress = throttleDebounce(async (id: string, totalBytesWritten: number, totalBytesExpectedToWrite: number) => {
         const progress = totalBytesWritten / totalBytesExpectedToWrite;
         console.log(`Download progress for ${id}: ${progress * 100}%`, totalBytesWritten, totalBytesExpectedToWrite);
+
+        updateActiveDownload(id);
 
         await upsertDownload({
             episodeId: id,
@@ -32,7 +40,7 @@ const useDownloadManager = () => {
             downloaded: progress === 1,
             error: null
         }, true);
-    }, 1000);
+    }, 1000, 5000); // Adjust throttle and debounce times as needed
 
     const downloadAudios = async (episodes: Partial<DownloadModel>[], upsert: boolean = true): Promise<void> => {
         if (episodes.length === 0) {
@@ -49,12 +57,21 @@ const useDownloadManager = () => {
     };
 
     const downloadAudio = async (episode: Partial<DownloadModel>): Promise<void> => {
-        if (isDownloading(episode.episodeId)) {
-            console.log('Download already in progress for this episode');
-            return; // Prevents starting a new download if it's already in progress
-        }
+        const lastDownload = getActiveDownload();
+        const now = new Date();
 
-        addDownload(episode.episodeId);
+        console.log('Last Active Download', lastDownload)
+
+        if (lastDownload) {
+            // const timeDifference = now.getTime() - lastDownload.updatedAt.getTime();
+            // const thirtySeconds = 30 * 1000;
+
+            // if (timeDifference < thirtySeconds) {
+                await upsertDownload(episode)
+                console.log('Downloading something else, wait your turn pal....');
+                return;
+            // }
+        }
 
         const existingDownload = await getDownloadById(episode.episodeId);
         if (existingDownload) {
@@ -94,7 +111,7 @@ const useDownloadManager = () => {
 
     const updateProgress = (id: string, progressData: DownloadProgressData) => {
         const { totalBytesWritten, totalBytesExpectedToWrite } = progressData;
-        debouncedUpdateProgress(id, totalBytesWritten, totalBytesExpectedToWrite);
+        throttledDebouncedUpdateProgress(id, totalBytesWritten, totalBytesExpectedToWrite);
     };
 
     const startOrResumeDownload = async (id: string, url: string): Promise<void> => {
@@ -103,6 +120,8 @@ const useDownloadManager = () => {
         // const pausedDownloadState = await AsyncStorage.getItem(`pausedDownload-${id}`);
 
         let downloadResumable;
+
+        setActiveDownload(id)
 
         try {
             // let downloadSnapshot = JSON.parse(pausedDownloadState ?? '{}');
@@ -125,6 +144,7 @@ const useDownloadManager = () => {
             console.error('Download failed:', error);
 
             // Maybe wait a little try again 3 times then mark as failed to download and proceed to next item in the list
+            clearActiveDownload()
 
             showToast('error', 'Download Failed', 'Failed to download episode!');
 
@@ -148,6 +168,8 @@ const useDownloadManager = () => {
         } else {
             console.log('Download aborted for:', id);
         }
+
+        clearActiveDownload()
 
         removeDownload(id);
 

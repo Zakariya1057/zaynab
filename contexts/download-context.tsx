@@ -38,7 +38,6 @@ export const DownloadProvider: React.FC<Props> = ({ children }) => {
     };
 
     const activelyDownloading = () => {
-        console.log(activeDownloads)
         return activeDownloads.size > 0;
     }
 

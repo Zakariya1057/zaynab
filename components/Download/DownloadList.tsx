@@ -27,44 +27,6 @@ interface DownloadItemProps {
     highlightedItemsFound: boolean
 }
 
-const DownloadItemModal = ({ modalVisible, setModalVisible, handlePauseDownload, handleDeleteDownload }) => {
-    return (
-        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
-            >
-                <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor="rgba(0, 0, 0, 0.5)">
-                    <YStack width={320} minHeight={200} padding={20} backgroundColor={'$background'} borderRadius={12}
-                            alignItems="center" elevation={5} gap={'$6'}>
-                        <Text fontSize={'$7'} fontWeight="bold" color={'$text'}>
-                            Manage Download
-                        </Text>
-
-                        <YStack gap={'$4'} alignItems={'center'} width={'100%'}>
-                            <Button backgroundColor="$blue5" borderRadius={10} width="100%"
-                                    onPress={handlePauseDownload}>
-                                <Text fontSize={'$5'}>Pause Download</Text>
-                            </Button>
-                            <Button onPress={handleDeleteDownload} backgroundColor="$red5" borderRadius={10}
-                                    width="100%">
-                                <Text fontSize={'$5'}>Delete Download</Text>
-                            </Button>
-                        </YStack>
-
-                        <Button onPress={() => setModalVisible(false)} backgroundColor="$gray5" borderRadius={10}
-                                width="100%">
-                            <Text fontSize={'$5'}>Cancel</Text>
-                        </Button>
-                    </YStack>
-                </YStack>
-            </Modal>
-        </TouchableWithoutFeedback>
-    );
-};
-
 const DownloadItem: React.FC<DownloadItemProps> = ({ download, status, highlight, setHighlightedId, highlightedItemsFound }) => {
     const { podcastId, episodeId, totalBytesWritten, totalBytesExpectedToWrite, downloaded, error } = download
 
@@ -195,15 +157,13 @@ const DownloadsList = ({ downloads }) => {
         const waitingToDownload = data.filter(d => !d.error && !d.downloaded && d.totalBytesWritten === 0);
         const inProgressPaused = data
             .filter(d => !d.error && !d.downloaded && d.totalBytesWritten > 0 && d.totalBytesExpectedToWrite > d.totalBytesWritten)
-            .splice()
-            .sort((a, b) => a.downloadStartedAt - b.downloadStartedAt);
 
         const failedToDownload = data.filter(d => d.error);
         const completedDownloads = data.filter(d => d.downloaded);
 
         return [
-            { title: DownloadStatus.CompletedDownload, data: completedDownloads },
             { title: DownloadStatus.InProgress, data: inProgressPaused },
+            { title: DownloadStatus.CompletedDownload, data: completedDownloads },
             { title: DownloadStatus.DownloadFailed, data: failedToDownload },
             { title: DownloadStatus.WaitingToDownload, data: waitingToDownload },
         ].filter(section => section.data.length > 0);
@@ -305,5 +265,10 @@ const DownloadsList = ({ downloads }) => {
 };
 
 export default withDatabase(withObservables(['downloads'], () => ({
-    downloads: database.collections.get('downloads').query(Q.sortBy('downloadUpdatedAt', Q.desc)).observeWithColumns(['downloadUpdatedAt'])
+    downloads: database.collections
+        .get('downloads').query(
+            Q.sortBy('downloadUpdatedAt', Q.desc)
+        ).observeWithColumns(
+            ['totalBytesWritten']
+        )
 }))(DownloadsList));

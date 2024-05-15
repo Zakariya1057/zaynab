@@ -45,5 +45,5 @@ export const upsertDownload = async (downloadData: Partial<DownloadModel>, updat
                 newDownload.downloadCompletedAt = downloadData.downloaded ? time : null;
             });
         }
-    });
+    }, 'upsert-download');
 }

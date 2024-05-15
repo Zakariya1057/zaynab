@@ -1,65 +1,68 @@
 import { useEffect } from "react";
-import TrackPlayer, {useActiveTrack, useProgress, State, Event} from "react-native-track-player";
+import TrackPlayer, { State, Event } from "react-native-track-player";
 import { upsertEpisode } from "@/utils/database/episode/upsert-episode";
-import {getEpisodeNumberFromTitle} from "@/utils/episode/get-episode-number-from-title";
-import {field} from "@nozbe/watermelondb/decorators";
-import {updateEpisode} from "@/utils/cache/episode-cache";
+import { getEpisodeNumberFromTitle } from "@/utils/episode/get-episode-number-from-title";
+import { updateEpisode } from "@/utils/cache/episode-cache";
+import { debounce } from "@/utils/debounce/debounce";
+
+const update = debounce(async (track, position, duration, podcastId, episodeId, episodeNumber) => {
+    await upsertEpisode({
+        ...track,
+        position: position,
+        duration: duration,
+        complete: (position === duration).toString(),
+        podcastId,
+        episodeId,
+        number: episodeNumber,
+        remoteImage: track.artwork
+    });
+
+    console.log('Progress updated for:', track.title, position, duration);
+}, 1000);
 
 export const recordAudioPosition = () => {
     useEffect(() => {
         const updateEpisodeProgress = async () => {
-
             const { position, duration } = await TrackPlayer.getProgress();
 
             try {
-                let track = await TrackPlayer.getActiveTrack()
-                let { state } = await TrackPlayer.getPlaybackState()
+                let track = await TrackPlayer.getActiveTrack();
+                let { state } = await TrackPlayer.getPlaybackState();
 
                 if (state === State.Loading) {
-                    return
+                    return;
                 }
 
-                if (position === 0 || duration === 0){
-                    return
+                if (position === 0 || duration === 0) {
+                    return;
                 }
 
                 if (track) {
                     try {
-                        const [ podcastId, episodeId ] = (track.description?.split('|') ?? [])
+                        const [podcastId, episodeId] = (track.description?.split('|') ?? []);
 
-                        if (!podcastId || !episodeId) return null
+                        if (!podcastId || !episodeId) return;
 
-                        const episodeNumber = getEpisodeNumberFromTitle(track.title)
+                        const episodeNumber = getEpisodeNumberFromTitle(track.title);
 
-                        await upsertEpisode({
-                            ...track,
-                            position: position,
-                            duration: duration,
-                            complete: (position === duration).toString(),
-                            podcastId,
-                            episodeId,
-                            number: episodeNumber,
-                            remoteImage: track.artwork
-                        });
+                        updateEpisode(track.description ?? '', { position, duration });
 
-                        updateEpisode(track.description ?? '', { position, duration })
-
-                        // console.log('Progress updated for:', track.title, position, duration);
+                        await update(track, position, duration, podcastId, episodeId, episodeNumber);
                     } catch (error) {
                         console.error('Error updating episode progress:', error);
                     }
                 }
-            } catch {
-
+            } catch (error) {
+                console.error('Error getting track info:', error);
             }
         };
 
         const subscriptions = [
             TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, updateEpisodeProgress),
-        ]
+        ];
 
         return () => {
-            subscriptions.forEach((subscription) => subscription.remove())
+            subscriptions.forEach((subscription) => subscription.remove());
         };
     }, []);
-}
+};

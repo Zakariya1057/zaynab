@@ -19,5 +19,5 @@ export const insertDownload = async (downloadData: Partial<DownloadModel>) => {
             newDownload.downloadStartedAt = time;
             newDownload.downloadCompletedAt = time;
         });
-    });
+    }, 'insertDownload');
 }

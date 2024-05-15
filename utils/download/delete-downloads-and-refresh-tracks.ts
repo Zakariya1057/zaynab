@@ -7,6 +7,7 @@ export const deleteDownloadsAndRefreshTracks = async (downloads: DownloadModel[]
     for (const download of downloads) {
         await deleteLocalFile(download);  // Deletes the local file associated with the download.
         await deleteDownloadRecord(download);  // Removes the record from the database.
-        await refreshTrackUrlsAfterDeletion();  // Refreshes track URLs to reflect the deletions.
     }
+
+    await refreshTrackUrlsAfterDeletion();
 }

@@ -52,7 +52,7 @@ export default function EpisodePlayer({ edges = [] }: { edges?: Edge[] }) {
 
                 <XStack flexDirection="row" paddingHorizontal={'$3'} alignItems="center" height={65}>
                     <Image src={episode.image ?? podcast.image} width={45} height={40} borderRadius={5} resizeMode="cover" />
-                    <YStack marginLeft={12} justifyContent="space-between" f={1} gap={'$1.5'}>
+                    <YStack marginLeft={12} justifyContent="space-between" f={1} gap={'$1.5'} mr={'$4'}>
                         <Text fontSize={15} fontWeight="600" numberOfLines={1}>
                             { track?.title }
                         </Text>

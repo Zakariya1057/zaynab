@@ -22,7 +22,7 @@ export const refreshTrackUrlsAfterDeletion = async () => {
         return;
     }
 
-    const podcast = await getPodcastById(podcastId);
+    const podcast = getPodcastById(podcastId);
 
     let updatesNeeded: { index: number, newTrack: Track }[] = [];
 

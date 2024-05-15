@@ -1,51 +1,62 @@
+import React, { useCallback, useState } from "react";
+import { RefreshControl, SectionList } from "react-native";
 import {
     Text,
     YStack,
     XStack,
     Stack,
-    useTheme, View
+    useTheme,
+    View
 } from 'tamagui';
-import {RefreshControl, SectionList} from "react-native";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
-import React, {useCallback, useState} from "react";
-import {Podcasts} from "@/utils/data/podcasts";
-import {useEpisodes} from "@/hooks/useEpisodes";
+import { useEpisodes } from "@/hooks/useEpisodes";
 import ContinueListening from "@/components/ContinueListening/ContinueListening";
-import {PodcastElement} from "@/components/Podcast/PodcastElement";
+import { PodcastElement } from "@/components/Podcast/PodcastElement";
+import RecentPodcasts from "@/components/RecentPocasts/RecentPodcasts";
+import { Podcasts } from "@/utils/data/podcasts";
 
 export default function App() {
-    const {episodes, retry} = useEpisodes()
+    const { episodes, retry } = useEpisodes();
     const [refreshing, setRefreshing] = useState(false);
 
     const theme = useTheme();
-    const purple = theme.purple.get()
+    const purple = theme.purple.get();
 
     const onRefresh = useCallback(async () => {
-        setRefreshing(true)
-        await retry()
-        setRefreshing(false)
-    }, [])
+        setRefreshing(true);
+        await retry();
+        setRefreshing(false);
+    }, [retry]);
 
     const sections = [
         ...episodes.length > 0 ? [{
-            title: "Continue Listening",
+            title: "Keep Listening",
             data: [1]
         }] : [], // Only add this section if there are episodes
+        // {
+        //     title: "Recently Viewed",
+        //     data: [1] // Placeholder data for section
+        // },
         {
-            title: "Popular Podcasts",
+            title: "Popular",
             data: Object.values(Podcasts) // Assuming Podcasts is an array
-        }
+        },
     ];
 
     const renderItem = ({ section, item }) => {
-        if (section.title === "Continue Listening") {
+        if (section.title === "Keep Listening") {
             // Render a horizontal list for this section
-            return <ContinueListening />
+            return <ContinueListening />;
+        } else if (section.title === "Recently Viewed") {
+            // Render RecentPodcasts component for this section
+            return <RecentPodcasts />;
         } else {
             // Render a single item for other sections
-            return <View px={'$3'} mb={'$2'}>
-                <PodcastElement podcast={item} />
-            </View>;
+            return (
+                <View px={'$3'} mb={'$3'}>
+                    <PodcastElement podcast={item} />
+                </View>
+            );
         }
     };
 
@@ -71,5 +82,5 @@ export default function App() {
             />
             <CompactAudioPlayer edges={[]} />
         </Stack>
-    )
+    );
 }

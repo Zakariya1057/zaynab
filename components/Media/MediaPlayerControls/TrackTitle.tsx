@@ -5,13 +5,8 @@ import {H4, YStack} from "tamagui";
 import {NativeSyntheticEvent, TextLayoutEventData} from "react-native/Libraries/Types/CoreEventTypes";
 
 export const TrackTitle = ({ title }: { title: string }) => {
-    const [isMarqueeNeeded, setIsMarqueeNeeded] = useState(false);
-    const [textWidth, setTextWidth] = useState(0);
+    const [isMarqueeNeeded, setIsMarqueeNeeded] = useState(true);
     const [containerWidth, setContainerWidth] = useState(0);
-
-    const checkIfMarqueeNeeded = (textWidth: number, containerWidth: number) => {
-        setIsMarqueeNeeded(textWidth > containerWidth);
-    };
 
     const onTextLayout = (event: NativeSyntheticEvent<TextLayoutEventData>) => {
         if (event.nativeEvent.lines.length === 0) {
@@ -24,10 +19,18 @@ export const TrackTitle = ({ title }: { title: string }) => {
         setIsMarqueeNeeded(percentage >= 97)
     };
 
+    const onHeadingTextLayout = (event: NativeSyntheticEvent<TextLayoutEventData>) => {
+        const lines = event.nativeEvent.lines.length
+        if (lines === 0) {
+            return
+        }
+
+        setIsMarqueeNeeded(lines === 2)
+    };
+
     const onContainerLayout = (event: LayoutChangeEvent) => {
         const {width} = event.nativeEvent.layout;
         setContainerWidth(width);
-        checkIfMarqueeNeeded(textWidth, width);
     };
 
     return (

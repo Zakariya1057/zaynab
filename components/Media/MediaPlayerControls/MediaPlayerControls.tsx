@@ -60,7 +60,7 @@ const MediaPlayerControls: React.FC<Props> = ({
                         <FontAwesome5 name="random" size={size} color={!shuffleOn ? color : purple} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={playPrev} disabled={isFirst}>
+                    <TouchableOpacity onPress={playPrev} disabled={isFirst} style={{ padding: 10 }}>
                         <FontAwesome5 size={size} name="backward" color={isFirst ? 'grey' : color} strokeWidth={strokeWidth} />
                     </TouchableOpacity>
 
@@ -90,7 +90,7 @@ const MediaPlayerControls: React.FC<Props> = ({
                         </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={playNext} disabled={isLast}>
+                    <TouchableOpacity onPress={playNext} disabled={isLast} style={{ padding: 10 }}>
                         <FontAwesome5 name="forward" size={size} color={isLast ? 'grey' : color} strokeWidth={strokeWidth} />
                     </TouchableOpacity>
 

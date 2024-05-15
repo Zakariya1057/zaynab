@@ -36,5 +36,5 @@ export const upsertEpisode = async (episodeData: Partial<EpisodeModel>) => {
                 newEpisode.episodeUpdatedAt = time;
             });
         }
-    });
+    }, 'upsertEpisode');
 }

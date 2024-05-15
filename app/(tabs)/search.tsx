@@ -70,7 +70,7 @@ export default function App() {
                         keyExtractor={(item, index) => item.id || index.toString()}
                         renderItem={renderItem}
                         showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ rowGap: 20 }}
+                        contentContainerStyle={{ rowGap: 25 }}
                     />
                 ) : (
                     <YStack ai='center' jc='center' f={1}>

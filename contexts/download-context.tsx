@@ -5,6 +5,7 @@ interface DownloadContextType {
     addDownload: (episodeId: string) => void;
     removeDownload: (episodeId: string) => void;
     isDownloading: (episodeId: string) => boolean;
+    activelyDownloading: () => boolean;
     setDownloadResumable: (episodeId: string, resumable: DownloadResumable | null) => void; // Updated function to set download resumable
     getDownloadResumable: (episodeId: string) => DownloadResumable | null; // Updated function to get download resumable
 }
@@ -36,6 +37,11 @@ export const DownloadProvider: React.FC<Props> = ({ children }) => {
         return activeDownloads.has(episodeId);
     };
 
+    const activelyDownloading = () => {
+        console.log(activeDownloads)
+        return activeDownloads.size > 0;
+    }
+
     const setDownloadResumable = (episodeId: string, resumable: DownloadResumable | null) => {
         setDownloadResumables(prev => new Map(prev.set(episodeId, resumable)));
     };
@@ -49,6 +55,7 @@ export const DownloadProvider: React.FC<Props> = ({ children }) => {
             addDownload,
             removeDownload,
             isDownloading,
+            activelyDownloading,
             setDownloadResumable,
             getDownloadResumable,
         }}>

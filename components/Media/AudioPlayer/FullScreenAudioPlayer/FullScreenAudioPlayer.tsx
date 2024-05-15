@@ -11,13 +11,14 @@ import MediaImage from '../../MediaPlayerControls/MediaImage';
 import {Theme} from "@/constants";
 import {Podcast} from "@/interfaces/podcast";
 import {Episode} from "@/interfaces/episode";
-import {RefreshControl} from "react-native";
+import {RefreshControl, Touchable, TouchableOpacity} from "react-native";
 import {useTrackManager} from "@/hooks/useTrackManager";
 import {showToast} from "@/utils/toast/show-toast";
 import {playNextTrack} from "@/utils/track/play-next-track";
 import {playPrevTrack} from "@/utils/track/play-prev-track";
 import useDownloadEpisode from "@/hooks/useDownloadEpisode";
 import {TrackTitle} from "@/components/Media/MediaPlayerControls/TrackTitle";
+import {router} from "expo-router";
 
 export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, episode: Episode }) {
     const track = useActiveTrack()
@@ -90,6 +91,8 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
         await TrackPlayer.retry()
     }
 
+    const openPodcast = () => router.push({pathname: "/series/", params: { id: podcast.id }})
+
     return (
         <ScrollView
             refreshControl={
@@ -116,13 +119,17 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
 
                 <YStack mt="$2" minHeight={55}>
                     <TrackTitle title={track?.title ?? ''} />
-                    <Paragraph
-                        textAlign="center"
-                        color={'$color'}
-                        numberOfLines={1}
-                    >
-                        {track?.artist}
-                    </Paragraph>
+
+                    <TouchableOpacity onPress={openPodcast} style={{ padding: 10, top: -7 }}>
+                        <Paragraph
+                            textAlign="center"
+                            color={'$color'}
+                            numberOfLines={1}
+                        >
+                            {track?.artist}
+                        </Paragraph>
+                    </TouchableOpacity>
+
                 </YStack>
 
                 <MediaProgressSlider

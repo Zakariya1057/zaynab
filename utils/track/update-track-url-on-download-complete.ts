@@ -3,7 +3,7 @@ import { getDownloadById } from "@/utils/database/download/get-download-by-id";
 import {showToast} from "@/utils/toast/show-toast";
 
 // Function to update track URLs from remote to local upon download completion
-export const updateTrackUrlOnDownloadComplete = async () => {
+export const updateTrackUrlOnDownloadComplete = async (id: string) => {
     console.log('Starting track URL update post-download completion');
     const tracks = await TrackPlayer.getQueue();
     const activeTrack = await TrackPlayer.getActiveTrack();
@@ -31,6 +31,8 @@ export const updateTrackUrlOnDownloadComplete = async () => {
             }
         }
     }
+
+    console.log(updatesNeeded)
 
     // Apply the URL updates
     let activeTrackUpdated = false;

@@ -31,7 +31,7 @@ export const PodcastElement: React.FC<PodcastElementProps>  = ({podcast, showPla
                     resizeMode="cover"
                 />
                 <YStack f={1} justifyContent="center" gap="$2">
-                    <H5 lineHeight="$4" numberOfLines={2}>{name}</H5>
+                    <H5 lineHeight="$4" numberOfLines={2} fontSize={'$6'}>{name}</H5>
                     <Text fontSize={'$4'} numberOfLines={2}>{subTitle}</Text>
                 </YStack>
                 {

@@ -1,21 +1,23 @@
-import React, {useCallback, useMemo, useState} from 'react';
-import {Modal, RefreshControl, SectionList, TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
-import {withDatabase} from '@nozbe/watermelondb/DatabaseProvider';
-import {withObservables} from '@nozbe/watermelondb/react';
-import {Q} from '@nozbe/watermelondb';
-import {DownloadModel} from "@/utils/database/models/download-model";
-import {database} from "@/utils/database/setup";
-import {Button, Separator, Text, useTheme, XStack, YStack} from "tamagui";
-import {AnimatedCircularProgress} from "react-native-circular-progress";
-import {getPodcastById} from "@/utils/data/getPodcastById";
-import {getEpisodeById} from "@/utils/data/getEpisodeById";
-import {router, Stack} from "expo-router";
-import {Ionicons} from "@expo/vector-icons";
-import {DownloadStatus} from "@/interfaces/download-status";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Modal, RefreshControl, SectionList, TouchableOpacity, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import { withObservables } from '@nozbe/watermelondb/react';
+import { Q } from '@nozbe/watermelondb';
+import { DownloadModel } from "@/utils/database/models/download-model";
+import { database } from "@/utils/database/setup";
+import { Button, Separator, Text, useTheme, XStack, YStack } from "tamagui";
+import { AnimatedCircularProgress } from "react-native-circular-progress";
+import { getPodcastById } from "@/utils/data/getPodcastById";
+import { getEpisodeById } from "@/utils/data/getEpisodeById";
+import { router, Stack } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { DownloadStatus } from "@/interfaces/download-status";
 import useDownloadManager from "@/hooks/useDownloadManager";
-import {ArrowLeft, Download} from "@tamagui/lucide-icons";
-import {confirmDeleteDownloads} from "@/utils/download/confirm-delete-downloads";
-import {setAutoPlay} from "@/utils/track/auto-play";
+import { ArrowLeft, Download } from "@tamagui/lucide-icons";
+import { confirmDeleteDownloads } from "@/utils/download/confirm-delete-downloads";
+import { setAutoPlay } from "@/utils/track/auto-play";
+
+const PAGE_SIZE = 20; // Number of items to load per page
 
 interface DownloadItemProps {
     download: DownloadModel
@@ -25,7 +27,7 @@ interface DownloadItemProps {
     highlightedItemsFound: boolean
 }
 
-const DownloadItemModal = ({modalVisible, setModalVisible, handlePauseDownload, handleDeleteDownload}) => {
+const DownloadItemModal = ({ modalVisible, setModalVisible, handlePauseDownload, handleDeleteDownload }) => {
     return (
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
             <Modal
@@ -63,31 +65,30 @@ const DownloadItemModal = ({modalVisible, setModalVisible, handlePauseDownload, 
     );
 };
 
-const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight, setHighlightedId, highlightedItemsFound}) => {
-    const {podcastId, episodeId, totalBytesWritten, totalBytesExpectedToWrite, downloaded, error} = download
+const DownloadItem: React.FC<DownloadItemProps> = ({ download, status, highlight, setHighlightedId, highlightedItemsFound }) => {
+    const { podcastId, episodeId, totalBytesWritten, totalBytesExpectedToWrite, downloaded, error } = download
 
-    const {downloadAudio} = useDownloadManager();
+    const { downloadAudio } = useDownloadManager();
 
     if (!podcastId || !episodeId) {
-        return null
+        return null;
     }
 
-    const podcast = getPodcastById(podcastId)
-    const episode = getEpisodeById(podcast, episodeId)
+    const podcast = getPodcastById(podcastId);
+    const episode = getEpisodeById(podcast, episodeId);
 
-
-    const theme = useTheme()
-    const color = theme.color.get()
+    const theme = useTheme();
+    const color = theme.color.get();
 
     const downloadEpisode = async (download: DownloadModel) => {
-        await downloadAudio(download)
+        await downloadAudio(download);
     }
 
     const onPress = () => {
         if (highlightedItemsFound) {
-            handleLongPress()
+            handleLongPress();
         } else {
-           router.push({pathname: "/notification.click/", params: {podcastId, episodeId}});
+            router.push({ pathname: "/notification.click/", params: { podcastId, episodeId } });
         }
     }
 
@@ -110,7 +111,7 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight,
             onPress={onPress}
             delayLongPress={200}
             onLongPress={handleLongPress}
-            style={{backgroundColor: backgroundColor}}
+            style={{ backgroundColor: backgroundColor }}
             activeOpacity={0.93}
         >
             <XStack
@@ -148,48 +149,63 @@ const DownloadItem: React.FC<DownloadItemProps> = ({download, status, highlight,
                 </YStack>
 
                 {((timeDifference > 10) && (status === DownloadStatus.InProgress || status === DownloadStatus.WaitingToDownload)) && (
-                    <TouchableOpacity onPress={() => downloadEpisode(download)} style={{padding: 10}}>
-                        <Download size={25} color={'white'} strokeWidth={2}/>
+                    <TouchableOpacity onPress={() => downloadEpisode(download)} style={{ padding: 10 }}>
+                        <Download size={25} color={'white'} strokeWidth={2} />
                     </TouchableOpacity>
                 )}
 
                 {status === DownloadStatus.DownloadFailed && (
-                    <TouchableOpacity onPress={() => downloadEpisode(download)} style={{padding: 10}}>
-                        <Ionicons name="reload" size={25} color={color}/>
+                    <TouchableOpacity onPress={() => downloadEpisode(download)} style={{ padding: 10 }}>
+                        <Ionicons name="reload" size={25} color={color} />
                     </TouchableOpacity>
                 )}
 
             </XStack>
 
-            <Separator alignSelf="stretch" vertical={false}/>
+            <Separator alignSelf="stretch" vertical={false} />
 
         </TouchableOpacity>
     );
 }
 
 // Main component to display the list of downloads
-const DownloadsList = ({downloads}) => {
+const DownloadsList = ({ downloads }) => {
     const theme = useTheme();
     const purple = theme.purple.get();
 
     const [refreshing, setRefreshing] = useState(false);
     const [highlighted, setHighlighted] = useState({});
+    const [page, setPage] = useState(1);
+    const [data, setData] = useState(downloads.slice(0, PAGE_SIZE));
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+    useEffect(() => {
+        setData(downloads.slice(0, page * PAGE_SIZE));
+    }, [downloads, page]);
+
+    const loadMore = () => {
+        if (!isLoadingMore && data.length < downloads.length) {
+            setIsLoadingMore(true);
+            setPage(prevPage => prevPage + 1);
+            setIsLoadingMore(false);
+        }
+    };
 
     const sections = () => {
-        const waitingToDownload = downloads.filter(d => !d.error && !d.downloaded && d.totalBytesWritten === 0);
-        const inProgressPaused = downloads
+        const waitingToDownload = data.filter(d => !d.error && !d.downloaded && d.totalBytesWritten === 0);
+        const inProgressPaused = data
             .filter(d => !d.error && !d.downloaded && d.totalBytesWritten > 0 && d.totalBytesExpectedToWrite > d.totalBytesWritten)
             .splice()
-            .sort((a,b) => a.downloadStartedAt - b.downloadStartedAt);
+            .sort((a, b) => a.downloadStartedAt - b.downloadStartedAt);
 
-        const failedToDownload = downloads.filter(d => d.error);
-        const completedDownloads = downloads.filter(d => d.downloaded);
+        const failedToDownload = data.filter(d => d.error);
+        const completedDownloads = data.filter(d => d.downloaded);
 
         return [
-            {title: DownloadStatus.InProgress, data: inProgressPaused},
-            {title: DownloadStatus.DownloadFailed, data: failedToDownload},
-            {title: DownloadStatus.WaitingToDownload, data: waitingToDownload},
-            {title: DownloadStatus.CompletedDownload, data: completedDownloads},
+            { title: DownloadStatus.CompletedDownload, data: completedDownloads },
+            { title: DownloadStatus.InProgress, data: inProgressPaused },
+            { title: DownloadStatus.DownloadFailed, data: failedToDownload },
+            { title: DownloadStatus.WaitingToDownload, data: waitingToDownload },
         ].filter(section => section.data.length > 0);
     }
 
@@ -201,7 +217,7 @@ const DownloadsList = ({downloads}) => {
     }, []);
 
     const updateHighlighted = (id: string, download: DownloadModel) => {
-        setHighlighted(prev => ({...prev, [id]: download ? download : undefined}));
+        setHighlighted(prev => ({ ...prev, [id]: download ? download : undefined }));
     }
 
     const highlightedItemsFound = Object.values(highlighted).some(download => download !== null);
@@ -212,27 +228,37 @@ const DownloadsList = ({downloads}) => {
         const validDownloads = Object.values(highlighted).filter((download): download is DownloadModel => download !== null);
 
         confirmDeleteDownloads(validDownloads, async () => {
-            cancelHighlighted()
-            await startNextDownload()
-            setAutoPlay(true)
+            cancelHighlighted();
+            await startNextDownload();
+            setAutoPlay(true);
         });
     }
 
     const cancelHighlighted = () => {
-        setHighlighted({})
+        setHighlighted({});
     }
 
-    const headerRight = () =>  highlightedItemsFound ?
+    const headerRight = () => highlightedItemsFound ?
         <TouchableOpacity onPress={deleteHighlighted}>
-            <Ionicons name="trash-outline" size={28} color={'white'} style={{ paddingRight: 15 }}/>
+            <Ionicons name="trash-outline" size={28} color={'white'} style={{ paddingRight: 15 }} />
         </TouchableOpacity> : null
 
-    const headerLeft = () =>  highlightedItemsFound ?
+    const headerLeft = () => highlightedItemsFound ?
         <TouchableOpacity onPress={cancelHighlighted}>
             <ArrowLeft size={28} color="white" style={{ paddingLeft: 55 }} />
         </TouchableOpacity> : null
 
     const headerTitle = highlightedItemsFound ? '' : 'Downloads'
+
+    const renderFooter = () => {
+        if (data.length === downloads.length) return null;
+
+        return (
+            <YStack justifyContent="center" alignItems="center" padding="$4">
+                <ActivityIndicator size="large" color={purple} />
+            </YStack>
+        );
+    };
 
     return (
         <>
@@ -240,11 +266,11 @@ const DownloadsList = ({downloads}) => {
                 headerTitle,
                 headerRight,
                 headerLeft,
-            }}/>
+            }} />
             <SectionList
                 sections={sections()}
                 keyExtractor={(item, index) => item.id + index}
-                renderItem={({item, section: {title}}) => (
+                renderItem={({ item, section: { title } }) => (
                     <DownloadItem
                         download={item}
                         status={title}
@@ -253,7 +279,7 @@ const DownloadsList = ({downloads}) => {
                         highlightedItemsFound={highlightedItemsFound}
                     />
                 )}
-                renderSectionHeader={({section: {title}}) => (
+                renderSectionHeader={({ section: { title } }) => (
                     <YStack width="100%">
                         <XStack justifyContent="space-between" alignItems="center" backgroundColor={'$background'}
                                 py={'$3'}>
@@ -270,9 +296,11 @@ const DownloadsList = ({downloads}) => {
                         tintColor={purple}
                     />
                 }
+                onEndReached={loadMore}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={renderFooter}
             />
         </>
-
     );
 };
 

@@ -30,13 +30,13 @@ export default function NavigationBar({ goBack, download, downloadStatus }: Prop
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.container}>
-                <TouchableOpacity onPress={goBack}>
+                <TouchableOpacity onPress={goBack} style={{ padding: 15, left: -20, top: -15}}>
                     <ArrowLeft size={30} color="white" strokeWidth={2}/>
                 </TouchableOpacity>
 
                 <View style={{ flex: 1 }} />
 
-                <TouchableOpacity onPress={download}>
+                <TouchableOpacity onPress={download} style={{ padding: 15, right: -15, top: -15}}>
                     <DownloadIcon status={downloadStatus}/>
                 </TouchableOpacity>
             </SafeAreaView>

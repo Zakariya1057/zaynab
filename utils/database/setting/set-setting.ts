@@ -27,7 +27,7 @@ export const setSetting = async (key: SettingKey, value: boolean): Promise<void>
                 settingRecord.value = value;
             });
         }
-    }).catch(error => {
+    }, 'setSetting').catch(error => {
         console.error('Error setting value:', error);
         throw error;
     });

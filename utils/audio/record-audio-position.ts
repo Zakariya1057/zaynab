@@ -3,9 +3,9 @@ import TrackPlayer, { State, Event } from "react-native-track-player";
 import { upsertEpisode } from "@/utils/database/episode/upsert-episode";
 import { getEpisodeNumberFromTitle } from "@/utils/episode/get-episode-number-from-title";
 import { updateEpisode } from "@/utils/cache/episode-cache";
-import { debounce } from "@/utils/debounce/debounce";
+import {throttleDebounce} from "@/utils/debounce/throttle-debounce";
 
-const update = debounce(async (track, position, duration, podcastId, episodeId, episodeNumber) => {
+const update = throttleDebounce(async (track, position, duration, podcastId, episodeId, episodeNumber) => {
     await upsertEpisode({
         ...track,
         position: position,
@@ -18,7 +18,7 @@ const update = debounce(async (track, position, duration, podcastId, episodeId, 
     });
 
     console.log('Progress updated for:', track.title, position, duration);
-}, 1000);
+}, 1000, 5000);
 
 export const recordAudioPosition = () => {
     useEffect(() => {

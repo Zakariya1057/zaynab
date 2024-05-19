@@ -5,13 +5,14 @@ import {
     Download, Bookmark, Settings
 } from "@tamagui/lucide-icons";
 import {executeActionsBasedOnSettings} from "@/utils/actions/execute-actions-based-on-settings";
-import {useEffect} from "react";
+import React, {useEffect} from "react";
 import {getSetting, initializeSettingsCache} from "@/utils/cache/setting-cache";
 import {SettingKey} from "@/interfaces/setting-key";
 import {useRestartDownloadsOnBoot} from "@/hooks/useRestartDownloadOnBoot";
 import useDownloadManager from "@/hooks/useDownloadManager";
 import {setupNotifications} from "@/utils/notification/setup-notifications";
 import {prefetchLastPodcastTracks} from "@/utils/track/prefetch-last-podcast-tracks";
+import CompactAudioPlayer from "@/components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
 
 export default function TabLayout() {
     const {downloadAudios} = useDownloadManager();
@@ -82,7 +83,6 @@ export default function TabLayout() {
                     tabBarIcon: ({color}) => <Settings color={color}/>,
                 }}
             />
-
         </Tabs>
     )
 }

@@ -9,7 +9,6 @@ import { upsertDownload } from "@/utils/database/download/upsert-download";
 import { getDownloadById } from "@/utils/database/download/get-download-by-id";
 import { insertDownload } from "@/utils/database/download/insert-download";
 import { DownloadModel } from "@/utils/database/models/download-model";
-import { useDownloads } from "@/contexts/download-context";
 import { showToast } from "@/utils/toast/show-toast";
 import { getDownloadInProgress } from "@/utils/database/download/get-download-in-progress";
 import { updateTrackUrlOnDownloadComplete } from "@/utils/track/update-track-url-on-download-complete";
@@ -25,8 +24,6 @@ import {
 import {throttleDebounce} from "@/utils/debounce/throttle-debounce";
 
 const useDownloadManager = () => {
-    const { addDownload, removeDownload, isDownloading, setDownloadResumable } = useDownloads();
-
     const throttledDebouncedUpdateProgress = throttleDebounce(async (id: string, totalBytesWritten: number, totalBytesExpectedToWrite: number) => {
         const progress = totalBytesWritten / totalBytesExpectedToWrite;
         console.log(`Download progress for ${id}: ${progress * 100}%`, totalBytesWritten, totalBytesExpectedToWrite);
@@ -40,7 +37,7 @@ const useDownloadManager = () => {
             downloaded: progress === 1,
             error: null
         }, true);
-    }, 1000, 5000); // Adjust throttle and debounce times as needed
+    }, 1000, 5000);
 
     const downloadAudios = async (episodes: Partial<DownloadModel>[], upsert: boolean = true): Promise<void> => {
         if (episodes.length === 0) {
@@ -135,8 +132,6 @@ const useDownloadManager = () => {
                 progressData => updateProgress(id, progressData)
             );
 
-            setDownloadResumable(id, downloadResumable);
-
             const result = await downloadResumable.downloadAsync();
 
             await downloadCompleted(id, result);
@@ -149,8 +144,6 @@ const useDownloadManager = () => {
             showToast('error', 'Download Failed', 'Failed to download episode!');
 
             await upsertDownload({ episodeId: id, error: error.message });
-
-            removeDownload(id);
         }
     };
 
@@ -170,8 +163,6 @@ const useDownloadManager = () => {
         }
 
         clearActiveDownload()
-
-        removeDownload(id);
 
         await startNextDownload();
     };

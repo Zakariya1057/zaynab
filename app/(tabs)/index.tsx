@@ -38,7 +38,7 @@ export default function App() {
         //     data: [1] // Placeholder data for section
         // },
         {
-            title: "Popular",
+            title: "Trending Podcasts",
             data: Object.values(Podcasts) // Assuming Podcasts is an array
         },
     ];

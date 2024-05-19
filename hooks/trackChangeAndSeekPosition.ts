@@ -28,10 +28,7 @@ export const trackChangeAndSeekPosition = () => {
                 if (position && duration && (duration - position) < 5) {
                     newTrackPosition = Math.max(0, duration - 5);
                     if (lastTrack?.description === activeTrack?.description) {
-                        await TrackPlayer.seekTo(newTrackPosition);
-                        if (!shouldAutoPlay) {
-                            await TrackPlayer.pause();
-                        }
+                        await TrackPlayer.pause();
                         return;
                     }
                 }

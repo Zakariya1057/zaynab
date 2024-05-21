@@ -5,7 +5,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Theme } from "../../constants";
 import {ArrowLeft, CheckCircle, Download} from "@tamagui/lucide-icons";
 import {Spinner} from "tamagui";
-import {Ionicons} from "@expo/vector-icons"; // Correctly import icons
+import {Ionicons} from "@expo/vector-icons";
+import {getAllowDownload} from "@/utils/cache/download-status-cache"; // Correctly import icons
 
 interface Props {
     goBack: () => void;
@@ -27,6 +28,8 @@ const DownloadIcon = ({ status }) => {
 };
 
 export default function NavigationBar({ goBack, download, downloadStatus }: Props) {
+    const allowDownload = getAllowDownload()
+
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.container}>
@@ -36,9 +39,13 @@ export default function NavigationBar({ goBack, download, downloadStatus }: Prop
 
                 <View style={{ flex: 1 }} />
 
-                <TouchableOpacity onPress={download} style={{ padding: 15, right: -15, top: -15}}>
-                    <DownloadIcon status={downloadStatus}/>
-                </TouchableOpacity>
+                {
+                    allowDownload && (
+                        <TouchableOpacity onPress={download} style={{ padding: 15, right: -15, top: -15}}>
+                            <DownloadIcon status={downloadStatus}/>
+                        </TouchableOpacity>
+                    )
+                }
             </SafeAreaView>
         </View>
     );

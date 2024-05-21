@@ -1,5 +1,4 @@
 import {database} from "@/utils/database/setup";
-import {Q} from "@nozbe/watermelondb";
 import {DownloadModel} from "@/utils/database/models/download-model";
 
 /**

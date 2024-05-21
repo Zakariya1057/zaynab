@@ -393,7 +393,7 @@ export const Podcasts: Record<string, Podcast> = {
     },
     "fdab8c75-221d-46c6-9a0e-b0dd641a96ea": {
         id: "fdab8c75-221d-46c6-9a0e-b0dd641a96ea",
-        name: "Prophet Muhammad's Journey – Makkan Period Part 1",
+        name: "The Prophet Muhammad Chronicles – Makkan Period Part 1",
         image: require('@/assets/images/podcasts/2b355614-58b0-4a75-9961-386ab29059d0/image.png'),
         remoteImage: "https://d21y2nonaorlw9.cloudfront.net/The+Makkan+Era+Prophet+Muhammad+(PBUH)+-+Part+1/image.png",
         background: require('@/assets/images/podcasts/2b355614-58b0-4a75-9961-386ab29059d0/image.png'),
@@ -516,7 +516,7 @@ export const Podcasts: Record<string, Podcast> = {
     },
     "df4cc688-0496-4237-abc6-2513fec8a0bd": {
         id: "df4cc688-0496-4237-abc6-2513fec8a0bd",
-        name: "The Medina Chronicles: Prophet Muhammad (PBUH) Part 2",
+        name: "The Prophet Muhammad Chronicles – Medina Period Part 2",
         image: require('../../assets/images/podcasts/df4cc688-0496-4237-abc6-2513fec8a0bd/image.png'),
         remoteImage: "https://d21y2nonaorlw9.cloudfront.net/The+Medina+Chronicles+Prophet+Muhammad+(PBUH)+Part+2/image.png",
         background: require('../../assets/images/podcasts/df4cc688-0496-4237-abc6-2513fec8a0bd/image.png'),
@@ -653,7 +653,7 @@ export const Podcasts: Record<string, Podcast> = {
     },
     "76495e37-b649-48d0-864d-8da33281ad77": {
         id: "76495e37-b649-48d0-864d-8da33281ad77",
-        name: "The Medina Chronicles: Prophet Muhammad (PBUH) Part 3",
+        name: "The Prophet Muhammad Chronicles – Medina Period Part 3",
         image: require('../../assets/images/podcasts/76495e37-b649-48d0-864d-8da33281ad77/image.png'),
         remoteImage: "https://d21y2nonaorlw9.cloudfront.net/The%20Medina%20Chronicles%20Prophet%20Muhammad%20(PBUH)%20Part%203/image.png",
         background: require('../../assets/images/podcasts/76495e37-b649-48d0-864d-8da33281ad77/image.png'),

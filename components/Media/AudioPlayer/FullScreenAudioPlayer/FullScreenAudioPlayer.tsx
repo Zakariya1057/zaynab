@@ -11,25 +11,22 @@ import MediaImage from '../../MediaPlayerControls/MediaImage';
 import {Theme} from "@/constants";
 import {Podcast} from "@/interfaces/podcast";
 import {Episode} from "@/interfaces/episode";
-import {RefreshControl, Touchable, TouchableOpacity} from "react-native";
 import {useTrackManager} from "@/hooks/useTrackManager";
 import {showToast} from "@/utils/toast/show-toast";
 import {playNextTrack} from "@/utils/track/play-next-track";
 import {playPrevTrack} from "@/utils/track/play-prev-track";
-import useDownloadEpisode from "@/hooks/useDownloadEpisode";
 import {TrackTitle} from "@/components/Media/MediaPlayerControls/TrackTitle";
 import {router} from "expo-router";
+import {RefreshControl, TouchableOpacity} from "react-native";
 
 export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, episode: Episode }) {
     const track = useActiveTrack()
     const {state} = usePlaybackState()
 
     const [refreshing, setRefreshing] = useState(false);
-    const {position, duration} = useProgress(1000);
+    const {position, duration} = useProgress();
 
     const {togglePlayPause, audioLoaded, buffering, audioFailedToLoad, setAudioFailedToLoad} = useTrackManager();
-
-    const downloadEpisode = useDownloadEpisode();
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
@@ -143,14 +140,13 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
 
                 <MediaPlayerControls
                     variant="large"
-                    togglePlayPause={togglePlayPause}
+                    togglePlayPause={() => togglePlayPause(position, duration)}
                     playNext={() => playNextTrack(audioFailedToLoad)}
                     playPrev={() => playPrevTrack(audioFailedToLoad)}
                     buffering={audioLoaded && buffering}
                     isPlaying={state === State.Playing}
                     isFirst={isFirstEpisode}
                     isLast={isLastEpisode}
-                    download={() => downloadEpisode()}
                     episodeId={track?.description?.split('|')[1]}
                     loading={duration !== 0 && (state === State.Loading)}
                 />

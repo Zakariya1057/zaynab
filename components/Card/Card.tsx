@@ -41,7 +41,7 @@ export default function DemoCard({title, position, duration, podcastId, episodeI
                     <XStack gap={'$2'}>
                         <Text f={1} lineHeight={'$1'} numberOfLines={2} fontWeight={'500'} fontSize={'$4'}>{title}</Text>
                         {
-                            (position && duration) && (
+                            (position && duration) ? (
                                 <XStack alignItems={'center'} justifyContent={'flex-end'}>
                                     <AnimatedCircularProgress
                                         size={43}
@@ -60,7 +60,7 @@ export default function DemoCard({title, position, duration, podcastId, episodeI
                                         }
                                     </AnimatedCircularProgress>
                                 </XStack>
-                            )
+                            ) : <></>
                         }
                     </XStack>
                 </Card.Header>

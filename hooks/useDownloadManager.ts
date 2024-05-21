@@ -26,7 +26,7 @@ import {throttleDebounce} from "@/utils/debounce/throttle-debounce";
 const useDownloadManager = () => {
     const throttledDebouncedUpdateProgress = throttleDebounce(async (id: string, totalBytesWritten: number, totalBytesExpectedToWrite: number) => {
         const progress = totalBytesWritten / totalBytesExpectedToWrite;
-        console.log(`Download progress for ${id}: ${progress * 100}%`, totalBytesWritten, totalBytesExpectedToWrite);
+        // console.log(`Download progress for ${id}: ${progress * 100}%`, totalBytesWritten, totalBytesExpectedToWrite);
 
         updateActiveDownload(id);
 

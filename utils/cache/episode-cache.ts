@@ -24,12 +24,14 @@ export const initializeCache = async (): Promise<void> => {
 
 // Function to get an episode from the cache
 export const getEpisode = (description: string): ProgressData | undefined => {
+    // console.log('Fetching', cache[description])
     return cache[description];
 };
 
 // Function to update or add an episode to the cache
 export const updateEpisode = (description: string, progress: ProgressData): void => {
     cache[description] = progress;
+    // console.log('Updating', cache[description])
 };
 
 // Function to clear the cache, useful in scenarios like user logout

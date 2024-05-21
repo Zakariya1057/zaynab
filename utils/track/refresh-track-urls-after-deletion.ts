@@ -1,22 +1,28 @@
-import TrackPlayer, {Track, TrackType} from 'react-native-track-player';
+import TrackPlayer, {State, Track, TrackType, usePlaybackState} from 'react-native-track-player';
 import {getDownloadById} from "@/utils/database/download/get-download-by-id";
 import {getPodcastById} from "@/utils/data/getPodcastById";
 import {getEpisodeById} from "@/utils/data/getEpisodeById";
 import {showToast} from "@/utils/toast/show-toast";
+import {setAutoPlay} from "@/utils/track/auto-play";
 
 // Function to handle track updates when a download has been deleted
 export const refreshTrackUrlsAfterDeletion = async () => {
     console.log('Starting track update due to download deletion');
     const tracks = await TrackPlayer.getQueue();
+    const { state } = await TrackPlayer.getPlaybackState()
     const activeTrack = await TrackPlayer.getActiveTrack();
     const activeTrackIndex = await TrackPlayer.getActiveTrackIndex();
 
-    if (!activeTrack?.description) {
+    const { description } = activeTrack ?? {}
+
+    setAutoPlay(state === State.Playing)
+
+    if (!description) {
         console.log('Active track does not have a description. Exiting...');
         return;
     }
 
-    const [podcastId] = activeTrack.description.split('|');
+    const [podcastId] = description.split('|');
     if (!podcastId) {
         console.log('No podcast ID found in the active track description.');
         return;
@@ -56,8 +62,8 @@ export const refreshTrackUrlsAfterDeletion = async () => {
         console.log(`Updating track at index ${update.index}`);
         await TrackPlayer.remove(update.index);
         await TrackPlayer.add(update.newTrack, update.index);
-        if (update.index === activeTrackIndex) {
-            await TrackPlayer.pause()
+
+        if (update.newTrack.description === description) {
             activeTrackUpdated = true;
         }
     }

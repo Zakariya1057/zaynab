@@ -4,6 +4,7 @@ import useSetting from "@/hooks/useSetting";
 import { SettingKey } from "@/interfaces/setting-key";
 import { clearReminders } from "@/utils/reminder/clear-reminders";
 import { scheduleReminder } from "@/utils/reminder/schedule-reminder";
+import {getAllowDownload} from "@/utils/cache/download-status-cache";
 
 export default function NotificationSettings() {
     const [reminder, setReminder] = useSetting(SettingKey.FinishEpisodeReminder);
@@ -27,12 +28,16 @@ export default function NotificationSettings() {
                 onValueChange={updateReminder}
                 description="Enable to receive a reminder one week after to finish your last episode or explore new talks."
             />
-            <SettingsToggle
-                label="Download Completion Notification"
-                value={downloadCompletedToaster}
-                onValueChange={setDownloadCompletedToaster}
-                description="Show a notification when a download is completed."
-            />
+            {
+                getAllowDownload() && (
+                    <SettingsToggle
+                        label="Download Completion Notification"
+                        value={downloadCompletedToaster}
+                        onValueChange={setDownloadCompletedToaster}
+                        description="Show a notification when a download is completed."
+                    />
+                )
+            }
         </SettingsSection>
     );
 }

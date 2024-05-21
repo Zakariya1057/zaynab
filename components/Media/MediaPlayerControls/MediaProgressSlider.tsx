@@ -1,7 +1,6 @@
-import React from 'react';
 import {YStack, Text, Spinner} from 'tamagui';
-import {Theme} from '../../../constants';
-import {ActivityIndicator, Platform} from "react-native";
+import {Theme} from '@/constants';
+import {Platform} from "react-native";
 import Slider from "@react-native-community/slider";
 
 interface MediaProgressSliderProps {
@@ -53,11 +52,11 @@ const MediaProgressSlider: React.FC<MediaProgressSliderProps> = ({
                 tapToSeek={true}
             />
             <YStack flexDirection="row" justifyContent="space-between" mt={'$2'}>
-                <Text color={Theme.colors.primary} fontSize={Theme.fontSizes.small}
+                <Text fontSize={Theme.fontSizes.small}
                       mt={Platform.OS === 'android' ? 5 : 0}>
                     {formatTime(currentTime)}
                 </Text>
-                <Text color={Theme.colors.primary} fontSize={Theme.fontSizes.small}
+                <Text fontSize={Theme.fontSizes.small}
                       mt={Platform.OS === 'android' ? 5 : 0}>
                     {
                         loading ? <Spinner size="small" color="$color.purple" height={10}/> : formatRemainingTime(currentTime, endTime)

@@ -3,6 +3,7 @@ import React from "react";
 import {useActiveTrack} from "react-native-track-player";
 import EpisodeDownload from "@/components/Episode/EpisodeDownload";
 import useDownloadEpisode from "@/hooks/useDownloadEpisode";
+import {getAllowDownload} from "@/utils/cache/download-status-cache";
 
 export default function () {
     const track = useActiveTrack()
@@ -10,10 +11,12 @@ export default function () {
 
     const downloadEpisode = useDownloadEpisode();
 
+    const allowDownload = getAllowDownload()
+
     return (
         <>
             <Stack.Screen options={{
-                headerRight: () => <EpisodeDownload episodeId={episodeId}  download={() => downloadEpisode()} />
+                headerRight: () => allowDownload ? <EpisodeDownload episodeId={episodeId}  download={() => downloadEpisode()} /> : <></>
             }}/>
             <Slot />
         </>

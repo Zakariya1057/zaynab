@@ -9,7 +9,7 @@ const update = throttleDebounce(async (track, position, duration, podcastId, epi
     await upsertEpisode({
         ...track,
         position: position,
-        duration: duration,
+        duration: position > duration ? position : duration,
         complete: (position === duration).toString(),
         podcastId,
         episodeId,
@@ -17,14 +17,13 @@ const update = throttleDebounce(async (track, position, duration, podcastId, epi
         remoteImage: track.artwork
     });
 
-    console.log('Progress updated for:', track.title, position, duration);
+    // console.log('Progress updated for:', track.title, position, duration);
 }, 1000, 5000);
 
 export const recordAudioPosition = () => {
     useEffect(() => {
         const updateEpisodeProgress = async () => {
             const { position, duration } = await TrackPlayer.getProgress();
-
             try {
                 let track = await TrackPlayer.getActiveTrack();
                 let { state } = await TrackPlayer.getPlaybackState();
@@ -33,7 +32,7 @@ export const recordAudioPosition = () => {
                     return;
                 }
 
-                if (position === 0 || duration === 0) {
+                if (position <= 0 || duration === 0) {
                     return;
                 }
 
@@ -45,9 +44,11 @@ export const recordAudioPosition = () => {
 
                         const episodeNumber = getEpisodeNumberFromTitle(track.title);
 
-                        updateEpisode(track.description ?? '', { position, duration });
+                        if (position >= 1) {
+                            updateEpisode(track.description ?? '', { position, duration });
+                        }
 
-                        await update(track, position, duration, podcastId, episodeId, episodeNumber);
+                        update(track, position, duration, podcastId, episodeId, episodeNumber);
                     } catch (error) {
                         console.error('Error updating episode progress:', error);
                     }

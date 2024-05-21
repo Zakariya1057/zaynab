@@ -12,10 +12,10 @@ const actionsMap: Record<SettingKey, () => void> = {
 
 export const executeActionsBasedOnSettings = () => {
     for (const [key, action] of Object.entries(actionsMap)) {
-        console.log(key,getSetting(key) )
+        // console.log(key,getSetting(key) )
 
         if (getSetting(key)) {
-            console.log(`Executing action for setting: ${key}`);
+            // console.log(`Executing action for setting: ${key}`);
             action();
         }
     }

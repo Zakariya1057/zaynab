@@ -15,7 +15,6 @@ import {trackChangeAndSeekPosition} from "@/hooks/trackChangeAndSeekPosition";
 import {setupPlayer} from "@/utils/track/setup-player";
 import {initializeCache} from "@/utils/cache/episode-cache";
 import {AudioPlaybackProvider} from "@/hooks/useAudioPlayback";
-import CompactAudioPlayer from "@/components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
 
 export {
     // Catch any errors thrown by the Layout component.

@@ -1,13 +1,17 @@
-import TrackPlayer, {Track, TrackType} from 'react-native-track-player';
+import TrackPlayer, {State, Track, TrackType, usePlaybackState} from 'react-native-track-player';
 import { getDownloadById } from "@/utils/database/download/get-download-by-id";
 import {showToast} from "@/utils/toast/show-toast";
+import {setAutoPlay} from "@/utils/track/auto-play";
 
 // Function to update track URLs from remote to local upon download completion
 export const updateTrackUrlOnDownloadComplete = async (id: string) => {
     console.log('Starting track URL update post-download completion');
     const tracks = await TrackPlayer.getQueue();
+    const { state } = await TrackPlayer.getPlaybackState()
     const activeTrack = await TrackPlayer.getActiveTrack();
     const activeTrackIndex = await TrackPlayer.getActiveTrackIndex();
+
+    setAutoPlay(state === State.Playing)
 
     let updatesNeeded: { index: number, newTrack: Track }[] = [];
 
@@ -32,9 +36,6 @@ export const updateTrackUrlOnDownloadComplete = async (id: string) => {
         }
     }
 
-    console.log(updatesNeeded)
-
-    // Apply the URL updates
     let activeTrackUpdated = false;
     for (const update of updatesNeeded) {
         console.log(`Updating track at index ${update.index}`);

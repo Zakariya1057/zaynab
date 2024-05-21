@@ -8,7 +8,7 @@ export const registerDeleteFinishedEpisodesTask = async () => {
             stopOnTerminate: false, // Android-only: keep running after app terminates
             startOnBoot: true, // Android-only: start after the device has been restarted
         });
-        console.log('Task registered');
+        // console.log('Task registered');
     } catch (err) {
         console.log('Task Register failed:', err);
     }

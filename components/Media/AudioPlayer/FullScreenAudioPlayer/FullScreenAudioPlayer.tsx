@@ -147,6 +147,7 @@ export default function EpisodePlayer({podcast, episode}: { podcast: Podcast, ep
                     isPlaying={state === State.Playing}
                     isFirst={isFirstEpisode}
                     isLast={isLastEpisode}
+                    seek={(time) => TrackPlayer.seekTo(time) }
                     episodeId={track?.description?.split('|')[1]}
                     loading={duration !== 0 && (state === State.Loading)}
                 />

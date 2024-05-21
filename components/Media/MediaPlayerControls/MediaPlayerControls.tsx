@@ -1,9 +1,10 @@
 import {Spinner, useTheme, View, YStack, Text} from 'tamagui';
-import {FontAwesome, FontAwesome5, Ionicons, MaterialIcons} from '@expo/vector-icons';
+import {FontAwesome, FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons} from '@expo/vector-icons';
 import {TouchableOpacity} from "react-native";
 import {FastForward, Rewind} from '@tamagui/lucide-icons'
 import useShuffle from "@/hooks/useShuffle";
 import {usePlaybackSpeed} from "@/hooks/usePlaybackSpeed";
+import {useProgress} from "react-native-track-player";
 
 interface Props {
     isPlaying: boolean;
@@ -13,6 +14,7 @@ interface Props {
     loading?: boolean;
     buffering?: boolean;
     variant: 'small' | 'medium' | 'large';
+    seek: (time: number) => void; // Function to seek to a specific time in the playback.
     isFirst?: boolean; // Indicates if the current track is the first one
     isLast?: boolean;  // Indicates if the current track is the last one
 }
@@ -22,6 +24,7 @@ const MediaPlayerControls: React.FC<Props> = ({
                                                   togglePlayPause,
                                                   playNext,
                                                   playPrev,
+                                                  seek,
                                                   isFirst,
                                                   isLast,
                                                   variant,
@@ -36,9 +39,20 @@ const MediaPlayerControls: React.FC<Props> = ({
 
     const strokeWidth = 1.7
 
-    const {speed, cycleSpeed} = usePlaybackSpeed();
+    // const {speed, cycleSpeed} = usePlaybackSpeed();
+    // const {shuffleOn, toggleShuffle} = useShuffle()
 
-    const {shuffleOn, toggleShuffle} = useShuffle()
+    const {position} = useProgress();
+
+    // Skip forward by 15 seconds
+    const skipForward = () => {
+        seek(position + 15);
+    }
+
+    // Skip backward by 15 seconds
+    const skipBackward = () => {
+        seek(Math.max(0, position - 15)); // Ensure we don't go below 0.
+    }
 
     return (
         <YStack flexDirection="row" alignItems="center" justifyContent="space-between">
@@ -56,19 +70,18 @@ const MediaPlayerControls: React.FC<Props> = ({
                 </TouchableOpacity>
             ) : (
                 <YStack f={1} flexDirection="row" alignItems="center" justifyContent="space-between">
-                    <TouchableOpacity onPress={toggleShuffle}>
-                        <FontAwesome5 name="random" size={size} color={!shuffleOn ? color : purple} />
-                    </TouchableOpacity>
-
                     <TouchableOpacity onPress={playPrev} disabled={isFirst} style={{ padding: 10 }}>
                         <FontAwesome5 size={size} name="backward" color={isFirst ? 'grey' : color} strokeWidth={strokeWidth} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={skipBackward} style={{ padding: 10 }}>
+                        <MaterialCommunityIcons name="rewind-15" size={size} color={color} strokeWidth={strokeWidth} />
                     </TouchableOpacity>
 
                     <TouchableOpacity
                         onPress={togglePlayPause}
                         disabled={buffering}
                     >
-
                         <View
                             borderRadius={100}
                             height={80}
@@ -80,25 +93,19 @@ const MediaPlayerControls: React.FC<Props> = ({
                         >
                             {
                                 buffering || loading ?
-                                    (
-                                        <Spinner size="large" color={'white'}/>
-                                    ) : (
-                                        <FontAwesome5 name={isPlaying ? 'pause' : 'play'} size={size} color={'white'} />
-                                    )
+                                    <Spinner size="large" color={'white'}/>
+                                    :
+                                    <FontAwesome5 name={isPlaying ? 'pause' : 'play'} size={size} color={'white'} />
                             }
-
                         </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={skipForward} style={{ padding: 10 }}>
+                        <MaterialCommunityIcons name="fast-forward-15" size={size} color={color} strokeWidth={strokeWidth} />
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={playNext} disabled={isLast} style={{ padding: 10 }}>
                         <FontAwesome5 name="forward" size={size} color={isLast ? 'grey' : color} strokeWidth={strokeWidth} />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={cycleSpeed}>
-                        <YStack alignItems="center">
-                            <FontAwesome5 name="tachometer-alt" size={size} color={color} />
-                            <Text mt={'$1'}>{`${speed}x`}</Text>
-                        </YStack>
                     </TouchableOpacity>
                 </YStack>
             )}

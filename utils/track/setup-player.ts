@@ -1,51 +1,56 @@
-import TrackPlayer, {AppKilledPlaybackBehavior, Capability} from "react-native-track-player";
-import {getSpeedFromStorage} from "@/utils/speed/speed-storage";
+import TrackPlayer, { AppKilledPlaybackBehavior, Capability } from "react-native-track-player";
+import { getSpeedFromStorage } from "@/utils/speed/speed-storage";
 
-let playerSetup = false
+let playerSetup = false;
 
 export const setupPlayer = async (): Promise<void> => {
-    if (playerSetup) return
+    if (playerSetup) return;
 
     try {
-        console.log('Setting Up Player')
+        console.log('Setting Up Player');
 
         await TrackPlayer.setupPlayer();
-        await TrackPlayer.reset()
+        await TrackPlayer.reset();
         await TrackPlayer.updateOptions({
-                capabilities: [
-                    Capability.Play,
-                    Capability.Pause,
-                    Capability.SkipToNext,
-                    Capability.SkipToPrevious,
-                    Capability.Stop,
-                    Capability.SeekTo,
-                ],
+            capabilities: [
+                Capability.Play,
+                Capability.Pause,
+                Capability.SkipToNext,
+                Capability.SkipToPrevious,
+                Capability.Stop,
+                Capability.SeekTo,
+                Capability.JumpForward,
+                Capability.JumpBackward,
+            ],
 
-                android: {
-                    alwaysPauseOnInterruption: true,
-                    appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
-                },
+            forwardJumpInterval: 15,
+            backwardJumpInterval: 15,
 
-                progressUpdateEventInterval: 1,
+            android: {
+                alwaysPauseOnInterruption: true,
+                appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+            },
 
-                // Capabilities that will show up when the notification.click is in the compact form on Android
-                compactCapabilities: [
-                    Capability.Play,
-                    Capability.Pause,
-                    Capability.SkipToNext,
-                    Capability.SkipToPrevious,
-                    Capability.Stop,
-                    Capability.SeekTo,
-                ],
-            }
-        )
+            progressUpdateEventInterval: 1,
 
-        const rate = await getSpeedFromStorage() ?? 1
-        await TrackPlayer.setRate(rate)
+            // Capabilities that will show up when the notification.click is in the compact form on Android
+            compactCapabilities: [
+                Capability.Play,
+                Capability.Pause,
+                Capability.SkipToNext,
+                Capability.SkipToPrevious,
+                Capability.Stop,
+                Capability.SeekTo,
+                Capability.JumpForward,
+                Capability.JumpBackward,
+            ],
+        });
 
-        playerSetup = true
-    } catch (error: any) {
-        console.log(`Failed To Set Up Player: ${error.message}`, error)
+        const rate = await getSpeedFromStorage() ?? 1;
+        await TrackPlayer.setRate(rate);
+
+        playerSetup = true;
+    } catch (error) {
+        console.log(`Failed To Set Up Player: ${error.message}`, error);
     }
-
 }

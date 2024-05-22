@@ -52,14 +52,15 @@ const MediaProgressSlider: React.FC<MediaProgressSliderProps> = ({
     };
 
     const handleSlidingComplete = async (value: number) => {
-        if (wasPlaying) {
-            await TrackPlayer.play()
-        }
-
         setCanUpdate(false)
         setNewValue(value)
         setCurrentTime(value)
+
         onValueChange(value);
+
+        if (wasPlaying) {
+            await TrackPlayer.play()
+        }
 
         await new Promise(resolve => setTimeout(() => setCanUpdate(true), 500));
     };

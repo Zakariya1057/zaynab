@@ -2,7 +2,7 @@ import {YStack, Text, Separator, XStack, useTheme} from 'tamagui';
 import {AnimatedCircularProgress} from 'react-native-circular-progress';
 import {Ionicons} from "@expo/vector-icons";
 
-export default function SeriesEpisode({title, description, openEpisode, active, playing, percentage, downloaded}: SeriesEpisodeProps) {
+export default function SeriesEpisode({title, description, openEpisode, active, percentage, downloaded}: SeriesEpisodeProps) {
     const theme = useTheme();
     const purple = theme.purple.get()
     const color = theme.color.get()
@@ -21,11 +21,11 @@ export default function SeriesEpisode({title, description, openEpisode, active, 
                         <Text fontSize={17} fontWeight="bold" color={active ? '$color.purple' : '$color'}>
                             {title}
                         </Text>
-                        {downloaded && (
+                        {downloaded ? (
                             <YStack pl={'$2'} h={'100%'}>
                                 <Ionicons name="cloud-done" size={25} color={color} strokeWidth={1.7}/>
                             </YStack>
-                        )}
+                        ) : <></>}
                     </XStack>
                     <Text fontSize={15} color={active ? '$color.purple2' : '$charcoal'}>{description}</Text>
                 </YStack>
@@ -42,7 +42,7 @@ export default function SeriesEpisode({title, description, openEpisode, active, 
                                 rotation={0}
                             >
                                 {
-                                    (fill) => (
+                                    () => (
                                         <Text>
                                             {Math.round(percentage * 100)}%
                                         </Text>
@@ -66,7 +66,6 @@ interface SeriesEpisodeProps {
     title: string;
     description: string;
     active: boolean;
-    playing: boolean;
     downloaded: boolean;
     percentage: number | null;
     openEpisode: () => void;

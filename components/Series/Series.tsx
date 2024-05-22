@@ -21,13 +21,22 @@ interface Props {
 
 export default ({podcast, play, playingEpisodeId}: Props) => {
     const {episodes, retry, loading} = useEpisodes(podcast.id);
-    const { downloads } = useDownloads(podcast.id);
+    const { downloads, retry: retryDownloads } = useDownloads(podcast.id);
 
     const { state } = usePlaybackState();
 
     const [refreshing, setRefreshing] = useState(false);
 
     const podcastEpisodes = Object.values(podcast.episodes)
+
+    useEffect(() => {
+        updateDownloadedEpisodes()
+    }, []);
+
+    const updateDownloadedEpisodes = async() => {
+        await retryDownloads()
+        setEpisodeHistory()
+    }
 
     const setEpisodeHistory = useCallback(() => {
         for (const episode of episodes) {
@@ -38,6 +47,7 @@ export default ({podcast, play, playingEpisodeId}: Props) => {
             }
         }
 
+        console.log(downloads.length)
         for (const download of downloads) {
             if (podcast.episodes[download.episodeId]) {
                 podcast.episodes[download.episodeId].downloaded = download.downloaded;
@@ -48,7 +58,7 @@ export default ({podcast, play, playingEpisodeId}: Props) => {
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
         await retry();
-        setEpisodeHistory();
+        await updateDownloadedEpisodes()
         setRefreshing(false);
     }, [retry, setEpisodeHistory]);
 
@@ -78,18 +88,17 @@ export default ({podcast, play, playingEpisodeId}: Props) => {
         });
     }, [podcast.id]);
 
-    const renderEpisodeItem = useCallback(({item}: { item: Episode }) => (
+    const renderEpisodeItem =({item}: { item: Episode }) => (
         <SeriesEpisode
             key={item.id}
             title={`Episode ${item.number}`}
             description={item.description}
             openEpisode={() => openEpisode(item.id)}
             active={playingEpisodeId === item.id}
-            playing={state === State.Playing && playingEpisodeId === item.id}
             percentage={getPercentage(item.position, item.duration)}
             downloaded={item.downloaded ?? false}
         />
-    ), [openEpisode, playingEpisodeId]);
+    )
 
     return (
         <FlatList

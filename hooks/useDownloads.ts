@@ -31,6 +31,7 @@ export const useDownloads = (podcastId: string) => {
     }, [fetchDownloads]);
 
     const retry = async () => {
+        console.log('Get Downloads')
         await fetchDownloads();
     };
 

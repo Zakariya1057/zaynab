@@ -60,7 +60,7 @@ const MediaPlayerControls: React.FC<Props> = ({
                 <TouchableOpacity onPress={togglePlayPause} style={{padding: 5, width: 40}}>
                     {
                         !loading ? (
-                                <FontAwesome5 name={isPlaying ? 'pause' : 'play'} size={size-10} color={purple} />
+                                <FontAwesome5 name={isPlaying ? 'pause' : 'play'} size={size - 10} color={purple}/>
                             ) :
                             (
                                 <Spinner size="small" color={purple}/>
@@ -70,12 +70,13 @@ const MediaPlayerControls: React.FC<Props> = ({
                 </TouchableOpacity>
             ) : (
                 <YStack f={1} flexDirection="row" alignItems="center" justifyContent="space-between">
-                    <TouchableOpacity onPress={playPrev} disabled={isFirst} style={{ padding: 10 }}>
-                        <FontAwesome5 size={size} name="backward" color={isFirst ? 'grey' : color} strokeWidth={strokeWidth} />
+                    <TouchableOpacity onPress={playPrev} disabled={isFirst} style={{padding: 10}}>
+                        <FontAwesome5 size={size} name="backward" color={isFirst ? 'grey' : color}
+                                      strokeWidth={strokeWidth}/>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={skipBackward} style={{ padding: 10 }}>
-                        <MaterialCommunityIcons name="rewind-15" size={size} color={color} strokeWidth={strokeWidth} />
+                    <TouchableOpacity onPress={skipBackward} style={{padding: 10}}>
+                        <MaterialCommunityIcons name="rewind-15" size={size} color={color} strokeWidth={strokeWidth}/>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -92,20 +93,19 @@ const MediaPlayerControls: React.FC<Props> = ({
                             alignItems={'center'}
                         >
                             {
-                                buffering || loading ?
-                                    <Spinner size="large" color={'white'}/>
-                                    :
-                                    <FontAwesome5 name={isPlaying ? 'pause' : 'play'} size={size} color={'white'} />
+                                <FontAwesome5 name={isPlaying ? 'pause' : 'play'} size={size} color={'white'}/>
                             }
                         </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={skipForward} style={{ padding: 10 }}>
-                        <MaterialCommunityIcons name="fast-forward-15" size={size} color={color} strokeWidth={strokeWidth} />
+                    <TouchableOpacity onPress={skipForward} style={{padding: 10}}>
+                        <MaterialCommunityIcons name="fast-forward-15" size={size} color={color}
+                                                strokeWidth={strokeWidth}/>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={playNext} disabled={isLast} style={{ padding: 10 }}>
-                        <FontAwesome5 name="forward" size={size} color={isLast ? 'grey' : color} strokeWidth={strokeWidth} />
+                    <TouchableOpacity onPress={playNext} disabled={isLast} style={{padding: 10}}>
+                        <FontAwesome5 name="forward" size={size} color={isLast ? 'grey' : color}
+                                      strokeWidth={strokeWidth}/>
                     </TouchableOpacity>
                 </YStack>
             )}

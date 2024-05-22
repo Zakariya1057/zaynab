@@ -8,6 +8,8 @@ export const updateExistingTracks = async (existingTracks: Track[], episodeId: s
 
         await TrackPlayer.skip(existingTrackIndex);
 
+        await TrackPlayer.pause()
+
         console.log('Set From Existing Tracks');
         return true;
     }

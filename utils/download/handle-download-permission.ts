@@ -16,7 +16,7 @@ export const handleDownloadPermission = async (setShowDownloadTab: (value: boole
 
         try {
             const localShowDownload = await getAllowDownloadFromLocal(platform, version);
-            if (localShowDownload) {
+            if (localShowDownload !== null) {
                 console.log(`Local setting allows download: ${localShowDownload}`);
                 await setAllowDownload(platform, version, localShowDownload);
                 setShowDownloadTab(localShowDownload);
@@ -32,12 +32,14 @@ export const handleDownloadPermission = async (setShowDownloadTab: (value: boole
 
             const remoteAllowDownload = await getAllowDownloadFromRemote(platform, version);
             console.log(`Remote setting allows download: ${remoteAllowDownload}`);
-            if (remoteAllowDownload) {
+            if (remoteAllowDownload !== null) {
                 await setAllowDownload(platform, version, remoteAllowDownload);
                 setShowDownloadTab(remoteAllowDownload);
             }
         } catch (error) {
             console.error('Error handling download permissions:', error);
         }
+    } else {
+        setShowDownloadTab(true);
     }
 }

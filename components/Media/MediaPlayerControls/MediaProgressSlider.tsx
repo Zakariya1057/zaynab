@@ -1,7 +1,9 @@
+import React, {useState, useEffect} from 'react';
 import {YStack, Text, Spinner} from 'tamagui';
-import {Theme} from '@/constants';
 import {Platform} from "react-native";
 import Slider from "@react-native-community/slider";
+import {Theme} from "@/constants";
+import TrackPlayer, {State, usePlaybackState} from "react-native-track-player";
 
 interface MediaProgressSliderProps {
     minimumTrackColor: string;
@@ -20,12 +22,52 @@ const MediaProgressSlider: React.FC<MediaProgressSliderProps> = ({
                                                                      loading,
                                                                      onValueChange,
                                                                  }) => {
-    // Helper function to format time in HH:MM:SS or MM:SS
+    const [sliderValue, setSliderValue] = useState(currentTime);
+    const [wasPlaying, setWasPlaying] = useState(false);
+    const [time, setCurrentTime] = useState(currentTime)
+
+    const [newValue, setNewValue] = useState<number|null>(null)
+    const [canUpdate, setCanUpdate] = useState(true)
+
+    const {state} = usePlaybackState()
+
+    useEffect(() => {
+        if ((canUpdate || newValue === currentTime)) {
+            setCanUpdate(true)
+            setSliderValue(currentTime);
+            setCurrentTime(currentTime)
+        }
+    }, [currentTime]);
+
+    const handleSliderChange = async (value: number) => {
+        setCurrentTime(value)
+    };
+
+    const handleSlidingStart = async () => {
+        setWasPlaying(state === State.Playing);
+
+        if (state === State.Playing) {
+            await TrackPlayer.pause()
+        }
+    };
+
+    const handleSlidingComplete = async (value: number) => {
+        if (wasPlaying) {
+            await TrackPlayer.play()
+        }
+
+        setCanUpdate(false)
+        setNewValue(value)
+        setCurrentTime(value)
+        onValueChange(value);
+
+        await new Promise(resolve => setTimeout(() => setCanUpdate(true), 500));
+    };
+
     const formatTime = (seconds: number) => {
         const hrs = Math.floor(seconds / 3600);
         const mins = Math.floor((seconds % 3600) / 60);
         const secs = Math.floor(seconds % 60);
-
         let result = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         if (hrs > 0) {
             result = `${hrs}:${result}`;
@@ -33,7 +75,6 @@ const MediaProgressSlider: React.FC<MediaProgressSliderProps> = ({
         return result;
     };
 
-    // Helper function to format remaining time
     const formatRemainingTime = (currentTime: number, endTime: number) => {
         const remaining = endTime - currentTime;
         return "-" + formatTime(Math.abs(remaining));
@@ -45,21 +86,24 @@ const MediaProgressSlider: React.FC<MediaProgressSliderProps> = ({
                 style={{width: '100%'}}
                 minimumValue={0}
                 maximumValue={endTime}
-                value={currentTime}
+                value={sliderValue}
                 minimumTrackTintColor={minimumTrackColor}
                 maximumTrackTintColor={maximumTrackColor}
-                onValueChange={onValueChange}
-                tapToSeek={true}
+                onValueChange={handleSliderChange}
+                onSlidingStart={handleSlidingStart}
+                onSlidingComplete={handleSlidingComplete}
+                tapToSeek={false}
             />
             <YStack flexDirection="row" justifyContent="space-between" mt={'$2'}>
                 <Text fontSize={Theme.fontSizes.small}
                       mt={Platform.OS === 'android' ? 5 : 0}>
-                    {formatTime(currentTime)}
+                    {formatTime(time)}
                 </Text>
                 <Text fontSize={Theme.fontSizes.small}
                       mt={Platform.OS === 'android' ? 5 : 0}>
                     {
-                        loading ? <Spinner size="small" color="$color.purple" height={10}/> : formatRemainingTime(currentTime, endTime)
+                        loading ? <Spinner size="small" color="$color.purple"
+                                           height={10}/> : formatRemainingTime(time, endTime)
                     }
                 </Text>
             </YStack>

@@ -12,6 +12,7 @@ import {useDownloadPodcastEpisodes} from "@/hooks/useDownloadPodcastEpisodes";
 import {DownloadStatus} from "@/interfaces/download-status";
 import {getDownloadsByPodcastId} from "@/utils/database/download/get-downloads-by-podcast-id";
 import {setPodcastTracks} from "@/utils/track/set-podcast-tracks";
+import {setAutoPlay} from "@/utils/track/auto-play";
 
 export default function () {
     const {id, play: playAudio} = useLocalSearchParams<{ id: string, play?: string }>()
@@ -26,6 +27,7 @@ export default function () {
 
     const play = async () => {
         await setupPlayer();
+        setAutoPlay(true)
         await setPodcastTracks(id)
     }
 

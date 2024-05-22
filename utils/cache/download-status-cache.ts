@@ -20,7 +20,6 @@ export const setAllowDownload = async (platform: string, version: string, value:
 export const getAllowDownloadFromLocal = async (platform: string, version: string): Promise<boolean|null> => {
     const key = getAsyncStorageKey(platform, version);
     const storedValue = await AsyncStorage.getItem(key);
-    // console.log('Stored Value:', storedValue)
     return storedValue ? storedValue === 'true' : null
 }
 

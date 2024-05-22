@@ -7,8 +7,6 @@ export const setupPlayer = async (): Promise<void> => {
     if (playerSetup) return;
 
     try {
-        console.log('Setting Up Player');
-
         await TrackPlayer.setupPlayer();
         await TrackPlayer.reset();
         await TrackPlayer.updateOptions({

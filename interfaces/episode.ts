@@ -7,6 +7,8 @@ export interface Episode {
     stream: string;
     download: string;
 
+    speaker?: string;
+
     description: string;
     duration?: number;
     position?: number;

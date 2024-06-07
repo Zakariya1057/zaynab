@@ -4,12 +4,13 @@ import EpisodeHeader from './EpisodeHeader';
 import {State, useActiveTrack, usePlaybackState} from "react-native-track-player";
 import {FontAwesome5} from "@expo/vector-icons"; // Ensure you have the correct icon import
 
-export default function SeriesHeader({ image, title, description, continuePlaying, play }: SeriesHeaderProps) {
+export default function SeriesHeader({ image, title, author, description, continuePlaying, play }: SeriesHeaderProps) {
     const track = useActiveTrack()
     const { state } = usePlaybackState()
     const theme = useTheme();
     const purple = theme.purple.get()
 
+    // TODO: Use Something ELSE
     const currentPodcastPlaying = track?.artist === title
 
     return (
@@ -70,6 +71,13 @@ export default function SeriesHeader({ image, title, description, continuePlayin
                     >
                         {description}
                     </Text>
+
+                    <Text
+                        color="white"
+                        fontSize={16} // Adjust based on your theme or use a direct value
+                    >
+                        By: {author}
+                    </Text>
                 </YStack>
             </YStack>
             <EpisodeHeader />
@@ -81,6 +89,7 @@ export default function SeriesHeader({ image, title, description, continuePlayin
 interface SeriesHeaderProps {
     image: any; // Adjust the type to match your image source type, e.g., string for URI
     title: string;
+    author: string;
     description: string;
     continuePlaying: boolean;
     play: () => void;

@@ -9,6 +9,6 @@ export interface Podcast {
     background: ImageSourcePropType;
     description: string;
     subTitle: string;
-    author?: string;
+    author: string;
     episodes: Record<string, Episode>;
 }

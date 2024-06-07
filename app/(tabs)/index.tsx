@@ -1,19 +1,19 @@
-import React, { useCallback, useState } from "react";
-import { RefreshControl, SectionList } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import { RefreshControl, StyleSheet } from "react-native";
 import {
     Text,
     YStack,
     XStack,
     Stack,
-    useTheme,
-    View
+    View,
+    useTheme
 } from 'tamagui';
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
 import { useEpisodes } from "@/hooks/useEpisodes";
 import ContinueListening from "@/components/ContinueListening/ContinueListening";
 import { PodcastElement } from "@/components/Podcast/PodcastElement";
-import RecentPodcasts from "@/components/RecentPocasts/RecentPodcasts";
 import { Podcasts } from "@/utils/data/podcasts";
+import { FlashList } from '@shopify/flash-list';
 
 export default function App() {
     const { episodes, retry } = useEpisodes();
@@ -28,32 +28,41 @@ export default function App() {
         setRefreshing(false);
     }, [retry]);
 
-    const sections = [
-        ...episodes.length > 0 ? [{
-            title: "Keep Listening",
-            data: [1]
-        }] : [], // Only add this section if there are episodes
-        // {
-        //     title: "Recently Viewed",
-        //     data: [1] // Placeholder data for section
-        // },
-        {
-            title: "Trending Podcasts",
-            data: Object.values(Podcasts) // Assuming Podcasts is an array
-        },
-    ];
+    const combinedData = useMemo(() => {
+        const data = [];
+        if (episodes.length > 0) {
+            data.push("Keep Listening", 1); // Assuming 1 is a placeholder for ContinueListening component
+        }
+        data.push("Trending Podcasts", ...Object.values(Podcasts)); // Assuming Podcasts is an array
+        return data;
+    }, [episodes]);
 
-    const renderItem = ({ section, item }) => {
-        if (section.title === "Keep Listening") {
-            // Render a horizontal list for this section
-            return <ContinueListening />;
-        } else if (section.title === "Recently Viewed") {
-            // Render RecentPodcasts component for this section
-            return <RecentPodcasts />;
-        } else {
-            // Render a single item for other sections
+    const stickyHeaderIndices = useMemo(() => {
+        return combinedData.map((item, index) => typeof item === 'string' ? index : null).filter(index => index !== null);
+    }, [combinedData]);
+
+    const renderItem = ({ item, index }) => {
+        if (typeof item === 'string') {
             return (
-                <View px={'$3'} mb={'$3'}>
+                <YStack width="100%">
+                    <XStack
+                        justifyContent="space-between"
+                        alignItems="center"
+                        backgroundColor={'$background'}
+                        py={'$3'}
+                        pl={'$3'}
+                    >
+                        <Text fontSize={'$6'} fontWeight="bold">{item}</Text>
+                    </XStack>
+                </YStack>
+            );
+        } else if (item === 1) {
+            // Render a horizontal list for "Keep Listening"
+            return <View my={'$4'}><ContinueListening /></View>;
+        } else {
+            // Render a single item for "Trending Podcasts"
+            return (
+                <View px={'$3'} mt={'$4'}>
                     <PodcastElement podcast={item} />
                 </View>
             );
@@ -62,23 +71,16 @@ export default function App() {
 
     return (
         <Stack f={1}>
-            <SectionList
-                sections={sections}
-                keyExtractor={(item, index) => item.id || index.toString()}
+            <FlashList
+                data={combinedData}
                 renderItem={renderItem}
-                renderSectionHeader={({ section: { title } }) => (
-                    <YStack width="100%">
-                        <XStack justifyContent="space-between" alignItems="center" backgroundColor={'$background'}
-                                py={'$3'} pl={'$3'} mb={'$2'}>
-                            <Text fontSize={'$6'} fontWeight="bold">{title}</Text>
-                        </XStack>
-                    </YStack>
-                )}
-                contentContainerStyle={{ rowGap: 10 }}
+                keyExtractor={(item, index) => (typeof item === 'string' ? item : item.id || index.toString())}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={purple}/>
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={purple} />
                 }
+                estimatedItemSize={80}
+                stickyHeaderIndices={stickyHeaderIndices}
             />
             <CompactAudioPlayer edges={[]} />
         </Stack>

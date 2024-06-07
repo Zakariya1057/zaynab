@@ -1,13 +1,12 @@
 import React from 'react';
-import { FlatList } from 'react-native';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { withObservables } from '@nozbe/watermelondb/react';
 import { Q } from '@nozbe/watermelondb';
 import { database } from "@/utils/database/setup";
 import { EpisodeModel } from "@/utils/database/models/episode-model";
-import DemoCard from "@/components/Card/Card";
 import {getPodcastById} from "@/utils/data/getPodcastById";
 import {PodcastElement} from "@/components/Podcast/PodcastElement";
+import { FlashList } from "@shopify/flash-list";
 
 const getUniquePodcastIds = (episodes: EpisodeModel[]) => {
     const podcastIds = episodes.reduce((acc, episode) => {
@@ -26,7 +25,8 @@ const RecentPodcasts: React.FC<{ episodes: EpisodeModel[] }> = ({ episodes }) =>
     })
 
     return (
-        <FlatList
+        <FlashList
+            estimatedItemSize={20}
             horizontal={true}
             data={podcasts}
             renderItem={({ item }) => (
@@ -34,7 +34,7 @@ const RecentPodcasts: React.FC<{ episodes: EpisodeModel[] }> = ({ episodes }) =>
             )}
             keyExtractor={item => item.id}
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ gap: 20, paddingLeft: 10 }}
+            contentContainerStyle={{ paddingLeft: 100 }}
         />
     );
 };

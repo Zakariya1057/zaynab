@@ -3,13 +3,13 @@ import {
     Stack,
     Input,
     Text,
-    YStack
+    YStack, View
 } from 'tamagui';
-import { FlatList } from "react-native";
 import CompactAudioPlayer from "../../components/Media/AudioPlayer/CompactAudioPlayer/CompactAudioPlayer";
 import { Podcasts } from "@/utils/data/podcasts";
 import { PodcastElement } from "@/components/Podcast/PodcastElement";
 import LottieView from "lottie-react-native";
+import { FlashList } from "@shopify/flash-list";
 
 export default function App() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -44,7 +44,7 @@ export default function App() {
     }, [searchQuery]);
 
     const renderItem = ({ item }) => {
-        return <PodcastElement podcast={item} showPlayIcon={false} />;
+        return <View mt={'$4'}><PodcastElement podcast={item} showPlayIcon={false} /></View>;
     };
 
     return (
@@ -65,12 +65,12 @@ export default function App() {
                 />
 
                 {filteredPodcasts.length > 0 ? (
-                    <FlatList
+                    <FlashList
                         data={filteredPodcasts}
+                        estimatedItemSize={80}
                         keyExtractor={(item, index) => item.id || index.toString()}
                         renderItem={renderItem}
                         showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ rowGap: 25 }}
                     />
                 ) : (
                     <YStack ai='center' jc='center' f={1}>

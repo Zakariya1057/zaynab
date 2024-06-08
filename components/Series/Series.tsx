@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { FlatList, RefreshControl, ActivityIndicator } from "react-native";
+import { RefreshControl } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import SeriesEpisode from "./SeriesEpisode";
 import SeriesHeader from "./SeriesHeader";
@@ -11,8 +11,6 @@ import { useTheme } from "tamagui";
 import { useDownloads } from "@/hooks/useDownloads";
 import { State, usePlaybackState } from "react-native-track-player";
 import { FlashList } from "@shopify/flash-list";
-
-const PAGE_SIZE = 20; // Number of items to load per page
 
 interface Props {
     podcast: Podcast,
@@ -29,21 +27,6 @@ export default ({ podcast, play, playingEpisodeId }: Props) => {
     const podcastEpisodes = Object.values(podcast.episodes)
 
     const [refreshing, setRefreshing] = useState(false);
-    const [page, setPage] = useState(1);
-    const [data, setData] = useState(podcastEpisodes.slice(0, PAGE_SIZE));
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-    useEffect(() => {
-        setData(podcastEpisodes.slice(0, page * PAGE_SIZE));
-    }, [episodes, page]);
-
-    const loadMore = () => {
-        if (!isLoadingMore && data.length < podcastEpisodes.length) {
-            setIsLoadingMore(true);
-            setPage(prevPage => prevPage + 1);
-            setIsLoadingMore(false);
-        }
-    };
 
     const updateDownloadedEpisodes = async () => {
         await retryDownloads()
@@ -122,7 +105,7 @@ export default ({ podcast, play, playingEpisodeId }: Props) => {
                     tintColor={purple}
                 />
             }
-            estimatedItemSize={60}
+            estimatedItemSize={80}
             ListHeaderComponent={ListHeader}
             data={podcastEpisodes}
             renderItem={renderEpisodeItem}

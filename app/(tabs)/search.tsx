@@ -67,7 +67,7 @@ export default function App() {
                 {filteredPodcasts.length > 0 ? (
                     <FlashList
                         data={filteredPodcasts}
-                        estimatedItemSize={80}
+                        estimatedItemSize={100}
                         keyExtractor={(item, index) => item.id || index.toString()}
                         renderItem={renderItem}
                         showsVerticalScrollIndicator={false}

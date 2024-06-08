@@ -79,7 +79,7 @@ export default function App() {
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={purple} />
                 }
-                estimatedItemSize={80}
+                estimatedItemSize={100}
                 stickyHeaderIndices={stickyHeaderIndices}
             />
             <CompactAudioPlayer edges={[]} />

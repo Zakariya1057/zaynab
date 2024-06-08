@@ -241,7 +241,7 @@ const DownloadsList = ({downloads}) => {
                         tintColor={purple}
                     />
                 }
-                estimatedItemSize={60}
+                estimatedItemSize={80}
             />
         </>
     );

@@ -11,6 +11,7 @@ export const TrackTitle = ({ title }: { title: string }) => {
 
     useEffect(() => {
         setDisplay(false)
+        setIsMarqueeNeeded(true)
     }, [title]);
 
     const onTextLayout = (event: NativeSyntheticEvent<TextLayoutEventData>) => {
@@ -42,7 +43,7 @@ export const TrackTitle = ({ title }: { title: string }) => {
     };
 
     return (
-        <YStack onLayout={onContainerLayout} f={1} width="100%" opacity={display ? 1 : 0}>
+        <YStack onLayout={onContainerLayout} f={1} width="100%" opacity={display ? 1 : 0} maxHeight={50}>
             {isMarqueeNeeded ? (
                 <Marquee spacing={50} speed={0.6}>
                     <H4 textAlign="center" color={'$color'} numberOfLines={1} onTextLayout={onMarqueTextLayout}>

@@ -10,7 +10,6 @@ export default function SeriesHeader({ image, title, author, description, contin
     const theme = useTheme();
     const purple = theme.purple.get()
 
-    // TODO: Use Something ELSE
     const currentPodcastPlaying = track?.artist === title
 
     return (

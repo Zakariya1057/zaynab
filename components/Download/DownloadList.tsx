@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {RefreshControl, TouchableOpacity} from 'react-native';
 import {withDatabase} from '@nozbe/watermelondb/DatabaseProvider';
 import {withObservables} from '@nozbe/watermelondb/react';
@@ -146,17 +146,18 @@ const DownloadsList = ({downloads}) => {
         setTimeout(() => setRefreshing(false), 2000);
     }, []);
 
-    const updateHighlighted = (id, download) => {
-        setHighlighted(prev => ({...prev, [id]: download ? download : undefined}));
+    const updateHighlighted = (download: DownloadModel) => {
+        setHighlighted(prev => ({...prev, [download.id]: download ? download : undefined}));
     };
 
-    const highlightedItemsFound = Object.values(highlighted).some(download => download !== null);
+    const highlightedItemsFound = Object.values(highlighted).some(download => download !== undefined);
 
     const {startNextDownload} = useDownloadManager();
 
     const deleteHighlighted = async () => {
-        const validDownloads = Object.values(highlighted).filter((download): download is DownloadModel => download !== null);
+        const validDownloads = Object.values(highlighted).filter((download): download is DownloadModel => download !== undefined);
 
+        console.log(validDownloads)
         confirmDeleteDownloads(validDownloads, async () => {
             cancelHighlighted();
             await startNextDownload();
@@ -186,18 +187,10 @@ const DownloadsList = ({downloads}) => {
         const {podcastId, episodeId} = download;
 
         if (highlightedItemsFound) {
-            handleLongPress(download);
+            updateHighlighted(download)
         } else {
             router.push({pathname: "/notification.click/", params: {podcastId, episodeId}});
         }
-    };
-
-    const handleLongPress = (download: DownloadModel) => {
-        const { id } = download
-
-        setHighlighted((prev) => {
-            return { ...prev, ...{[download.id]: highlighted[id] ? !highlighted[id] : true}}
-        })
     };
 
     return (
@@ -221,15 +214,12 @@ const DownloadsList = ({downloads}) => {
                         );
                     }
 
-                    const highlight = highlighted[item.id]
-                    const backgroundColor = highlight ? 'rgba(189, 0, 0, 0.5)' : 'transparent';
-
                     return (
                         <TouchableOpacity
                             onPress={() => onPress(item)}
                             delayLongPress={100}
-                            onLongPress={() => handleLongPress(item)}
-                            style={{backgroundColor: backgroundColor}}
+                            onLongPress={() => updateHighlighted(item)}
+                            style={{backgroundColor: highlighted[item.id] ? 'rgba(189, 0, 0, 0.5)' : 'transparent'}}
                             activeOpacity={0.93}
                         >
                             <DownloadItem
@@ -239,7 +229,10 @@ const DownloadsList = ({downloads}) => {
                         </TouchableOpacity>
                     );
                 }}
-                keyExtractor={(item, index) => (typeof item === 'string' ? item : item.id) + index}
+                keyExtractor={(item, index) => {
+                    return typeof item === 'string' ? item : item.id
+                }}
+                extraData={highlighted}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}

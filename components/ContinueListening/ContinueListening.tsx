@@ -15,7 +15,7 @@ const ContinueListening: React.FC<{ episodes: EpisodeModel[] }> = ({episodes}) =
             data={episodes}
             estimatedItemSize={100}
             renderItem={({item}) => (
-                <View mr={'$4'}>
+                <View ml={'$3'}>
                     <DemoCard
                         title={item.title}
                         position={item.position}
